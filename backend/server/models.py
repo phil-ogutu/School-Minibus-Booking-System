@@ -92,6 +92,10 @@ class Route(db.Model):
     status = db.Column(Enum(RouteStatus), default=RouteStatus.pending)
     created_at = db.Column(db.DateTime(), server_default=func.now())
 
+    buses = db.relationship("Bus", backref="route", lazy=True)
+    
+
+
 #Location Table
 class Location(db.Model):
     __tablename__ = 'location'
