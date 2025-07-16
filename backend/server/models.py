@@ -79,7 +79,7 @@ class Driver(db.Model,SerializerMixin):
 
 
 #Owner Table
-class Owner(db.Model):
+class Owner(db.Model,SerializerMixin):
     __tablename__ = 'owners'
 
     id=db.Column(db.Integer, primary_key=True)
@@ -89,7 +89,7 @@ class Owner(db.Model):
     buses = db.relationship("Bus", backref="owner", lazy=True)
 
 #Route Table
-class Route(db.Model):
+class Route(db.Model,SerializerMixin):
     __tablename__ = 'routes'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -103,7 +103,7 @@ class Route(db.Model):
 
 
 #Location Table
-class Location(db.Model):
+class Location(db.Model,SerializerMixin):
     __tablename__ = 'locations'
 
     id = db.Column(db.Integer, primary_key=True)
