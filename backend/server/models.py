@@ -69,6 +69,9 @@ class Driver(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     driver_name = db.Column(db.String, nullable=False)
 
+    buses = db.relationship("Bus", backref="driver", lazy=True)
+
+
 #Owner Table
 class Owner(db.Model):
     __tablename__ = 'owners'
