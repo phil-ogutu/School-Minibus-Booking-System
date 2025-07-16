@@ -9,7 +9,8 @@ from service import (
     AuthService,
     UserService, DriverService, OwnerService,
     BookingService, 
-    BusService
+    BusService,
+    RouteService, LocationService
 )
 
 # Local imports
@@ -317,12 +318,75 @@ class BookingById(Resource):
                 response_body,
                 200
             )
-        return make_response(jsonify({'message':'user not found'}),404)  
+        return make_response(jsonify({'message':'booking not found'}),404)  
 
 class Routes(Resource):
-    pass
+    def get(self):
+        routes = RouteService.findAll()
+        return make_response(
+            jsonify(routes),
+            200        
+        )
+
+    def post(self):
+        data = request.get_json()
+        new_route = RouteService.createRoute(
+            start=data["start"],
+            end=data["end"]
+        )
+        db.session.add(new_route)
+        db.session.commit()
+
+        response=make_response(
+            {"driver":new_route,"message":"Route created successfully"},
+            201
+        )
+        return response
+
+class RouteById(Resource):
+    def get(self, id):
+        route = RouteService.findOne(id)
+        return make_response(
+            jsonify(route.to_dict()),
+            200        
+        )
+
+    def patch(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        route=RouteService.findOne(id)
+        if route:
+            for attr in data:
+                setattr(route,attr,data[attr])
+            db.session.commit()
+            response=make_response(
+                jsonify(route.to_dict()),
+                200
+            )
+            return response
+        return make_response(jsonify({'message':'route not found'}),404)
+    
+    def delete(self,id):  
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+              
+        route=RouteService.findOne(id)
+        if route:
+            db.session.delete(route)
+            db.session.commit()
+            response_body=jsonify({'Message':f'route : *{route.id}* is deleted successfully'})
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'route not found'}),404)  
 
 class Locations(Resource):
+    pass
+
+class LocationById(Resource):
     pass
 
 class Buses(Resource):
