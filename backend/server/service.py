@@ -1,5 +1,5 @@
 from config import bcrypt
-from models import db, User, Booking, Driver, Owner
+from models import db, User, Booking, Driver, Owner, Bus
 import jwt
 from flask import abort
 
@@ -114,7 +114,7 @@ class BookingService():
         if not parent:
             abort(400, description="Invalid parent_id: parent not found")
 
-        bus = BusService.findById(id=bus_id)
+        bus = BusService.findOne(id=bus_id)
         if not bus:
             abort(400, description="Invalid bus_id: bus not found")
         if not bus.status:
@@ -131,6 +131,49 @@ class BookingService():
             pickup=pickup,
             dropoff=dropoff,
             price=price
+        )
+    
+class BusService():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def findAll():
+        return [bus.to_dict() for bus in Bus.query.all()]
+    
+    @staticmethod
+    def findOne(id, plate):
+        if id:
+            return Bus.query.filter_by(id=id).first()
+        if plate:
+            return Bus.query.filter_by(plate=plate).first()
+        return None
+    
+    @classmethod
+    def createBus(cls,route_id, driver_id, title, owner_id, plate, capacity):
+        owner = OwnerService.findById(id=owner_id)
+        if not owner:
+            abort(400, description="Invalid owner_id: owner not found")
+
+        driver = DriverService.findById(id=driver_id)
+        if not driver:
+            abort(400, description="Invalid driver_id: driver not found")
+
+        route = RouteService.findById(id=route_id)
+        if not route:
+            abort(400, description="Invalid route_id: route not found")
+
+        bus = cls.findOne(plate=plate)
+        if bus:
+            abort(400, description="A bus with this plate number already exists")
+
+        return Bus(
+            route_id=route_id,
+            driver_id=driver_id,
+            title=title,
+            owner_id=owner_id,
+            plate=plate,
+            capacity=capacity
         )
     
     
