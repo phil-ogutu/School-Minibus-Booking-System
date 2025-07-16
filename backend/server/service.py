@@ -1,5 +1,5 @@
 from config import bcrypt
-from models import db, User, Booking
+from models import db, User, Booking, Driver
 import jwt
 
 class UserService():
@@ -33,6 +33,31 @@ class UserService():
     
     def findAll(self,):
         return [user.to_dict() for user in User.query.all()]
+    
+class DriverService():
+    def __init__(self):
+        pass
+
+    def findById(self,id):
+        if not id == None:
+            return Driver.query.filter_by(id=id).first()
+        return None
+    
+    def createDriver(self, driver_name ):
+        return Driver(
+            driver_name=driver_name
+        )
+    
+    def findAll(self,):
+        return [driver.to_dict() for driver in Driver.query.all()]
+    
+    def findOne(self,id,driver_name):
+        if id:
+            return Driver.query.filter_by(id=id).first()
+        elif driver_name:
+            return Driver.query.filter_by(driver_name=driver_name).first()
+        else:
+            return None
     
 class AuthService():
     def __init__(self):
