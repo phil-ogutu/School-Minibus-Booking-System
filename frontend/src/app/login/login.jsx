@@ -42,11 +42,11 @@ const Login = () => {
   const handleSignup = (e) => {
     e.preventDefault();
     // send the data to backend
-    alert(`Sign up functionality would be implemented here\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`);
+    alert(`Sign up functionality will be implemented here\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`);
   };
 
   const showForgotPassword = () => {
-    alert('Forgot password functionality would be implemented here');
+    alert('Forgot password functionality will be implemented here');
   };
 
   return (
