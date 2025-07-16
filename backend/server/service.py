@@ -54,4 +54,6 @@ class BookingService():
     def findAll(self):
         return [booking.to_dict() for booking in Booking.query.all()]
     
+    def findOne(self,id):
+        return Booking.query.filter_by(id=id).first()
     
