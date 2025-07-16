@@ -104,7 +104,7 @@ class Route(db.Model):
 
 #Location Table
 class Location(db.Model):
-    __tablename__ = 'location'
+    __tablename__ = 'locations'
 
     id = db.Column(db.Integer, primary_key=True)
     route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))
