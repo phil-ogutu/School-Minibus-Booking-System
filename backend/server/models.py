@@ -62,21 +62,21 @@ class Bus(db.Model):
     status = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
-#Driver 
+#Driver Table
 class Driver(db.Model):
     __tablename__ = 'drivers'
 
     id = db.Column(db.Integer, primary_key=True)
     driver_name = db.Column(db.String, nullable=False)
 
-#Owner
+#Owner Table
 class Owner(db.Model):
     __tablename__ = 'owners'
 
     id=db.Column(db.Integer, primary_key=True)
     owner_name=db.Column(db.String, nullable=False)
 
-#Route
+#Route Table
 class Route(db.Model):
     __tablename__ = 'routes'
 
@@ -86,7 +86,7 @@ class Route(db.Model):
     status = db.Column(Enum(RouteStatus), default=RouteStatus.pending)
     created_at = db.Column(db.DateTime(), server_default=func.now())
 
-#Location
+#Location Table
 class Location(db.Model):
     __tablename__ = 'location'
 
