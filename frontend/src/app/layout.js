@@ -1,6 +1,6 @@
 // Here is the Next.js App Router pages
 // Root layout
-import "./globals.css";
+import "../styles/globals.css";
 
 export const metadata = {
   title: "SkoolaBus",
