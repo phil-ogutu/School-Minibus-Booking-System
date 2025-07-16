@@ -5,7 +5,7 @@
 # Remote library imports
 from flask import request, make_response, jsonify
 from flask_restful import Resource
-from service import UserService, BookingService, AuthService
+from service import UserService, DriverService, BookingService, AuthService
 
 # Local imports
 from config import app, db, api
@@ -85,6 +85,95 @@ class Users(Resource):
             200        
         )
 
+class Drivers(Resource):
+    def get(self):
+        drivers = DriverService.findAll()
+        return make_response(
+            jsonify(drivers),
+            200        
+        )
+    def post(self):
+        data=request.get_json()
+        driver_name = data['driver_name']
+        if driver_name == None:
+            return make_response("Required Inputs are required", 400)
+        
+        new_driver = DriverService.createDriver(driver_name)
+        db.session.add(new_driver)
+        db.session.commit()
+        response=make_response(
+            {"driver":new_driver,"message":"Driver created successfully"},
+            201
+        )
+        return response
+    
+class DriverById(Resource):
+    def get(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        driver=DriverService.findById(id)
+        if driver:
+            response=make_response(
+                jsonify(driver),
+                200
+            )
+  
+            return response
+        return make_response(jsonify({'message':'driver not found'}),404)
+    
+    def post(self):
+        data=request.get_json()
+        action=data['action']
+        owner_id=data['owner_id']
+        bus_id=data['bus_id']
+
+        # check if bus exists
+        # check if owner exists 
+        if action == 'assign':
+            # assign to bus by owner
+            pass
+        elif action == 'release':
+            pass
+        else:
+            pass
+
+    def patch(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        driver=DriverService.findById(id)
+        if driver:
+            for attr in data:
+                setattr(driver,attr,data[attr])
+            db.session.commit()
+            response=make_response(
+                jsonify(driver.to_dict()),
+                200
+            )
+            return response
+        return make_response(jsonify({'message':'driver not found'}),404)
+    
+    def delete(self,id):  
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+              
+        driver=DriverService.findById(id)
+        if driver:
+            db.session.delete(driver)
+            db.session.commit()
+            response_body=jsonify({'Message':f'driver : *{driver.driver_name}* is deleted successfully'})
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'user not found'}),404)
+
+
+class Owners(Resource):
+    pass
+
 class Bookings(Resource):
     def get(self):
         bookings = BookingService.findAll()
@@ -152,12 +241,6 @@ class Locations(Resource):
 
 
 class Buses(Resource):
-    pass
-
-class Drivers(Resource):
-    pass
-
-class Owners(Resource):
     pass
 
 @app.route('/')
