@@ -1,5 +1,5 @@
 from config import bcrypt
-from models import db, User, Booking, Driver, Owner, Bus
+from models import db, User, Booking, Driver, Owner, Bus, Route
 import jwt
 from flask import abort
 
@@ -176,4 +176,40 @@ class BusService():
             capacity=capacity
         )
     
+class RouteService():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def findAll():
+        return [route.to_dict() for route in Route.query.all()]
     
+    @staticmethod
+    def findOne(id=None, start=None, end=None):
+        if id:
+            return Route.query.filter_by(id=id).first()
+        if start and end:
+            return Route.query.filter_by(start=start, end=end).first()
+        if start:
+            return Route.query.filter_by(start=start).first()
+        if end:
+            return Route.query.filter_by(end=end).first()
+        return None
+    
+    
+    @classmethod
+    def createRoute(cls,start, end ):
+        if not start or not end:
+            abort(400, description="Missing required fields: 'start' and 'end'")
+
+        existing_route = cls.findOne(
+            id=None, plate=None,
+            start=start, end=end
+        )
+        if existing_route:
+            abort(400, description="Route with the same start and end already exists")
+            
+        return Route(
+            start=start,
+            end=end
+        )
