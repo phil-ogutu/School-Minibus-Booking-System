@@ -1,5 +1,5 @@
 from config import bcrypt
-from models import db, User, Booking, Driver, Owner, Bus, Route
+from models import db, User, Booking, Driver, Owner, Bus, Route, Location
 import jwt
 from flask import abort
 
@@ -208,8 +208,49 @@ class RouteService():
         )
         if existing_route:
             abort(400, description="Route with the same start and end already exists")
-            
+
         return Route(
             start=start,
             end=end
+        )
+    
+class LocationService():
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def findAll():
+        return [location.to_dict() for location in Location.query.all()]
+    
+    @staticmethod
+    def findOne(id=None, location_name=None, latitude=None, longitude=None):
+        if id:
+            return Location.query.filter_by(id=id).first()
+        if location_name:
+            return Location.query.filter_by(location_name=location_name).first()
+        if latitude and longitude:
+            return Location.query.filter_by(latitude=latitude, longitude=longitude).first()
+        if latitude:
+            return Location.query.filter_by(latitude=latitude).first()
+        if longitude:
+            return Location.query.filter_by(longitude=longitude).first()
+        return None
+    
+    
+    @classmethod
+    def createLocation(cls,location_name, latitude, longitude ):
+        if not location_name or not latitude or not longitude:
+            abort(400, description="Missing required fields: 'location_name' and 'latitude' and 'longitude'")
+
+        existing_location = cls.findOne(
+            id=None, location_name=None,
+            latitude=latitude, longitude=longitude
+        )
+        if existing_location:
+            abort(400, description="location with the same longitude and latitude already exists")
+            
+        return Location(
+            latitude=latitude,
+            longitude=longitude,
+            location_name=location_name
         )
