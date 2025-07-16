@@ -35,13 +35,13 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // send the data to your backend
+    // send the data to backend
     alert('Login functionality will be implemented here\nEmail: ' + loginData.email);
   };
 
   const handleSignup = (e) => {
     e.preventDefault();
-    // send the data to your backend
+    // send the data to backend
     alert(`Sign up functionality would be implemented here\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`);
   };
 
