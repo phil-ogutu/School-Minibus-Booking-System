@@ -65,6 +65,9 @@ class Bus(db.Model):
     status = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
+    bookings = db.relationship("Booking", backref="bus", lazy=True)
+
+
 #Driver Table
 class Driver(db.Model):
     __tablename__ = 'drivers'
