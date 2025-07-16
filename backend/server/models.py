@@ -84,7 +84,13 @@ class Route(db.Model):
     status = db.Column(Enum(RouteStatus), default=RouteStatus.pending)
     created_at = db.Column(db.DateTime(), server_default=func.now())
 
+class Location(db.Model):
+    __tablename__ = 'location'
 
+    id = db.Column(db.Integer, primary_key=True)
+    route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))
+    location_name = db.Column(db.String, nullable=False)
+    GPS = db.Column(db.String)
 
 
 
