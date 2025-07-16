@@ -112,7 +112,7 @@ class Location(db.Model,SerializerMixin):
     
 
     latitude = db.Column(db.Float, nullable=False)
-    
+    longitude = db.Column(db.Float, nullable=False)
 
 
 
