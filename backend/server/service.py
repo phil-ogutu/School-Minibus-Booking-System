@@ -1,6 +1,7 @@
 from config import bcrypt
 from models import db, User, Booking, Driver, Owner
 import jwt
+from flask import abort
 
 class UserService():
     def __init__(self):
@@ -107,7 +108,21 @@ class BookingService():
     def findOne(self,id):
         return Booking.query.filter_by(id=id).first()
     
+    @staticmethod
     def createBooking(self, parent_id, bus_id, title, child_name, pickup, dropoff, price):
+        parent = UserService.findById(id=parent_id)
+        if not parent:
+            abort(400, description="Invalid parent_id: parent not found")
+
+        bus = BusService.findById(id=bus_id)
+        if not bus:
+            abort(400, description="Invalid bus_id: bus not found")
+        if not bus.status:
+            abort(400, description="Bus is not avaible for booking")
+
+        if not isinstance(price, float):
+            abort(400, description="Invalid Price Input")
+
         return Booking(
             parent_id=parent_id,
             bus_id=bus_id,

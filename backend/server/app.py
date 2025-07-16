@@ -253,6 +253,7 @@ class Bookings(Resource):
     
     def post(self):
         data = request.get_json()
+        # validate parent_id, bus_id, pick_up, drop_off
         new_booking = BookingService.createBooking(
             parent_id=data["parent_id"],
             bus_id=data["bus_id"],
