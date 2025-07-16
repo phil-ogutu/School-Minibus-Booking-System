@@ -35,18 +35,18 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    alert('Login functionality will be implemented here!\nEmail: ' + loginData.email);
+    // send the data to your backend
+    alert('Login functionality will be implemented here\nEmail: ' + loginData.email);
   };
 
   const handleSignup = (e) => {
     e.preventDefault();
-    // Here you would send the data to your backend
-    alert(`Sign up functionality would be implemented here!\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`);
+    // send the data to your backend
+    alert(`Sign up functionality would be implemented here\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`);
   };
 
   const showForgotPassword = () => {
-    alert('Forgot password functionality would be implemented here!');
+    alert('Forgot password functionality would be implemented here');
   };
 
   return (
