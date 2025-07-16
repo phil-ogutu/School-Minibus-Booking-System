@@ -61,3 +61,11 @@ class Bus(db.Model):
     capacity = db.Column(db.String)
     status = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime(), server_default= func.now())
+
+class Driver(db.Model):
+    __tablename__ = 'drivers'
+
+    id = db.Column(db.Integer, primary_key=True)
+    driver_name = db.Column(db.String, nullable=False)
+
+
