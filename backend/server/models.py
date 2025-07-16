@@ -53,7 +53,7 @@ class Booking(db.Model,SerializerMixin):
     updated_at = db.Column(db.DateTime(), onupdate=func.now())
 
 # Buses Table
-class Bus(db.Model):
+class Bus(db.Model,SerializerMixin):
     __tablename__ = 'buses'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -69,7 +69,7 @@ class Bus(db.Model):
 
 
 #Driver Table
-class Driver(db.Model):
+class Driver(db.Model,SerializerMixin):
     __tablename__ = 'drivers'
 
     id = db.Column(db.Integer, primary_key=True)
