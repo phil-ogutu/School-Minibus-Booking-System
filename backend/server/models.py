@@ -78,6 +78,9 @@ class Owner(db.Model):
 
     id=db.Column(db.Integer, primary_key=True)
     owner_name=db.Column(db.String, nullable=False)
+    
+
+    buses = db.relationship("Bus", backref="owner", lazy=True)
 
 #Route Table
 class Route(db.Model):
