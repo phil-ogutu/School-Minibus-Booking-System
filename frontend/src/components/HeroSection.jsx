@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
+import Button from "./Button";
 
 const HeroSection = () => {
   return (
@@ -10,11 +10,9 @@ const HeroSection = () => {
           Affordable, Reliable School Transport for Every Family.
         </h2>
         <div className="flex justify-center mb-8">
-          <Link href="/login">
-            <button className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded">
-              Book your ride
-            </button>
-          </Link>
+          <Button href="/login" variant="secondary">
+            Book your ride
+          </Button>
         </div>
       </div>
 
@@ -29,15 +27,14 @@ const HeroSection = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-        <div className="bg-white shadow-md rounded p-4">
-          <h3 className="font-semibold">Safe Rides</h3>
-        </div>
-        <div className="bg-white shadow-md rounded p-4">
-          <h3 className="font-semibold">Real-Time Tracking</h3>
-        </div>
-        <div className="bg-white shadow-md rounded p-4">
-          <h3 className="font-semibold">Easy Booking</h3>
-        </div>
+        {["Safe Rides", "Real-Time Tracking", "Easy Booking"].map((feature) => (
+          <div
+            key={feature}
+            className="bg-white shadow-md rounded p-4 font-semibold"
+          >
+            {feature}
+          </div>
+        ))}
       </div>
     </section>
   );
