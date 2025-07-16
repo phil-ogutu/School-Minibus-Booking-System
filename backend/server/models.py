@@ -33,6 +33,9 @@ class User(db.Model):
     role = db.Column(Enum(UserRole), nullable=False)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
+    bookings = db.relationship("Booking", backref="parent", lazy=True)
+
+
 # Bookings Table
 class Booking(db.Model):
     __tablename__ = 'bookings'
