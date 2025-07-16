@@ -252,7 +252,23 @@ class Bookings(Resource):
         )
     
     def post(self):
-        pass
+        data = request.get_json()
+        new_booking = BookingService.createBooking(
+            parent_id=data["parent_id"],
+            bus_id=data["bus_id"],
+            title=data["title"],
+            child_name=data["child_name"],
+            pickup=data["pickup"],
+            dropoff=data["dropoff"],
+            price=data["price"]
+        )
+        db.session.add(new_booking)
+        db.session.commit()
+        response=make_response(
+            {"driver":new_booking,"message":"Booking created successfully"},
+            201
+        )
+        return response
 
 class BookingById(Resource):
     def get(self,id):
@@ -306,8 +322,6 @@ class Routes(Resource):
 
 class Locations(Resource):
     pass
-
-
 
 class Buses(Resource):
     pass
