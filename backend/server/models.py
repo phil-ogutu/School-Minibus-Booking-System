@@ -93,7 +93,7 @@ class Route(db.Model):
     created_at = db.Column(db.DateTime(), server_default=func.now())
 
     buses = db.relationship("Bus", backref="route", lazy=True)
-    
+    locations = db.relationship("Location", backref="route", lazy=True)
 
 
 #Location Table
