@@ -69,11 +69,13 @@ class Driver(db.Model):
     driver_name = db.Column(db.String, nullable=False)
 
 
-class owner(db.Model):
+class Owner(db.Model):
     __tablename__ = 'owners'
 
     id=db.Column(db.Integer, primary_key=True)
     owner_name=db.Column(db.String, nullable=False)
+
+
 
 
 
