@@ -1,5 +1,5 @@
 from config import bcrypt
-from models import db, User, Booking, Driver
+from models import db, User, Booking, Driver, Owner
 import jwt
 
 class UserService():
@@ -56,6 +56,31 @@ class DriverService():
             return Driver.query.filter_by(id=id).first()
         elif driver_name:
             return Driver.query.filter_by(driver_name=driver_name).first()
+        else:
+            return None
+        
+class OwnerService():
+    def __init__(self):
+        pass
+
+    def findById(self,id):
+        if not id == None:
+            return Owner.query.filter_by(id=id).first()
+        return None
+    
+    def createOwner(self, owner_name ):
+        return Owner(
+            owner_name=owner_name
+        )
+    
+    def findAll(self,):
+        return [owner.to_dict() for owner in Owner.query.all()]
+    
+    def findOne(self,id,owner_name):
+        if id:
+            return Owner.query.filter_by(id=id).first()
+        elif owner_name:
+            return Owner.query.filter_by(owner_name=owner_name).first()
         else:
             return None
     
