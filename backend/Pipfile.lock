@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2d8bcee0dc2890d90c35f7c852e75a98c94ba81964865f0325a200cfce46a663"
+            "sha256": "b0105c84105d0bc59a91bc4cfb312c7859ccb8f64c56a1b178ae78434f0eafe7"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_full_version": "3.12.3"
+            "python_full_version": "3.12"
         },
         "sources": [
             {
@@ -523,7 +523,6 @@
                 "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f"
             ],
             "index": "pypi",
-            "markers": "sys_platform != 'win32'",
             "version": "==4.9.0"
         },
         "pickleshare": {
