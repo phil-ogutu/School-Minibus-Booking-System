@@ -384,10 +384,68 @@ class RouteById(Resource):
         return make_response(jsonify({'message':'route not found'}),404)  
 
 class Locations(Resource):
-    pass
+    def get(self):
+        locations = LocationService.findAll()
+        return make_response(
+            jsonify(locations),
+            200        
+        )
+
+    def post(self):
+        data = request.get_json()
+        location_name = data.get("location_name")
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
+
+        new_location = LocationService.createLocation(location_name, latitude, longitude)
+        db.session.add(new_location)
+        db.session.commit()
+
+        response=make_response(
+            {"driver":new_location,"message":"Location created successfully"},
+            201
+        )
+        return response
 
 class LocationById(Resource):
-    pass
+    def get(self, id):
+        location = LocationService.findOne(id)
+        return make_response(
+            jsonify(location),
+            200        
+        )
+
+    def patch(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        location = LocationService.findOne(id)
+        if location:
+            for attr in data:
+                setattr(location,attr,data[attr])
+            db.session.commit()
+            response=make_response(
+                jsonify(location.to_dict()),
+                200
+            )
+            return response
+        return make_response(jsonify({'message':'location not found'}),404)
+    
+    def delete(self,id):  
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+              
+        location = LocationService.findOne(id)
+        if location:
+            db.session.delete(location)
+            db.session.commit()
+            response_body=jsonify({'Message':f'location : *{location.id}* is deleted successfully'})
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'location not found'}),404)  
 
 class Buses(Resource):
     def post(self):
