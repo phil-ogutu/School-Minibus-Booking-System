@@ -107,3 +107,15 @@ class BookingService():
     def findOne(self,id):
         return Booking.query.filter_by(id=id).first()
     
+    def createBooking(self, parent_id, bus_id, title, child_name, pickup, dropoff, price):
+        return Booking(
+            parent_id=parent_id,
+            bus_id=bus_id,
+            title=title,
+            child_name=child_name,
+            pickup=pickup,
+            dropoff=dropoff,
+            price=price
+        )
+    
+    
