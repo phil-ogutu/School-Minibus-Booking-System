@@ -61,7 +61,7 @@ class Bus(db.Model):
     driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))  # FK for driver
     owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))  # FK for owner
     plate = db.Column(db.String)
-    capacity = db.Column(db.String)
+    capacity = db.Column(db.Integer)
     status = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
