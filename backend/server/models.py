@@ -21,7 +21,7 @@ class RouteStatus(enum.Enum):
 # Models go here!
 
 # Users Table
-class User(db.Model):
+class User(db.Model,SerializerMixin):
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -37,7 +37,7 @@ class User(db.Model):
 
 
 # Bookings Table
-class Booking(db.Model):
+class Booking(db.Model,SerializerMixin):
     __tablename__ = 'bookings'
     
     id = db.Column(db.Integer, primary_key=True)
