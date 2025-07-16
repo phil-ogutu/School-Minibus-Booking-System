@@ -109,7 +109,10 @@ class Location(db.Model,SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))
     location_name = db.Column(db.String, nullable=False)
-    GPS = db.Column(db.String)
+    
+
+    latitude = db.Column(db.Float, nullable=False)
+    
 
 
 
