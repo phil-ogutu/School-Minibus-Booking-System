@@ -41,7 +41,7 @@ const Login = () => {
 
   const handleSignup = (e) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
+    // Here you would send the data to your backend
     alert(`Sign up functionality would be implemented here!\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`);
   };
 
