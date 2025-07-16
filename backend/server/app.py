@@ -5,7 +5,11 @@
 # Remote library imports
 from flask import request, make_response, jsonify
 from flask_restful import Resource
-from service import UserService, DriverService, BookingService, AuthService
+from service import (
+    AuthService,
+    UserService, DriverService, OwnerService,
+    BookingService, 
+)
 
 # Local imports
 from config import app, db, api
@@ -170,9 +174,74 @@ class DriverById(Resource):
             )
         return make_response(jsonify({'message':'user not found'}),404)
 
-
 class Owners(Resource):
-    pass
+    def get(self):
+        owners = OwnerService.findAll()
+        return make_response(
+            jsonify(owners),
+            200        
+        )
+    def post(self):
+        data=request.get_json()
+        owner_name = data['owner_name']
+        if owner_name == None:
+            return make_response("Required Inputs are required", 400)
+        
+        new_owner = OwnerService.createOwner(owner_name)
+        db.session.add(new_owner)
+        db.session.commit()
+        response=make_response(
+            {"owner":new_owner,"message":"owner created successfully"},
+            201
+        )
+        return response
+    
+class OwnerById(Resource):
+    def get(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        owner=OwnerService.findById(id)
+        if owner:
+            response=make_response(
+                jsonify(owner),
+                200
+            )
+  
+            return response
+        return make_response(jsonify({'message':'owner not found'}),404)
+
+    def patch(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        owner=OwnerService.findById(id)
+        if owner:
+            for attr in data:
+                setattr(owner,attr,data[attr])
+            db.session.commit()
+            response=make_response(
+                jsonify(owner.to_dict()),
+                200
+            )
+            return response
+        return make_response(jsonify({'message':'Owner not found'}),404)
+    
+    def delete(self,id):  
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+              
+        owner=OwnerService.findById(id)
+        if owner:
+            db.session.delete(owner)
+            db.session.commit()
+            response_body=jsonify({'Message':f'owner : *{owner.owner_name}* is deleted successfully'})
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'owner not found'}),404)
 
 class Bookings(Resource):
     def get(self):
