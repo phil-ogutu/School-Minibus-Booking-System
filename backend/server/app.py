@@ -9,6 +9,7 @@ from service import (
     AuthService,
     UserService, DriverService, OwnerService,
     BookingService, 
+    BusService
 )
 
 # Local imports
@@ -325,7 +326,80 @@ class Locations(Resource):
     pass
 
 class Buses(Resource):
-    pass
+    def post(self):
+        data = request.get_json()
+
+        new_bus = BusService.createBus(
+            route_id=data["route_id"],
+            driver_id=data["driver_id"],
+            title=data["title"],
+            owner_id=data["owner_id"],
+            plate=data["plate"],
+            capacity=data["capacity"]
+        )
+
+        db.session.add(new_bus)
+        db.session.commit()
+        response=make_response(
+            {"bus":new_bus,"message":"Bus created successfully"},
+            201
+        )
+        return response
+
+    def get(self):
+        buses = BusService.findAll()
+        return make_response(
+            jsonify(buses),
+            200        
+        )
+    
+class BusById(Resource):
+    def get(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        bus=BusService.findOne(id=id)
+        if bus:
+            response=make_response(
+                jsonify(bus),
+                200
+            )
+  
+            return response
+        return make_response(jsonify({'message':'bus not found'}),404)
+    
+    def patch(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        bus=BusService.findOne(id)
+        if bus:
+            for attr in data:
+                setattr(bus,attr,data[attr])
+            db.session.commit()
+            response=make_response(
+                jsonify(bus.to_dict()),
+                200
+            )
+            return response
+        return make_response(jsonify({'message':'bus not found'}),404)
+    
+    def delete(self,id):  
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+              
+        bus=BusService.findOne(id)
+        if bus:
+            db.session.delete(bus)
+            db.session.commit()
+            response_body=jsonify({'Message':f'bus : *{bus.id}* is deleted successfully'})
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'user not found'}),404)  
+
 
 @app.route('/')
 def index():
