@@ -75,6 +75,15 @@ class Owner(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     owner_name=db.Column(db.String, nullable=False)
 
+class Route(db.Model):
+    __tablename__ = 'routes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    start = db.Column(db.String, nullable=False)
+    end = db.Column(db.String, nullable=False)
+    status = db.Column(Enum(RouteStatus), default=RouteStatus.pending)
+    created_at = db.Column(db.DateTime(), server_default=func.now())
+
 
 
 
