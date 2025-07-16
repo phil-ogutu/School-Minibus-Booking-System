@@ -5,7 +5,7 @@
 # Remote library imports
 from flask import request, make_response, jsonify
 from flask_restful import Resource
-from service import UserService, AuthService
+from service import UserService, BookingService, AuthService
 
 # Local imports
 from config import app, db, api
@@ -87,15 +87,61 @@ class Users(Resource):
 
 class Bookings(Resource):
     def get(self):
-        users = UserService.findAll()
+        bookings = BookingService.findAll()
         return make_response(
-            jsonify(users),
+            jsonify(bookings),
             200        
         )
     
     def post(self):
+        pass
 
-
+class BookingById(Resource):
+    def get(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        booking=BookingService.findOne(id)
+        if booking:
+            response=make_response(
+                jsonify(booking),
+                200
+            )
+  
+            return response
+        return make_response(jsonify({'message':'booking not found'}),404)
+    
+    def patch(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        booking=BookingService.findOne(id)
+        if booking:
+            for attr in data:
+                setattr(booking,attr,data[attr])
+            db.session.commit()
+            response=make_response(
+                jsonify(booking.to_dict()),
+                200
+            )
+            return response
+        return make_response(jsonify({'message':'booking not found'}),404)
+    
+    def delete(self,id):  
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+              
+        booking=BookingService.findOne(id)
+        if booking:
+            db.session.delete(booking)
+            db.session.commit()
+            response_body=jsonify({'Message':f'Booking : *{booking.id}* is deleted successfully'})
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'user not found'}),404)  
 
 class Routes(Resource):
     pass
@@ -103,8 +149,7 @@ class Routes(Resource):
 class Locations(Resource):
     pass
 
-class BookingById(Resource):
-    pass
+
 
 class Buses(Resource):
     pass
