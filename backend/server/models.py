@@ -60,7 +60,7 @@ class Bus(db.Model,SerializerMixin):
     route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))  # FK for route
     driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))  # FK for driver
     owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))  # FK for owner
-    plate = db.Column(db.String)
+    plate = db.Column(db.String, unique=True)
     capacity = db.Column(db.Integer)
     status = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime(), server_default= func.now())
@@ -109,7 +109,10 @@ class Location(db.Model,SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))
     location_name = db.Column(db.String, nullable=False)
-    GPS = db.Column(db.String)
+    
+
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
 
 
 
