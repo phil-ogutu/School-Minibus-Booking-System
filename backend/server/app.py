@@ -250,6 +250,7 @@ class Owners(Resource):
             jsonify(owners),
             200        
         )
+    
     def post(self):
         data=request.get_json()
         owner_name = data['owner_name']
@@ -260,7 +261,7 @@ class Owners(Resource):
         db.session.add(new_owner)
         db.session.commit()
         response=make_response(
-            {"owner":new_owner,"message":"owner created successfully"},
+            {"owner":new_owner.to_dict(),"message":"owner created successfully"},
             201
         )
         return response
@@ -273,7 +274,7 @@ class OwnerById(Resource):
         owner=OwnerService.findById(id)
         if owner:
             response=make_response(
-                jsonify(owner),
+                jsonify(owner.to_dict()),
                 200
             )
   
