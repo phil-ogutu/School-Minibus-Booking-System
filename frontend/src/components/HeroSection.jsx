@@ -32,7 +32,7 @@ const HeroSection = () => {
 
         {/* Call to Action button */}
         <div className="mb-16">
-          <Button href="/login" variant="primary" size="lg">
+          <Button href="/bookings" variant="primary" size="lg">
             Book your ride
           </Button>
         </div>

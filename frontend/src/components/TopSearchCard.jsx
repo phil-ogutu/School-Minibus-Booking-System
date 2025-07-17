@@ -23,7 +23,7 @@ const TopSearchCard = ({pickup, dropoff, time, price }) => {
       <div className="w-full flex items-center justify-between ">
         <h1 className="text-xl text-neutral-700 font-semibold">{price}</h1>
 
-        <button className="w-fit px-5 py-1.5 h-full bg-green-600 hover:bg-green-400 rounded-xl">
+        <button className="w-fit px-5 py-1.5 h-full bg-yellow-500 hover:bg-yellow-600 rounded-xl">
           Book Now
         </button>
       </div>
