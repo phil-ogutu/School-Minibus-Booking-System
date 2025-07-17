@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import "./login.css";
 import Image from "next/image";
@@ -69,7 +70,9 @@ const Login = () => {
       <div className="left-panel">
         <div className="auth-container">
           <div className="logo">
+
             <h1>🚌 Skoola Bus</h1>
+
             <p>Safe & Reliable School Transport</p>
           </div>
 

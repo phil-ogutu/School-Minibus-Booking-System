@@ -1,6 +1,7 @@
 // Here is the Next.js App Router pages
 // Root layout
 import "../styles/globals.css";
+import { Providers } from "./providers"; // NextAuth wrapper
 
 export const metadata = {
   title: "SkoolaBus",
@@ -10,7 +11,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
+// This is the root layout for the Next.js application
+// It wraps the entire application with the Providers component, which includes session management.
+// The "use client" directive indicates that this component should be rendered on the client side.
+// The metadata object defines the title and description for the application, which can be used for SEO purposes.
+// The global styles are imported from the globals.css file.
