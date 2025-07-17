@@ -406,14 +406,14 @@ class Routes(Resource):
         db.session.commit()
 
         response=make_response(
-            {"driver":new_route,"message":"Route created successfully"},
+            {"route":new_route.to_dict(),"message":"Route created successfully"},
             201
         )
         return response
 
 class RouteById(Resource):
     def get(self, id):
-        route = RouteService.findOne(id)
+        route = RouteService.findById(id)
         return make_response(
             jsonify(route.to_dict()),
             200        
@@ -424,7 +424,7 @@ class RouteById(Resource):
             return make_response(jsonify({'message':'missing id parameter'}),400)
         
         data=request.get_json()
-        route=RouteService.findOne(id)
+        route=RouteService.findById(id)
         if route:
             for attr in data:
                 setattr(route,attr,data[attr])
@@ -440,7 +440,7 @@ class RouteById(Resource):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
               
-        route=RouteService.findOne(id)
+        route=RouteService.findById(id)
         if route:
             db.session.delete(route)
             db.session.commit()

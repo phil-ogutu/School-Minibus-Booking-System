@@ -224,8 +224,7 @@ class RouteService():
             abort(400, description="Missing required fields: 'start' and 'end'")
 
         existing_route = cls.findOne(
-            id=None, plate=None,
-            start=start, end=end
+            id=None, start=start, end=end
         )
         if existing_route:
             abort(400, description="Route with the same start and end already exists")
