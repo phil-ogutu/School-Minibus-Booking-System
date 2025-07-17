@@ -39,23 +39,24 @@ class UserService():
         return [user.to_dict() for user in User.query.all()]
     
 class DriverService():
-    def __init__(self):
-        pass
-
-    def findById(self,id):
+    @staticmethod
+    def findById(id):
         if not id == None:
             return Driver.query.filter_by(id=id).first()
         return None
     
-    def createDriver(self, driver_name ):
+    @staticmethod
+    def createDriver(driver_name ):
         return Driver(
             driver_name=driver_name
         )
     
-    def findAll(self,):
+    @staticmethod
+    def findAll():
         return [driver.to_dict() for driver in Driver.query.all()]
     
-    def findOne(self,id,driver_name):
+    @staticmethod
+    def findOne(id,driver_name):
         if id:
             return Driver.query.filter_by(id=id).first()
         elif driver_name:
@@ -64,23 +65,24 @@ class DriverService():
             return None
         
 class OwnerService():
-    def __init__(self):
-        pass
-
-    def findById(self,id):
+    @staticmethod
+    def findById(id):
         if not id == None:
             return Owner.query.filter_by(id=id).first()
         return None
     
-    def createOwner(self, owner_name ):
+    @staticmethod
+    def createOwner( owner_name ):
         return Owner(
             owner_name=owner_name
         )
     
-    def findAll(self,):
+    @staticmethod
+    def findAll():
         return [owner.to_dict() for owner in Owner.query.all()]
     
-    def findOne(self,id,owner_name):
+    @staticmethod
+    def findOne(id,owner_name):
         if id:
             return Owner.query.filter_by(id=id).first()
         elif owner_name:
@@ -145,11 +147,17 @@ class BusService():
         return [bus.to_dict() for bus in Bus.query.all()]
     
     @staticmethod
-    def findOne(id, plate):
+    def findOne(id=None, plate=None):
         if id:
             return Bus.query.filter_by(id=id).first()
         if plate:
             return Bus.query.filter_by(plate=plate).first()
+        return None
+    
+    @staticmethod
+    def findById(id):
+        if id:
+            return Bus.query.filter_by(id=id).first()
         return None
     
     @classmethod
