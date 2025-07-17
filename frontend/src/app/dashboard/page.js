@@ -1,25 +1,24 @@
 // here is the Parent dashboard page
-"use client";
-import Link from "next/link";
+import DashboardSidebar from "@/components/DashboardSidebar";
 
-const DashboardSidebar = () => {
+export default function AdminDashboard() {
   return (
-    <aside className="w-64 h-screen bg-yellow-500 text-white flex flex-col p-6">
-      <h2 className="text-2xl font-bold mb-8">SkoolaBus Admin</h2>
-      <nav className="space-y-4">
-        <Link href="/admin">Dashboard</Link>
-        <Link href="/admin/buses">Manage Buses</Link>
-        <Link href="/admin/routes">Manage Routes</Link>
-        <Link href="/admin/bookings">View Bookings</Link>
-        <Link href="/admin/parents">Parents & Children</Link>
-      </nav>
-      <div className="mt-auto">
-        <button className="bg-red-600 hover:bg-red-700 rounded px-4 py-2">
-          Logout
-        </button>
-      </div>
-    </aside>
+    <div className="flex">
+      <DashboardSidebar />
+      <main className="flex-1 p-10">
+        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {["Total Buses", "Total Routes", "Total Bookings"].map((item) => (
+            <div
+              key={item}
+              className="bg-white border rounded shadow p-6 text-center"
+            >
+              <p className="text-gray-500">{item}</p>
+              <p className="text-2xl font-bold">0</p>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
   );
-};
-
-export default DashboardSidebar;
+}
