@@ -104,13 +104,12 @@ class AuthService():
         return jwt.encode(body, 'secret', algorithm="HS256")
     
 class BookingService():
-    def __init__(self):
-        pass
-
-    def findAll(self):
+    @staticmethod
+    def findAll():
         return [booking.to_dict() for booking in Booking.query.all()]
     
-    def findOne(self,id):
+    @staticmethod
+    def findOne(id):
         return Booking.query.filter_by(id=id).first()
     
     @staticmethod
@@ -122,6 +121,7 @@ class BookingService():
         bus = BusService.findOne(id=bus_id)
         if not bus:
             abort(400, description="Invalid bus_id: bus not found")
+            
         if not bus.status:
             abort(400, description="Bus is not avaible for booking")
 
@@ -135,7 +135,7 @@ class BookingService():
             child_name=child_name,
             pickup=pickup,
             dropoff=dropoff,
-            price=price
+            price=price,
         )
     
 class BusService():
@@ -187,7 +187,8 @@ class BusService():
             driver_id=driver_id,
             owner_id=owner_id,
             plate=plate,
-            capacity=capacity
+            capacity=capacity,
+            status=True
         )
     
 class RouteService():

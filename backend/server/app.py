@@ -336,7 +336,7 @@ class Bookings(Resource):
         db.session.add(new_booking)
         db.session.commit()
         response=make_response(
-            {"driver":new_booking,"message":"Booking created successfully"},
+            {"driver":new_booking.to_dict(),"message":"Booking created successfully"},
             201
         )
         return response
@@ -349,7 +349,7 @@ class BookingById(Resource):
         booking=BookingService.findOne(id)
         if booking:
             response=make_response(
-                jsonify(booking),
+                jsonify(booking.to_dict()),
                 200
             )
   
