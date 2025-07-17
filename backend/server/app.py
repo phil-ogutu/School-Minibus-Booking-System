@@ -470,7 +470,7 @@ class Locations(Resource):
         db.session.commit()
 
         response=make_response(
-            {"driver":new_location,"message":"Location created successfully"},
+            {"location":new_location.to_dict(),"message":"Location created successfully"},
             201
         )
         return response
@@ -479,7 +479,7 @@ class LocationById(Resource):
     def get(self, id):
         location = LocationService.findOne(id)
         return make_response(
-            jsonify(location),
+            jsonify(location.to_dict()),
             200        
         )
 

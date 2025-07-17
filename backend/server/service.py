@@ -235,9 +235,6 @@ class RouteService():
         )
     
 class LocationService():
-    def __init__(self):
-        pass
-
     @staticmethod
     def findAll():
         return [location.to_dict() for location in Location.query.all()]
