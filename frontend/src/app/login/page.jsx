@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import "./login.css";
+import Image from "next/image";
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState("login");
@@ -69,7 +70,9 @@ const Login = () => {
       <div className="left-panel">
         <div className="auth-container">
           <div className="logo">
-            <h1>🚌 BusEase</h1>
+
+            <h1>🚌 Skoola Bus</h1>
+
             <p>Safe & Reliable School Transport</p>
           </div>
 
@@ -206,7 +209,15 @@ const Login = () => {
         </div>
       </div>
 
-      <div className="right-panel">{/* Background continues seamlessly */}</div>
+      <div className="right-panel">
+        <Image
+          src="/bus-hero.png"
+          alt="School Bus with children"
+          width={800}
+          height={800}
+          priority
+        />
+      </div>
     </div>
   );
 };
