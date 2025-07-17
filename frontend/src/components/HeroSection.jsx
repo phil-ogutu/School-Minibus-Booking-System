@@ -12,8 +12,7 @@ const HeroSection = () => {
             Affordable, Reliable School Transport for Every Family.
           </h1>
           <p className="text-gray-600 text-lg max-w-xl mx-auto">
-            Real-time tracking, safe rides, and seamless booking – all in one
-            platform built for your family’s peace of mind.
+            All in one platform built for your family’s peace of mind.
           </p>
         </div>
 

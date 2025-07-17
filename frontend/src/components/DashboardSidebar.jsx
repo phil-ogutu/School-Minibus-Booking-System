@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 export default function DashboardSidebar() {
   return (
     <aside className="w-64 h-screen bg-yellow-500 text-white flex flex-col p-6">
-      <h2 className="text-2xl font-bold mb-8">SkoolaBus</h2>
+      <h2 className="text-4xl font-bold mb-8">SkoolaBus</h2>
 
       <nav className="space-y-4">
         <Link href="/admin">Dashboard</Link>
