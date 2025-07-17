@@ -4,14 +4,16 @@ import Button from "./Button";
 
 const HeroSection = () => {
   return (
-    <section className="bg-white py-20 px-6">
+    <section
+      className="bg-white py-20 px-6r"
+    >
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         {/* Hero text */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
             Affordable, Reliable School Transport for Every Family.
           </h1>
-          <p className="text-gray-600 text-lg max-w-xl mx-auto">
+          <p className="text-gray-900 text-lg max-w-xl mx-auto">
             All in one platform built for your family’s peace of mind.
           </p>
         </div>

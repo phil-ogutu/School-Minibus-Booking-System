@@ -26,12 +26,12 @@ export default function Booking() {
         Top Search Routes
       </div>
       <div className="w-full grid grid-cols-3 gap-5 p-10">
-        <TopSearchCard pickup={"Nairobi"} dropoff={"Juja"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Nairobi"} dropoff={"Juja"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Nairobi"} dropoff={"Juja"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Nairobi"} dropoff={"Juja"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Nairobi"} dropoff={"Juja"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Nairobi"} dropoff={"Juja"} time={"10:30pm"} price={"Ksh. 500"}/> 
+        <TopSearchCard pickup={"Kitengela"} dropoff={"Imaara"} time={"10:30pm"} price={"Ksh. 500"}/>
+        <TopSearchCard pickup={"Syokimau"} dropoff={"Mlolongo"} time={"10:30pm"} price={"Ksh. 500"}/>
+        <TopSearchCard pickup={"Kileleshwa"} dropoff={"Westlands"} time={"10:30pm"} price={"Ksh. 500"}/>
+        <TopSearchCard pickup={"Roysambu"} dropoff={"Westlands"} time={"10:30pm"} price={"Ksh. 500"}/>
+        <TopSearchCard pickup={"Nairobi West"} dropoff={"Parkands"} time={"10:30pm"} price={"Ksh. 500"}/>
+        <TopSearchCard pickup={"Umoja"} dropoff={"Donholm"} time={"10:30pm"} price={"Ksh. 500"}/> 
       </div>
     </div>
   );
