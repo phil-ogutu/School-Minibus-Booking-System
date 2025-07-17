@@ -1,19 +1,23 @@
 "use client";
 
-const DashboardHeader = ({ title }) => {
+import { useSession } from "next-auth/react";
+
+export default function DashboardHeader({ title }) {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   return (
-    <div className="flex justify-between items-center mb-6">
+    <header className="flex justify-between items-center mb-6">
       <h1 className="text-3xl font-bold">{title}</h1>
-      <div className="flex items-center space-x-4">
-        <span className="text-gray-600">Admin</span>
+
+      <div className="flex items-center space-x-3">
+        <span className="text-gray-700">{user?.name || "User"}</span>
         <img
-          src="/admin-avatar.png"
-          alt="Admin Avatar"
+          src={user?.image || "/fallback-avatar.png"}
+          alt="avatar"
           className="w-10 h-10 rounded-full border"
         />
       </div>
-    </div>
+    </header>
   );
-};
-
-export default DashboardHeader;
+}
