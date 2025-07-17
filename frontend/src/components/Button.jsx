@@ -6,7 +6,7 @@ const Button = ({ href, children, variant = "primary", size = "base" }) => {
   const base =
     "inline-block rounded font-semibold focus:outline-none transition duration-200";
   const sizes = {
-    base: "px-6 py-3 text-base",
+    base: "px-4 py-2 text-base rounded-lg",
     lg: "px-8 py-4 text-lg",
   };
   const variants = {
