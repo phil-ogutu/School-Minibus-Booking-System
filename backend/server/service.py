@@ -114,7 +114,7 @@ class BookingService():
         return Booking.query.filter_by(id=id).first()
     
     @staticmethod
-    def createBooking(self, parent_id, bus_id, title, child_name, pickup, dropoff, price):
+    def createBooking(parent_id, bus_id, title, child_name, pickup, dropoff, price):
         parent = UserService.findById(id=parent_id)
         if not parent:
             abort(400, description="Invalid parent_id: parent not found")
@@ -161,7 +161,11 @@ class BusService():
         return None
     
     @classmethod
-    def createBus(cls,route_id, driver_id, title, owner_id, plate, capacity):
+    def createBus(cls,route_id, driver_id, owner_id, plate, capacity):
+        existing_bus = cls.findOne(plate=plate)
+        if existing_bus:
+            abort(400, description="This bus already exists")
+
         owner = OwnerService.findById(id=owner_id)
         if not owner:
             abort(400, description="Invalid owner_id: owner not found")
@@ -181,7 +185,6 @@ class BusService():
         return Bus(
             route_id=route_id,
             driver_id=driver_id,
-            title=title,
             owner_id=owner_id,
             plate=plate,
             capacity=capacity
@@ -194,6 +197,12 @@ class RouteService():
     @staticmethod
     def findAll():
         return [route.to_dict() for route in Route.query.all()]
+    
+    @staticmethod
+    def findById(id):
+        if id:
+            return Route.query.filter_by(id=id).first()
+        return None
     
     @staticmethod
     def findOne(id=None, start=None, end=None):

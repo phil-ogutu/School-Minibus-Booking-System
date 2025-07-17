@@ -522,7 +522,6 @@ class Buses(Resource):
         new_bus = BusService.createBus(
             route_id=data["route_id"],
             driver_id=data["driver_id"],
-            title=data["title"],
             owner_id=data["owner_id"],
             plate=data["plate"],
             capacity=data["capacity"]
@@ -531,7 +530,7 @@ class Buses(Resource):
         db.session.add(new_bus)
         db.session.commit()
         response=make_response(
-            {"bus":new_bus,"message":"Bus created successfully"},
+            {"bus":new_bus.to_dict(),"message":"Bus created successfully"},
             201
         )
         return response
@@ -551,7 +550,7 @@ class BusById(Resource):
         bus=BusService.findOne(id=id)
         if bus:
             response=make_response(
-                jsonify(bus),
+                jsonify(bus.to_dict()),
                 200
             )
   
