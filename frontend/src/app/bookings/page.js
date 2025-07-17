@@ -1,6 +1,7 @@
 // Here is the Bookings page
-import TopSearchCard from "@/src/components/TopSearchCard";
+import TopSearchCard from "../../components/TopSearchCard";
 import SearchBus from "../../components/SearchBus";
+import Navbar from "@/components/Navbar";
 
 export default function Booking() {
   return (
@@ -11,6 +12,7 @@ export default function Booking() {
         backgroundPosition: "center 30%",
       }}
     >
+      <Navbar />
       <div className="text-lg text-neutral-500 font-medium flex justify-center mt-5">
         Get bus tickets
       </div>

@@ -33,7 +33,7 @@ const SearchBus = () => {
                     <input type="date"  className="flex-1 h-full border-none bg-transparent focus:outline-none"/>
                 </div>
 
-                <button className="w-fit px-5 h-full bg-green-600 hover:bg-green-400 rounded-xl flex items-center justify-center gap-x-2">
+                <button className="w-fit px-5 h-full bg-yellow-500 hover:bg-yellow-600 rounded-xl flex items-center justify-center gap-x-2">
                     <FaSearch />
                     Search
                 </button>
