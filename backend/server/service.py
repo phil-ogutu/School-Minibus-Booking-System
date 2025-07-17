@@ -4,24 +4,26 @@ import jwt
 from flask import abort
 
 class UserService():
-    def __init__(self):
-        pass
-    def findById(self,id):
+    @staticmethod
+    def findById(id):
         if not id == None:
             return User.query.filter_by(id=id).first()
         return None
     
-    def findByEmail(self,email):
+    @staticmethod
+    def findByEmail(email):
         if not email == None:
             return User.query.filter_by(email=email).first()
         return None
     
-    def findByMobile(self,mobile):
+    @staticmethod
+    def findByMobile(mobile):
         if not mobile == None:
             return User.query.filter_by(mobile=mobile).first()
         return None
     
-    def createUser(self, username, mobile, email, password_hash, role):
+    @staticmethod
+    def createUser( username, mobile, email, password_hash, role):
         return User(
             username=username,
             email=email,
@@ -32,7 +34,8 @@ class UserService():
             role=role
         )
     
-    def findAll(self,):
+    @staticmethod
+    def findAll():
         return [user.to_dict() for user in User.query.all()]
     
 class DriverService():
