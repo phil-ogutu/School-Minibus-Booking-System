@@ -1,4 +1,4 @@
-from config import bcrypt
+import bcrypt
 from models import db, User, Booking, Driver, Owner, Bus, Route, Location
 import jwt
 from flask import abort
@@ -28,7 +28,6 @@ class UserService():
             username=username,
             email=email,
             mobile=mobile,
-            restaurant_bio="",
             photo_url="",
             password_hash=password_hash,
             role=role
@@ -91,16 +90,14 @@ class OwnerService():
             return None
     
 class AuthService():
-    def __init__(self):
-        pass
-
-    def hashPassword(self,password):
+    @staticmethod
+    def hashPassword(password):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    
-    def checkPassword(self,password,user_password):
+    @staticmethod
+    def checkPassword(password,user_password):
         return bcrypt.checkpw(password.encode('utf-8'), user_password)
-    
-    def jwtTokenEncoder(self, body):
+    @staticmethod
+    def jwtTokenEncoder(body):
         return jwt.encode(body, 'secret', algorithm="HS256")
     
 class BookingService():

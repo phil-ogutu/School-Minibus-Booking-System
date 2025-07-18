@@ -3,7 +3,7 @@
 # Standard library imports
 
 # Remote library imports
-from flask import request, make_response, jsonify
+from flask import request, make_response, jsonify, g
 from flask_restful import Resource
 from service import (
     AuthService,
@@ -12,10 +12,31 @@ from service import (
     BusService,
     RouteService, LocationService
 )
+import jwt
+from functools import wraps
 
 # Local imports
 from config import app, db, api
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.cookies.get('token')
+
+        if not token:
+            return {"message": "Token is missing!"}, 401
+
+        try:
+            data = jwt.decode(token, 'secret', algorithms=["HS256"])
+            g.user_id = data['id']
+            g.username = data['name']
+        except jwt.ExpiredSignatureError:
+            return {"message": "Token expired!"}, 401
+        except jwt.InvalidTokenError:
+            return {"message": "Invalid token!"}, 401
+
+        return f(*args, **kwargs)
+    return decorated
 # Add your model imports
 class Auth(Resource):
     def post(self):
@@ -40,7 +61,7 @@ class Auth(Resource):
             db.session.add(new_user)
             db.session.commit()
 
-            encoded_jwt = AuthService.jwtTokenEncoder({"name": new_user.username,"id":new_user.id,"role":new_user.role})
+            encoded_jwt = AuthService.jwtTokenEncoder({"name": new_user.username,"id":new_user.id,"role":new_user.role.value})
             response=make_response(
                 {"token":encoded_jwt,"message":"User created successfully"},
                 201
@@ -64,7 +85,7 @@ class Auth(Resource):
             if not AuthService.checkPassword(password, user.password_hash):
                 return make_response("Wrong Credentials", 400)
             
-            encoded_jwt = AuthService.jwtTokenEncoder({"name": user.username,"id":user.id,"role":user.role})
+            encoded_jwt = AuthService.jwtTokenEncoder({"name": user.username,"id":user.id,"role":user.role.value})
             response=make_response(
                 {"token":encoded_jwt,"message":"User Logged in successfully"},
                 201
@@ -84,6 +105,7 @@ class Auth(Resource):
             )
 
 class Users(Resource):
+    method_decorators = [token_required]
     def get(self):
         users = UserService.findAll()
         return make_response(
@@ -91,6 +113,7 @@ class Users(Resource):
             200        
         )
 class UserById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         print('I got hit')
         if id is None:
@@ -140,6 +163,7 @@ class UserById(Resource):
         return make_response(jsonify({'message':'user not found'}),404)
 
 class Drivers(Resource):
+    method_decorators = [token_required]
     def get(self):
         drivers = DriverService.findAll()
         return make_response(
@@ -162,6 +186,7 @@ class Drivers(Resource):
         return response
     
 class DriverById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
@@ -244,6 +269,7 @@ class DriverById(Resource):
         return make_response(jsonify({'message':'user not found'}),404)
 
 class Owners(Resource):
+    method_decorators = [token_required]
     def get(self):
         owners = OwnerService.findAll()
         return make_response(
@@ -267,6 +293,7 @@ class Owners(Resource):
         return response
     
 class OwnerById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
@@ -314,6 +341,7 @@ class OwnerById(Resource):
         return make_response(jsonify({'message':'owner not found'}),404)
 
 class Bookings(Resource):
+    method_decorators = [token_required]
     def get(self):
         bookings = BookingService.findAll()
         return make_response(
@@ -342,6 +370,7 @@ class Bookings(Resource):
         return response
 
 class BookingById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
@@ -389,6 +418,7 @@ class BookingById(Resource):
         return make_response(jsonify({'message':'booking not found'}),404)  
 
 class Routes(Resource):
+    method_decorators = [token_required]
     def get(self):
         routes = RouteService.findAll()
         return make_response(
@@ -412,6 +442,7 @@ class Routes(Resource):
         return response
 
 class RouteById(Resource):
+    method_decorators = [token_required]
     def get(self, id):
         route = RouteService.findById(id)
         return make_response(
@@ -452,6 +483,7 @@ class RouteById(Resource):
         return make_response(jsonify({'message':'route not found'}),404)  
 
 class Locations(Resource):
+    method_decorators = [token_required]
     def get(self):
         locations = LocationService.findAll()
         return make_response(
@@ -476,6 +508,7 @@ class Locations(Resource):
         return response
 
 class LocationById(Resource):
+    method_decorators = [token_required]
     def get(self, id):
         location = LocationService.findOne(id)
         return make_response(
@@ -516,6 +549,7 @@ class LocationById(Resource):
         return make_response(jsonify({'message':'location not found'}),404)  
 
 class Buses(Resource):
+    method_decorators = [token_required]
     def post(self):
         data = request.get_json()
 
@@ -543,6 +577,7 @@ class Buses(Resource):
         )
     
 class BusById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
