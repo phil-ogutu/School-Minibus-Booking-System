@@ -7,6 +7,11 @@ export const useRoutes = () => {
   const { mutate: updateRoute } = useMutation('/api/routes', 'PATCH');
   const { mutate: deleteRoute } = useMutation('/api/routes', 'DELETE');
 
+  const getRouteById = (id) => {
+    const { data, loading, error } = useFetch(`/api/routes/${id}`);
+    return { route: data, loading, error };
+  };
+
   const createNewRoute = async (routeData) => {
     return await createRoute(routeData);
   };
@@ -23,6 +28,7 @@ export const useRoutes = () => {
     routes,
     routesLoading,
     routesError,
+    getRouteById,
     createNewRoute,
     updateExistingRoute,
     deleteExistingRoute,
