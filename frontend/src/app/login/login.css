@@ -126,7 +126,7 @@ body {
 }
 
 .logo h1 {
-    color: #2e8b57;
+    color: #eab308;
     font-size: 32px;
     margin-bottom: 8px;
     font-weight: 700;
@@ -161,7 +161,7 @@ body {
 }
 
 .tab-button.active {
-    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+    background: linear-gradient(135deg, #eab308 0%, #3cb371 100%);
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
@@ -174,7 +174,7 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 10px;
-    color: #2e8b57;
+    color: #eab308;
     font-weight: 600;
     font-size: 14px;
 }
@@ -192,7 +192,7 @@ body {
 
 .form-group input:focus, .form-group select:focus {
     outline: none;
-    border-color: #2e8b57;
+    border-color: #eab308;
     box-shadow: 0 0 0 4px rgba(46, 139, 87, 0.1);
     background: white;
 }
@@ -200,7 +200,7 @@ body {
 .submit-btn {
     width: 100%;
     padding: 18px;
-    background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+    background: linear-gradient(135deg, #eab308 0%, #3cb371 100%);
     color: white;
     border: none;
     border-radius: 12px;
@@ -231,7 +231,7 @@ body {
 }
 
 .forgot-password a {
-    color: #2e8b57;
+    color: #eab308;
     text-decoration: none;
     font-size: 15px;
     font-weight: 500;
