@@ -28,3 +28,12 @@ const register = async (userData) => {
     throw error;
   }
 }; 
+const logout = async () => {
+  try {
+    setUser(null);
+  } catch (error) {
+    setAuthError(error.message);
+    throw error;
+  }
+}; 
+
