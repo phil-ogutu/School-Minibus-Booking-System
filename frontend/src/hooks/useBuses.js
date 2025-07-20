@@ -6,7 +6,6 @@ export const useBuses = () => {
   const { mutate: createBus } = useMutation('/api/buses');
   const { mutate: updateBus } = useMutation('/api/buses', 'PATCH');
   const { mutate: deleteBus } = useMutation('/api/buses', 'DELETE');
-  
 
   const getBusById = (id) => {
     const { data, loading, error } = useFetch(`/api/buses/${id}`);
@@ -17,7 +16,7 @@ export const useBuses = () => {
     return await createBus(busData);
   };
 
-   const updateExistingBus = async (id, updates) => {
+  const updateExistingBus = async (id, updates) => {
     return await updateBus(updates, `/api/buses/${id}`);
   };
 
@@ -32,7 +31,6 @@ export const useBuses = () => {
     getBusById,
     createNewBus,
     updateExistingBus,
-    deleteExistingBus, 
+    deleteExistingBus,
   };
 };
-
