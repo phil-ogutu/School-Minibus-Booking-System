@@ -5,11 +5,13 @@ export const useFetch = (url, options = {}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BASE_URL = "http://127.0.0.1:5000"
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(url, {
+        const response = await fetch(`${BASE_URL}${url}`, {
           ...options,
           credentials: 'include', // For cookies (JWT)
           headers: {

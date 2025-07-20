@@ -3,8 +3,13 @@
 import React, { useState } from "react";
 import "./login.css";
 import Image from "next/image";
+import {useAuth} from '@/hooks/useAuth'
+import { useRouter } from "next/navigation";
+
 
 const Login = () => {
+  const router = useRouter();
+  const { login, register } = useAuth(); 
   const [activeTab, setActiveTab] = useState("login");
   const [loginData, setLoginData] = useState({
     email: "",
@@ -12,9 +17,9 @@ const Login = () => {
   });
   const [signupData, setSignupData] = useState({
     role: "",
-    name: "",
+    username: "",
     email: "",
-    phone: "",
+    mobile: "",
     password: "",
   });
 
@@ -36,20 +41,27 @@ const Login = () => {
     });
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     // send the data to backend
-    alert(
+    await login(loginData).then(() => {
+    console.log(
       "Login functionality will be implemented here\nEmail: " + loginData.email
     );
-  };
+    router.push("/bookings");
+  });
+};
 
-  const handleSignup = (e) => {
+
+  const handleSignup = async (e) => {
     e.preventDefault();
     // send the data to backend
-    alert(
-      `Sign up functionality will be implemented here\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`
-    );
+    await register(signupData).then(()=>{
+      console.log(
+        `Sign up functionality will be implemented here\nRole: ${signupData.role}\nName: ${signupData.name}\nEmail: ${signupData.email}`
+      );
+      router.push("/bookings")
+    });
   };
 
   const showForgotPassword = () => {
@@ -158,9 +170,9 @@ const Login = () => {
                 <input
                   type="text"
                   id="signup-name"
-                  name="name"
+                  name="username"
                   placeholder="Enter your full name"
-                  value={signupData.name}
+                  value={signupData.username}
                   onChange={handleSignupChange}
                   required
                 />
@@ -182,9 +194,9 @@ const Login = () => {
                 <input
                   type="tel"
                   id="signup-phone"
-                  name="phone"
+                  name="mobile"
                   placeholder="Enter your phone number"
-                  value={signupData.phone}
+                  value={signupData.mobile}
                   onChange={handleSignupChange}
                   required
                 />
