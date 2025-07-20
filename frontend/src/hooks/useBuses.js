@@ -4,6 +4,8 @@ import { useFetch, useMutation } from './useFetch';
 export const useBuses = () => {
   const { data: buses, loading: busesLoading, error: busesError } = useFetch('/api/buses');
   const { mutate: createBus } = useMutation('/api/buses');
+  const { mutate: updateBus } = useMutation('/api/buses', 'PATCH');
+  
 
   const getBusById = (id) => {
     const { data, loading, error } = useFetch(`/api/buses/${id}`);
@@ -14,12 +16,17 @@ export const useBuses = () => {
     return await createBus(busData);
   };
 
+   const updateExistingBus = async (id, updates) => {
+    return await updateBus(updates, `/api/buses/${id}`);
+  };
+
   return {
     buses,
     busesLoading,
     busesError,
     getBusById,
     createNewBus,
+    updateExistingBus,
   };
 };
 
