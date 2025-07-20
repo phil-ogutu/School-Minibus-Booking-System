@@ -1,10 +1,12 @@
 'use client'
-import { FormField, FormWrapper } from '@/components/reusables/Form';
+import { FormField, FormWrapper } from '@/components/ui/Form';
 import * as Yup from 'yup';
-import Container from '@/components/reusables/Container.js';
-import Text from '@/components/reusables/Text.js';
+import Container from '@/components/ui/Container.js';
+import Text from '@/components/ui/Text.js';
+import { useRouter } from 'next/navigation';
 
 export default function DriverLogin() {
+  const router = useRouter();
   const initialValues = {
     name: '',
     password: '',
@@ -15,6 +17,7 @@ export default function DriverLogin() {
   })
   const handleSubmit=(values)=>{
     console.log(values)
+    router.push('/driver/home')
   }
   return (
     <Container className="flex flex-col md:flex-row bg-gradient-gold h-screen">

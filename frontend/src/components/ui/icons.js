@@ -1,4 +1,4 @@
-import { MdNotifications, MdAccountCircle } from 'react-icons/md';
+import { MdNotifications, MdAccountCircle, MdDirectionsBus } from 'react-icons/md';
 
 /**
  * Generic icon renderer
@@ -17,3 +17,6 @@ export const notificationIcon = (color = '', size = '', style = {}) =>
 
 export const accountIcon = (color = '', size = '', style = {}) =>
   renderIcon(MdAccountCircle, color, size, style);
+
+export const busIcon = (color = '', size = '', style = {}) =>
+  renderIcon(MdDirectionsBus, color, size, style);
