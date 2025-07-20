@@ -1,3 +1,4 @@
+// src/hooks/useBookings.js
 import { useFetch, useMutation } from './useFetch';
 
 export const useBookings = () => {
@@ -6,12 +7,11 @@ export const useBookings = () => {
   const { mutate: updateBooking } = useMutation('/api/bookings', 'PATCH');
   const { mutate: deleteBooking } = useMutation('/api/bookings', 'DELETE');
 
-
-
   const getBookingById = (id) => {
     const { data, loading, error } = useFetch(`/api/bookings/${id}`);
     return { booking: data, loading, error };
   };
 
-
-
+  const createNewBooking = async (bookingData) => {
+    return await createBooking(bookingData);
+  };
