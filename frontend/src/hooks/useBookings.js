@@ -23,3 +23,15 @@ export const useBookings = () => {
   const deleteExistingBooking = async (id) => {
     return await deleteBooking({}, `/api/bookings/${id}`);
   };
+
+  return {
+    bookings,
+    bookingsLoading,
+    bookingsError,
+    getBookingById,
+    createNewBooking,
+    updateExistingBooking,
+    deleteExistingBooking,
+    creatingBooking,
+  };
+};
