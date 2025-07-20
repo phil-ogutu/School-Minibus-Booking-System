@@ -34,3 +34,5 @@ export const useMutation = (url, method = 'POST') => {
     }
   };
 
+  return { mutate, data, loading, error };
+};
