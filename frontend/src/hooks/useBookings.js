@@ -15,3 +15,7 @@ export const useBookings = () => {
   const createNewBooking = async (bookingData) => {
     return await createBooking(bookingData);
   };
+
+  const updateExistingBooking = async (id, updates) => {
+    return await updateBooking(updates, `/api/bookings/${id}`);
+  };
