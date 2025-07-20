@@ -33,6 +33,7 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # or True with CSRF token (fronte
 app.config["JWT_VERIFY_SUB"] = False # Test # Optional
 app.config["JWT_COOKIE_SECURE"] = False # True in production
 app.config["JWT_COOKIE_SAMESITE"] = "Lax"  # or 'None' -if using HTTPS cross-origin
+app.json.compact=False
 
 jwt = JWTManager(app)
 

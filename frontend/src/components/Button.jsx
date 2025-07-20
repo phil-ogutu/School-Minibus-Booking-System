@@ -2,27 +2,24 @@
 import React from "react";
 import Link from "next/link";
 
-const Button = ({ children, href, onClick, variant = "primary" }) => {
-  const baseStyle = "px-6 py-3 rounded font-semibold transition duration-300";
+const Button = ({ href, children, variant = "primary", size = "base" }) => {
+  const base =
+    "inline-block rounded font-semibold focus:outline-none transition duration-200";
+  const sizes = {
+    base: "px-4 py-2 text-base rounded-lg",
+    lg: "px-8 py-4 text-lg",
+  };
   const variants = {
-    primary: "bg-green-600 text-white hover:bg-green-700",
-    secondary: "bg-yellow-400 text-black hover:bg-yellow-500",
+    primary: "bg-yellow-500 hover:bg-yellow-600 text-white",
+    secondary: "bg-gray-700 hover:bg-gray-800 text-white",
   };
 
-  const className = `${baseStyle} ${variants[variant]}`;
-
-  if (href) {
-    return (
-      <Link href={href}>
-        <button className={className}>{children}</button>
-      </Link>
-    );
-  }
-
   return (
-    <button onClick={onClick} className={className}>
-      {children}
-    </button>
+    <Link href={href}>
+      <span className={`${base} ${variants[variant]} ${sizes[size]}`}>
+        {children}
+      </span>
+    </Link>
   );
 };
 
