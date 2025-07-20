@@ -1,7 +1,7 @@
 // src/app/providers.js
 "use client";
 import { SessionProvider } from "next-auth/react";
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 
 
 export function Providers({ children }) {
