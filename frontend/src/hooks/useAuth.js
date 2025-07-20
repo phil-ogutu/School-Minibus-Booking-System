@@ -14,15 +14,7 @@ export const useAuth = () => {
         ...credentials,
         action: 'login',
       });
-
-      console.log("LOGIN RESPONSE:", data); // Debug log
-
-      if (data && data.user) {
-        setUser(data.user);
-      } else {
-        throw new Error('Invalid response: missing user');
-      }
-
+      setUser(data.user);
       return data;
     } catch (error) {
       setAuthError(error.message);
@@ -36,15 +28,7 @@ export const useAuth = () => {
         ...userData,
         action: 'register',
       });
-
-      console.log("REGISTER RESPONSE:", data); // Debug log
-
-      if (data && data.user) {
-        setUser(data.user);
-      } else {
-        throw new Error('Invalid response: missing user');
-      }
-
+      setUser(data.user);
       return data;
     } catch (error) {
       setAuthError(error.message);
@@ -54,7 +38,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      // logout endpoint to be implemented later
+      // logout endpoin later implementation
       setUser(null);
     } catch (error) {
       setAuthError(error.message);
