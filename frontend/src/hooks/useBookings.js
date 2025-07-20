@@ -19,3 +19,7 @@ export const useBookings = () => {
   const updateExistingBooking = async (id, updates) => {
     return await updateBooking(updates, `/api/bookings/${id}`);
   };
+
+  const deleteExistingBooking = async (id) => {
+    return await deleteBooking({}, `/api/bookings/${id}`);
+  };
