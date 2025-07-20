@@ -1,10 +1,10 @@
+// src/hooks/useFetch.js
 import { useState, useEffect } from 'react';
 
 export const useFetch = (url, options = {}) => {
-    const [data, setData] = useState(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,3 +34,5 @@ export const useFetch = (url, options = {}) => {
     fetchData();
   }, [url, options]);
 
+  return { data, loading, error };
+};
