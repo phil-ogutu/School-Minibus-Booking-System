@@ -7,3 +7,11 @@ export const useBookings = () => {
   const { mutate: deleteBooking } = useMutation('/api/bookings', 'DELETE');
 
 
+
+  const getBookingById = (id) => {
+    const { data, loading, error } = useFetch(`/api/bookings/${id}`);
+    return { booking: data, loading, error };
+  };
+
+
+
