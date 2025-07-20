@@ -11,7 +11,7 @@ export const useFetch = (url, options = {}) => {
       try {
         const response = await fetch(url, {
           ...options,
-          credentials: 'include', // For cookies if using JWT
+          credentials: 'include', // For cookies (JWT)
           headers: {
             'Content-Type': 'application/json',
             ...options.headers,
