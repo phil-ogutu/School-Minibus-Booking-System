@@ -1,5 +1,6 @@
 // src/hooks/useBookings.js
-import { useFetch, useMutation } from './useFetch';
+import { useFetch } from './useFetch';
+import { useMutation } from './useMutation'; // ✅ Correct
 
 export const useBookings = () => {
   const { data: bookings, loading: bookingsLoading, error: bookingsError } = useFetch('/api/bookings');
