@@ -15,3 +15,16 @@ const login = async (credentials) => {
     throw error;
   }
 };
+const register = async (userData) => {
+  try {
+    const data = await mutate({
+      ...userData,
+      action: 'register',
+    });
+    setUser(data.user);
+    return data;
+  } catch (error) {
+    setAuthError(error.message);
+    throw error;
+  }
+}; 
