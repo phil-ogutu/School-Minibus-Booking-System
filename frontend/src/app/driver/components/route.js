@@ -1,8 +1,11 @@
+'use client'
 import { busIcon } from '@/components/ui/icons';
+import { useRouter } from 'next/navigation';
 
 export default function RouteCard({index}) {
+  const router = useRouter();
   return (
-    <div className={`bg-gradient-to-r from-[#2e2e2e] to-[#4d4d4d] text-white rounded-xl shadow-md p-4 w-full max-w-md m-1 cursor-pointer`}>
+    <div onClick={()=>{router.push('/driver/route')}} className={`bg-gradient-to-r from-[#2e2e2e] to-[#4d4d4d] text-white rounded-xl shadow-md p-4 w-full max-w-md m-1 cursor-pointer`}>
       {/* Header: Icon + Route Name + Date */}
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 flex items-center justify-center bg-white bg-opacity-10 rounded-full">

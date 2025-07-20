@@ -1,4 +1,7 @@
 import { MdNotifications, MdAccountCircle, MdDirectionsBus } from 'react-icons/md';
+import { TiGroup } from "react-icons/ti";
+import { RiMapPin2Fill } from "react-icons/ri";
+import { FaPlay } from "react-icons/fa";
 
 /**
  * Generic icon renderer
@@ -20,3 +23,12 @@ export const accountIcon = (color = '', size = '', style = {}) =>
 
 export const busIcon = (color = '', size = '', style = {}) =>
   renderIcon(MdDirectionsBus, color, size, style);
+
+export const groupIcon = (color = '', size = '', style = {}) =>
+  renderIcon(TiGroup, color, size, style);
+
+export const mapPinIcon = (color = '', size = '', style = {}) =>
+  renderIcon(RiMapPin2Fill, color, size, style);
+
+export const playIcon = (color = '', size = '', style = {}) =>
+  renderIcon(FaPlay, color, size, style);
