@@ -170,9 +170,9 @@ const Login = () => {
                 <input
                   type="text"
                   id="signup-name"
-                  name="name"
+                  name="username"
                   placeholder="Enter your full name"
-                  value={signupData.name}
+                  value={signupData.username}
                   onChange={handleSignupChange}
                   required
                 />
@@ -194,9 +194,9 @@ const Login = () => {
                 <input
                   type="tel"
                   id="signup-phone"
-                  name="phone"
+                  name="mobile"
                   placeholder="Enter your phone number"
-                  value={signupData.phone}
+                  value={signupData.mobile}
                   onChange={handleSignupChange}
                   required
                 />
