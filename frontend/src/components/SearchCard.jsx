@@ -41,8 +41,8 @@ const SearchCard = ({ route }) => {
             </h1>
 
             <div className="flex-1  border-dashed border border-neutral-400 relative">
-              <div className="absolute w-8 h-8 px-3 h-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-100 rounded-full flex items-center justify-center">
-                <FaArrowRight className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-neutral-500" />
+              <div className="absolute w-8 h-8 z-50 px-3 h-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-100 rounded-full flex items-center justify-center">
+                <FaArrowRight className="absolute z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-neutral-500" />
               </div>
             </div>
 

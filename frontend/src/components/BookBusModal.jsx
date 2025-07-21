@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
+import { createPortal } from "react-dom";
 
 const BookBusModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[1200] flex items-center justify-center z-50">
+  return createPortal(
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md relative">
         <h2 className="text-xl font-semibold mb-4">Book This Bus</h2>
 
@@ -61,7 +62,8 @@ const BookBusModal = ({ isOpen, onClose }) => {
           &times;
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
