@@ -1,33 +1,32 @@
 "use client";
 import React, { useState } from "react";
-import { FaCircle } from "react-icons/fa";
+import { FaArrowDown, FaArrowRight, FaChevronDown, FaChevronUp, FaCircle, FaLocationArrow } from "react-icons/fa";
 import BookBusModal from "./BookBusModal";
 import { routesData } from "@/data/RoutesData";
 import { format } from "date-fns";
 import { fetchLatLng } from "@/utils/geocode";
 
-const SearchCard = ({route}) => {
-    console.log("Search Card", route)
-    const [isModalOpen, setModalOpen] = useState(false);
-    const today = new Date();
-    const formattedDate = format(today, 'dd/MM/yyyy');
+const SearchCard = ({ route }) => {
+  console.log("Search Card", route);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const today = new Date();
+  const formattedDate = format(today, "dd/MM/yyyy");
 
-    const handleGetPrice = async () => {
+  const [showStops, setShowStops] = useState(false);
 
-        const fromCoords = await fetchLatLng(route.start);
-        const toCoords = await fetchLatLng(route.end);
-        console.log("Search Card coor", fromCoords)
-    
-        const distance = haversineDistance(fromCoords, toCoords);
-        const route_price = calculatePrice(distance);  // Update price
-        if (route_price ) {
-          return <span>route_price</span>
-        }
-      };
+  const handleGetPrice = async () => {
+    const fromCoords = await fetchLatLng(route.start);
+    const toCoords = await fetchLatLng(route.end);
 
+    const distance = haversineDistance(fromCoords, toCoords);
+    const route_price = calculatePrice(distance); // Update price
+    if (route_price) {
+      return <span>route_price</span>;
+    }
+  };
 
   return (
-    <div className="w-full mb-5 rounded-xl p-5 border-2 border-neutral-300 space-y-4">
+    <div className="w-[98%] mx-auto mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-4">
       <div className="space-y-2 w-full">
         {/* Route */}
         <div className="space-y-0">
@@ -36,64 +35,66 @@ const SearchCard = ({route}) => {
             <p className="text-xs text-neutral-400 font-normal">To</p>
           </div>
 
-          <div className="w-full flex items-center justify-between gap-x-3">
-            <h1 className="text-xl text-neutral-600 font-semibold">{route.start}</h1>
+          <div className="w-full flex items-center justify-between gap-x-5">
+            <h1 className="text-xl text-neutral-600 font-semibold w-1/4">
+              {route.start}
+            </h1>
 
-           <div className="flex-1 border-dashed border border-neutral-400 relative">
-            <p className="absolute w-fit px-3 h-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-50 rounded-full text-md font-normal">{formattedDate}</p>
-           </div>
+            <div className="flex-1  border-dashed border border-neutral-400 relative">
+              <div className="absolute w-8 h-8 px-3 h-6 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-neutral-100 rounded-full flex items-center justify-center">
+                <FaArrowRight className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-neutral-500" />
+              </div>
+            </div>
 
-            <h1 className="text-xl text-neutral-600 font-semibold">{route.end}</h1>
+            <h1 className="text-xl text-neutral-600 font-semibold w-1/4 text-right">
+              {route.end}
+            </h1>
           </div>
         </div>
       </div>
+      
+      <div
+        onClick={() => setShowStops(!showStops)}
+        className=""
+      >
+        {showStops ? (
+          <FaChevronUp className="text-neutral-500 text-sm" />
+        ) : (
+          <div className="flex items-center space-x-2">
+          <FaLocationArrow className="text-neutral-500 text-sm" />
+          <p className="text-xs">stops</p>
+          </div>
+        )}
+      </div>
 
-      {console.log("Search Card Locations", route.locations)}
-      {
-        route.locations.length > 0 && route.locations.map(
-          (location) => (
-            <div className="w-full flex items-center justify-center-safe gap-x-20">
-              <div className="flex flex-col items-center">
-                <FaCircle className="w-2.5 h-2.5 text-neutral-600"/>
-                <p className="text-sm text-neutral-600 font-normal">{location.location_name}</p>
-              </div>
+      {showStops && route.locations.length > 0 && (
+        <div className="w-[95%] mt-2 bg-neutral-300/20 space-y-2 pl-10 mx-auto rounded-md">
+          {route.locations.map((location) => (
+            <div key={location.id} className="flex items-center gap-x-2">
+              <FaCircle className="w-2 h-2 text-neutral-500" />
+              <p className="text-sm text-neutral-600">
+                {location.location_name}
+              </p>
             </div>
-          )
-        )
-      }
-      {/* <div className="w-full flex items-center justify-center-safe gap-x-20">
-        <div className="flex flex-col items-center">
-          <FaCircle className="w-2.5 h-2.5 text-neutral-600"/>
-          <p className="text-sm text-neutral-600 font-normal">Nairobi</p>
+          ))}
         </div>
-
-         <div className="flex flex-col items-center">
-          <FaCircle className="w-2.5 h-2.5 text-neutral-600"/>
-          <p className="text-sm text-neutral-600 font-normal">Imaara</p>
-        </div>
-
-         <div className="flex flex-col items-center">
-          <FaCircle className="w-2.5 h-2.5 text-neutral-600"/>
-          <p className="text-sm text-neutral-600 font-normal">Syokimau</p>
-        </div>
-
-         <div className="flex flex-col items-center">
-          <FaCircle className="w-2.5 h-2.5 text-neutral-600"/>
-          <p className="text-sm text-neutral-600 font-normal">Kitengela</p>
-        </div>
-      </div> */}
+      )}
 
       <div className="w-full flex items-center justify-between">
         {/* <h1 className="text-lg text-neutral-700 font-semibold">{() =>handleGetPrice}</h1> */}
         <h1 className="text-lg text-neutral-700 font-semibold">Ksh 100</h1>
 
-
-        <button onClick={() => setModalOpen(true)} className="w-fit px-5 py-1.5 h-full text-lg text-white font-light bg-yellow-500 hover:bg-yellow-600 rounded-xl">
+        <button
+          onClick={() => setModalOpen(true)}
+          className="w-fit px-2 py-1.5 h-full text-base text-yellow-600 font-medium hover:text-neutral-400"
+        >
           Book Now
         </button>
 
-        <BookBusModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
-
+        <BookBusModal
+          isOpen={isModalOpen}
+          onClose={() => setModalOpen(false)}
+        />
       </div>
     </div>
   );

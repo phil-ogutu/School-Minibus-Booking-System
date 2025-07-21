@@ -35,10 +35,10 @@ const SearchBus = () => {
   };
 
   return (
-    <div className="w-full flex justify-center gap-5 bg-neutral-50/20 border-1 border-neutral-200 shadow-lg rounded-xl py-4 mx-auto mb-5">
+    <div className="w-full bg-neutral-50/20 border-1 border-neutral-100 shadow-md rounded-xl py-4 mb-5">
 
-      <form onSubmit={handleSubmit} className="flex justify-center gap-5">
-        <div className="w-[35%] h-12 border border-neutral-300 bg-white font-medium flex items-center gap-1 rounded-lg p-3">
+      <form onSubmit={handleSubmit} className="w-full flex justify-center gap-5 px-4">
+        <div className="flex-1 h-12 border border-neutral-300 bg-white font-medium flex items-center gap-1 rounded-lg p-3">
             <div className="w-5 h-5 text-neutral-400">
               <FaMapMarkerAlt />
             </div>
@@ -50,7 +50,7 @@ const SearchBus = () => {
             />
         </div>
 
-        <div className="w-[35%] h-12 border border-neutral-300 bg-white font-medium flex items-center gap-1 rounded-lg p-3">
+        <div className="flex-1 h-12 border border-neutral-300 bg-white font-medium flex items-center gap-1 rounded-lg p-3">
             <div className="w-5 h-5 text-neutral-400">
               <FaMapMarkerAlt />
             </div>
@@ -63,12 +63,12 @@ const SearchBus = () => {
         </div>
 
         {/* Search Button */}
-        <div className="w-[30%] flex justify-center">
+        <div className="flex justify-center">
           <button 
             type="submit" 
             className="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-yellow-600 transition"
           >
-            <FaSearch /> View on map
+            <FaSearch /> View
           </button>
         </div>
         </form>
