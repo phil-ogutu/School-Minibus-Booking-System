@@ -1,58 +1,61 @@
-from config import bcrypt
+import bcrypt
 from models import db, User, Booking, Driver, Owner, Bus, Route, Location
 import jwt
 from flask import abort
 
 class UserService():
-    def __init__(self):
-        pass
-    def findById(self,id):
+    @staticmethod
+    def findById(id):
         if not id == None:
             return User.query.filter_by(id=id).first()
         return None
     
-    def findByEmail(self,email):
+    @staticmethod
+    def findByEmail(email):
         if not email == None:
             return User.query.filter_by(email=email).first()
         return None
     
-    def findByMobile(self,mobile):
+    @staticmethod
+    def findByMobile(mobile):
         if not mobile == None:
             return User.query.filter_by(mobile=mobile).first()
         return None
     
-    def createUser(self, username, mobile, email, password_hash, role):
+    @staticmethod
+    def createUser( username, mobile, email, password_hash, role):
         return User(
             username=username,
             email=email,
             mobile=mobile,
-            restaurant_bio="",
             photo_url="",
             password_hash=password_hash,
             role=role
         )
     
-    def findAll(self,):
+    @staticmethod
+    def findAll():
         return [user.to_dict() for user in User.query.all()]
     
 class DriverService():
-    def __init__(self):
-        pass
-
-    def findById(self,id):
+    @staticmethod
+    def findById(id):
         if not id == None:
             return Driver.query.filter_by(id=id).first()
         return None
     
-    def createDriver(self, driver_name ):
+    @staticmethod
+    def createDriver(driver_name ):
         return Driver(
             driver_name=driver_name
         )
     
-    def findAll(self,):
+    @staticmethod
+    def findAll():
         return [driver.to_dict() for driver in Driver.query.all()]
     
-    def findOne(self,id,driver_name):
+    @staticmethod
+    def findOne(id,driver_name):
         if id:
             return Driver.query.filter_by(id=id).first()
         elif driver_name:
@@ -61,23 +64,24 @@ class DriverService():
             return None
         
 class OwnerService():
-    def __init__(self):
-        pass
-
-    def findById(self,id):
+    @staticmethod
+    def findById(id):
         if not id == None:
             return Owner.query.filter_by(id=id).first()
         return None
     
-    def createOwner(self, owner_name ):
+    @staticmethod
+    def createOwner( owner_name ):
         return Owner(
             owner_name=owner_name
         )
     
-    def findAll(self,):
+    @staticmethod
+    def findAll():
         return [owner.to_dict() for owner in Owner.query.all()]
     
-    def findOne(self,id,owner_name):
+    @staticmethod
+    def findOne(id,owner_name):
         if id:
             return Owner.query.filter_by(id=id).first()
         elif owner_name:
@@ -86,30 +90,27 @@ class OwnerService():
             return None
     
 class AuthService():
-    def __init__(self):
-        pass
-
-    def hashPassword(self,password):
+    @staticmethod
+    def hashPassword(password):
         return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    
-    def checkPassword(self,password,user_password):
+    @staticmethod
+    def checkPassword(password,user_password):
         return bcrypt.checkpw(password.encode('utf-8'), user_password)
-    
-    def jwtTokenEncoder(self, body):
+    @staticmethod
+    def jwtTokenEncoder(body):
         return jwt.encode(body, 'secret', algorithm="HS256")
     
 class BookingService():
-    def __init__(self):
-        pass
-
-    def findAll(self):
+    @staticmethod
+    def findAll():
         return [booking.to_dict() for booking in Booking.query.all()]
     
-    def findOne(self,id):
+    @staticmethod
+    def findOne(id):
         return Booking.query.filter_by(id=id).first()
     
     @staticmethod
-    def createBooking(self, parent_id, bus_id, title, child_name, pickup, dropoff, price):
+    def createBooking(parent_id, bus_id, title, child_name, pickup, dropoff, price):
         parent = UserService.findById(id=parent_id)
         if not parent:
             abort(400, description="Invalid parent_id: parent not found")
@@ -117,6 +118,7 @@ class BookingService():
         bus = BusService.findOne(id=bus_id)
         if not bus:
             abort(400, description="Invalid bus_id: bus not found")
+            
         if not bus.status:
             abort(400, description="Bus is not avaible for booking")
 
@@ -130,7 +132,7 @@ class BookingService():
             child_name=child_name,
             pickup=pickup,
             dropoff=dropoff,
-            price=price
+            price=price,
         )
     
 class BusService():
@@ -142,15 +144,25 @@ class BusService():
         return [bus.to_dict() for bus in Bus.query.all()]
     
     @staticmethod
-    def findOne(id, plate):
+    def findOne(id=None, plate=None):
         if id:
             return Bus.query.filter_by(id=id).first()
         if plate:
             return Bus.query.filter_by(plate=plate).first()
         return None
     
+    @staticmethod
+    def findById(id):
+        if id:
+            return Bus.query.filter_by(id=id).first()
+        return None
+    
     @classmethod
-    def createBus(cls,route_id, driver_id, title, owner_id, plate, capacity):
+    def createBus(cls,route_id, driver_id, owner_id, plate, capacity):
+        existing_bus = cls.findOne(plate=plate)
+        if existing_bus:
+            abort(400, description="This bus already exists")
+
         owner = OwnerService.findById(id=owner_id)
         if not owner:
             abort(400, description="Invalid owner_id: owner not found")
@@ -170,10 +182,10 @@ class BusService():
         return Bus(
             route_id=route_id,
             driver_id=driver_id,
-            title=title,
             owner_id=owner_id,
             plate=plate,
-            capacity=capacity
+            capacity=capacity,
+            status=True
         )
     
 class RouteService():
@@ -183,6 +195,12 @@ class RouteService():
     @staticmethod
     def findAll():
         return [route.to_dict() for route in Route.query.all()]
+    
+    @staticmethod
+    def findById(id):
+        if id:
+            return Route.query.filter_by(id=id).first()
+        return None
     
     @staticmethod
     def findOne(id=None, start=None, end=None):
@@ -203,8 +221,7 @@ class RouteService():
             abort(400, description="Missing required fields: 'start' and 'end'")
 
         existing_route = cls.findOne(
-            id=None, plate=None,
-            start=start, end=end
+            id=None, start=start, end=end
         )
         if existing_route:
             abort(400, description="Route with the same start and end already exists")
@@ -215,9 +232,6 @@ class RouteService():
         )
     
 class LocationService():
-    def __init__(self):
-        pass
-
     @staticmethod
     def findAll():
         return [location.to_dict() for location in Location.query.all()]

@@ -3,7 +3,7 @@
 # Standard library imports
 
 # Remote library imports
-from flask import request, make_response, jsonify
+from flask import request, make_response, jsonify, g
 from flask_restful import Resource
 from service import (
     AuthService,
@@ -12,21 +12,44 @@ from service import (
     BusService,
     RouteService, LocationService
 )
+import jwt
+from functools import wraps
 
 # Local imports
 from config import app, db, api
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.cookies.get('token')
+
+        if not token:
+            return {"message": "Token is missing!"}, 401
+
+        try:
+            data = jwt.decode(token, 'secret', algorithms=["HS256"])
+            g.user_id = data['id']
+            g.username = data['name']
+        except jwt.ExpiredSignatureError:
+            return {"message": "Token expired!"}, 401
+        except jwt.InvalidTokenError:
+            return {"message": "Invalid token!"}, 401
+
+        return f(*args, **kwargs)
+    return decorated
 # Add your model imports
 class Auth(Resource):
     def post(self):
         data=request.get_json()
-        action = data['action']
+        action = data.get('action')
 
-        username=data['username']
-        email=data['email']
-        mobile=data['mobile']
-        role=data['role']
-        password=data['password']
+
+        username = data.get('username')
+        email = data.get('email')
+        mobile = data.get('mobile')
+        role = data.get('role')
+        password = data.get('password')
+
 
         if action == "register":
             if username == None and email == None and role == None and password == None:
@@ -40,7 +63,7 @@ class Auth(Resource):
             db.session.add(new_user)
             db.session.commit()
 
-            encoded_jwt = AuthService.jwtTokenEncoder({"name": new_user.username,"id":new_user.id,"role":new_user.role})
+            encoded_jwt = AuthService.jwtTokenEncoder({"name": new_user.username,"id":new_user.id,"role":new_user.role.value})
             response=make_response(
                 {"token":encoded_jwt,"message":"User created successfully"},
                 201
@@ -64,7 +87,7 @@ class Auth(Resource):
             if not AuthService.checkPassword(password, user.password_hash):
                 return make_response("Wrong Credentials", 400)
             
-            encoded_jwt = AuthService.jwtTokenEncoder({"name": user.username,"id":user.id,"role":user.role})
+            encoded_jwt = AuthService.jwtTokenEncoder({"name": user.username,"id":user.id,"role":user.role.value})
             response=make_response(
                 {"token":encoded_jwt,"message":"User Logged in successfully"},
                 201
@@ -84,14 +107,65 @@ class Auth(Resource):
             )
 
 class Users(Resource):
+    method_decorators = [token_required]
     def get(self):
         users = UserService.findAll()
         return make_response(
             jsonify(users),
             200        
         )
+class UserById(Resource):
+    method_decorators = [token_required]
+    def get(self,id):
+        print('I got hit')
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        user=UserService.findById(id)
+        if user:
+            response=make_response(
+                jsonify(user.to_dict()),
+                200
+            )
+  
+            return response
+        return make_response(jsonify({'message':'user not found'}),404)
+
+    def patch(self,id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        user=UserService.findById(id)
+        if user:
+            for attr in data:
+                print(data[attr])
+                setattr(user,attr,data[attr])
+            db.session.commit()
+            response=make_response(
+                jsonify(user.to_dict()),
+                200
+            )
+            return response
+        return make_response(jsonify({'message':'user not found'}),404)
+    
+    def delete(self,id):  
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+              
+        user=UserService.findById(id)
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            response_body=jsonify({'Message':f'user : *{user.username}* is deleted successfully'})
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'user not found'}),404)
 
 class Drivers(Resource):
+    method_decorators = [token_required]
     def get(self):
         drivers = DriverService.findAll()
         return make_response(
@@ -108,12 +182,13 @@ class Drivers(Resource):
         db.session.add(new_driver)
         db.session.commit()
         response=make_response(
-            {"driver":new_driver,"message":"Driver created successfully"},
+            {"driver":new_driver.to_dict(),"message":"Driver created successfully"},
             201
         )
         return response
     
 class DriverById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
@@ -121,24 +196,43 @@ class DriverById(Resource):
         driver=DriverService.findById(id)
         if driver:
             response=make_response(
-                jsonify(driver),
+                jsonify(driver.to_dict()),
                 200
             )
   
             return response
         return make_response(jsonify({'message':'driver not found'}),404)
     
-    def post(self):
+    def post(self,id):
         data=request.get_json()
         action=data['action']
         owner_id=data['owner_id']
         bus_id=data['bus_id']
 
+        if not action or not bus_id:
+            return {"error": "Missing 'action' or 'bus_id'"}, 400
+        
+        # check if driver exists
+        driver = DriverService.findById(id)
+        if not driver:
+            return {"error": f"Driver with ID {id} not found"}, 404
+
         # check if bus exists
+        bus = BusService.findById(id=bus_id)
+        if not bus:
+            return {"error": f"Bus with ID {bus_id} not found"}, 404
         # check if owner exists 
         if action == 'assign':
-            # assign to bus by owner
-            pass
+            if not owner_id:
+                return {"error": "Missing 'owner_id' for assignment"}, 400
+
+            owner = OwnerService.findById(id=owner_id)
+            if not owner:
+                return {"error": f"Owner with ID {owner_id} not found"}, 404
+
+            bus.driver_id = id
+            db.session.commit()
+            return {"message": f"Driver {driver.driver_name} assigned to bus {bus_id}"}, 200
         elif action == 'release':
             pass
         else:
@@ -161,7 +255,7 @@ class DriverById(Resource):
             return response
         return make_response(jsonify({'message':'driver not found'}),404)
     
-    def delete(self,id):  
+    def delete(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
               
@@ -177,12 +271,14 @@ class DriverById(Resource):
         return make_response(jsonify({'message':'user not found'}),404)
 
 class Owners(Resource):
+    method_decorators = [token_required]
     def get(self):
         owners = OwnerService.findAll()
         return make_response(
             jsonify(owners),
             200        
         )
+    
     def post(self):
         data=request.get_json()
         owner_name = data['owner_name']
@@ -193,12 +289,13 @@ class Owners(Resource):
         db.session.add(new_owner)
         db.session.commit()
         response=make_response(
-            {"owner":new_owner,"message":"owner created successfully"},
+            {"owner":new_owner.to_dict(),"message":"owner created successfully"},
             201
         )
         return response
     
 class OwnerById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
@@ -206,7 +303,7 @@ class OwnerById(Resource):
         owner=OwnerService.findById(id)
         if owner:
             response=make_response(
-                jsonify(owner),
+                jsonify(owner.to_dict()),
                 200
             )
   
@@ -246,6 +343,7 @@ class OwnerById(Resource):
         return make_response(jsonify({'message':'owner not found'}),404)
 
 class Bookings(Resource):
+    method_decorators = [token_required]
     def get(self):
         bookings = BookingService.findAll()
         return make_response(
@@ -268,12 +366,13 @@ class Bookings(Resource):
         db.session.add(new_booking)
         db.session.commit()
         response=make_response(
-            {"driver":new_booking,"message":"Booking created successfully"},
+            {"driver":new_booking.to_dict(),"message":"Booking created successfully"},
             201
         )
         return response
 
 class BookingById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
@@ -281,7 +380,7 @@ class BookingById(Resource):
         booking=BookingService.findOne(id)
         if booking:
             response=make_response(
-                jsonify(booking),
+                jsonify(booking.to_dict()),
                 200
             )
   
@@ -321,6 +420,7 @@ class BookingById(Resource):
         return make_response(jsonify({'message':'booking not found'}),404)  
 
 class Routes(Resource):
+    method_decorators = [token_required]
     def get(self):
         routes = RouteService.findAll()
         return make_response(
@@ -338,14 +438,15 @@ class Routes(Resource):
         db.session.commit()
 
         response=make_response(
-            {"driver":new_route,"message":"Route created successfully"},
+            {"route":new_route.to_dict(),"message":"Route created successfully"},
             201
         )
         return response
 
 class RouteById(Resource):
+    method_decorators = [token_required]
     def get(self, id):
-        route = RouteService.findOne(id)
+        route = RouteService.findById(id)
         return make_response(
             jsonify(route.to_dict()),
             200        
@@ -356,7 +457,7 @@ class RouteById(Resource):
             return make_response(jsonify({'message':'missing id parameter'}),400)
         
         data=request.get_json()
-        route=RouteService.findOne(id)
+        route=RouteService.findById(id)
         if route:
             for attr in data:
                 setattr(route,attr,data[attr])
@@ -372,7 +473,7 @@ class RouteById(Resource):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
               
-        route=RouteService.findOne(id)
+        route=RouteService.findById(id)
         if route:
             db.session.delete(route)
             db.session.commit()
@@ -384,6 +485,7 @@ class RouteById(Resource):
         return make_response(jsonify({'message':'route not found'}),404)  
 
 class Locations(Resource):
+    method_decorators = [token_required]
     def get(self):
         locations = LocationService.findAll()
         return make_response(
@@ -402,16 +504,17 @@ class Locations(Resource):
         db.session.commit()
 
         response=make_response(
-            {"driver":new_location,"message":"Location created successfully"},
+            {"location":new_location.to_dict(),"message":"Location created successfully"},
             201
         )
         return response
 
 class LocationById(Resource):
+    method_decorators = [token_required]
     def get(self, id):
         location = LocationService.findOne(id)
         return make_response(
-            jsonify(location),
+            jsonify(location.to_dict()),
             200        
         )
 
@@ -448,13 +551,13 @@ class LocationById(Resource):
         return make_response(jsonify({'message':'location not found'}),404)  
 
 class Buses(Resource):
+    method_decorators = [token_required]
     def post(self):
         data = request.get_json()
 
         new_bus = BusService.createBus(
             route_id=data["route_id"],
             driver_id=data["driver_id"],
-            title=data["title"],
             owner_id=data["owner_id"],
             plate=data["plate"],
             capacity=data["capacity"]
@@ -463,7 +566,7 @@ class Buses(Resource):
         db.session.add(new_bus)
         db.session.commit()
         response=make_response(
-            {"bus":new_bus,"message":"Bus created successfully"},
+            {"bus":new_bus.to_dict(),"message":"Bus created successfully"},
             201
         )
         return response
@@ -476,6 +579,7 @@ class Buses(Resource):
         )
     
 class BusById(Resource):
+    method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
@@ -483,7 +587,7 @@ class BusById(Resource):
         bus=BusService.findOne(id=id)
         if bus:
             response=make_response(
-                jsonify(bus),
+                jsonify(bus.to_dict()),
                 200
             )
   
@@ -528,7 +632,20 @@ def index():
     return '<h1>Project Server</h1>'
 
 api.add_resource(Auth, '/api/auth')
-
+api.add_resource(Users, '/api/users')
+api.add_resource(UserById, '/api/users/<int:id>')
+api.add_resource(Drivers, '/api/drivers')
+api.add_resource(DriverById, '/api/drivers/<int:id>')
+api.add_resource(Owners, '/api/owners')
+api.add_resource(OwnerById, '/api/owners/<int:id>')
+api.add_resource(Bookings, '/api/bookings')
+api.add_resource(BookingById, '/api/bookings/<int:id>')
+api.add_resource(Routes, '/api/routes')
+api.add_resource(RouteById, '/api/routes/<int:id>')
+api.add_resource(Locations, '/api/locations')
+api.add_resource(LocationById, '/api/locations/<int:id>')
+api.add_resource(Buses, '/api/buses')
+api.add_resource(BusById, '/api/buses/<int:id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
