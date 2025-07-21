@@ -41,13 +41,15 @@ def token_required(f):
 class Auth(Resource):
     def post(self):
         data=request.get_json()
-        action = data['action']
+        action = data.get('action')
 
-        username=data['username']
-        email=data['email']
-        mobile=data['mobile']
-        role=data['role']
-        password=data['password']
+
+        username = data.get('username')
+        email = data.get('email')
+        mobile = data.get('mobile')
+        role = data.get('role')
+        password = data.get('password')
+
 
         if action == "register":
             if username == None and email == None and role == None and password == None:
