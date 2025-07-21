@@ -225,8 +225,8 @@ const Login = () => {
         <Image
           src="/bus-hero.png"
           alt="School Bus with children"
-          width={800}
-          height={800}
+          width={1200}
+          height={1200}
           priority
         />
       </div>
