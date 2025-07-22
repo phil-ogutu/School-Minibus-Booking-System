@@ -1,7 +1,10 @@
 // Here is the Next.js App Router pages
 // Root layout
+// "use client";
 import "../styles/globals.css";
-import { Providers } from "./providers"; // NextAuth wrapper
+// import { Providers } from "./providers"; // NextAuth wrapper
+// import { MapProvider } from "@/context/MapContext";
+import { AppWrapper } from "./AppWrapper";
 
 export const metadata = {
   title: "SkoolaBus",
@@ -12,7 +15,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        {/* <MapProvider>
+          <Providers>{children}</Providers>
+        </MapProvider> */}
+        <AppWrapper>{children}</AppWrapper>
       </body>
     </html>
   );
