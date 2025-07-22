@@ -109,3 +109,18 @@ class DriverById(Resource):
                 200
             )
         return make_response(jsonify({'message':'user not found'}),404)
+
+class DriverTrips(Resource):
+    def get(self, id):
+        if id is None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        driver=DriverService.findById(id)
+        if driver:
+            buses = BusService.findAll(driver_id=id)
+            response_body=jsonify(buses)
+            return make_response(
+                response_body,
+                200
+            )
+        return make_response(jsonify({'message':'driver not found'}),404)

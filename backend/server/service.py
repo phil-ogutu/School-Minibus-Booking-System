@@ -136,11 +136,10 @@ class BookingService():
         )
     
 class BusService():
-    def __init__(self):
-        pass
-
     @staticmethod
-    def findAll():
+    def findAll(driver_id=None):
+        if driver_id:
+            return [bus.to_dict(rules=('-routes.buses','-bookings',)) for bus in Bus.query.filter_by(driver_id=driver_id).all()]
         return [bus.to_dict() for bus in Bus.query.all()]
     
     @staticmethod
@@ -189,9 +188,6 @@ class BusService():
         )
     
 class RouteService():
-    def __init__(self):
-        pass
-
     @staticmethod
     def findAll():
         return [route.to_dict() for route in Route.query.all()]
