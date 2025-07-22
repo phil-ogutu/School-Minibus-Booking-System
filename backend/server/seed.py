@@ -74,7 +74,9 @@ if __name__ == '__main__':
             plate=fake.license_plate(),
             capacity=str(randint(10, 50)),  # Random capacity between 10 and 50
             status=rc([TripStatus.pending, TripStatus.started, TripStatus.ended]), # Random bus status
-            created_at=fake.date_this_year()
+            created_at=fake.date_this_year(),
+            arrived=fake.date_this_year(),
+            departure=fake.date_this_year()
         )
 
     # Helper function to generate random bookings

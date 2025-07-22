@@ -1,8 +1,8 @@
-"""initial migration
+"""added arived and departure fields on bus table; add bio field on driver table
 
-Revision ID: 4df716817998
+Revision ID: 4e1a6afbd3c1
 Revises: 
-Create Date: 2025-07-20 16:59:26.111209
+Create Date: 2025-07-23 01:04:37.909290
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '4df716817998'
+revision = '4e1a6afbd3c1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,6 +21,7 @@ def upgrade():
     op.create_table('drivers',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('driver_name', sa.String(), nullable=False),
+    sa.Column('bio', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('owners',
@@ -55,8 +56,10 @@ def upgrade():
     sa.Column('owner_id', sa.Integer(), nullable=True),
     sa.Column('plate', sa.String(), nullable=True),
     sa.Column('capacity', sa.Integer(), nullable=True),
-    sa.Column('status', sa.Boolean(), nullable=True),
+    sa.Column('status', sa.Enum('pending', 'started', 'ended', name='tripstatus'), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('arrived', sa.DateTime(), nullable=True),
+    sa.Column('departure', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['driver_id'], ['drivers.id'], name=op.f('fk_buses_driver_id_drivers')),
     sa.ForeignKeyConstraint(['owner_id'], ['owners.id'], name=op.f('fk_buses_owner_id_owners')),
     sa.ForeignKeyConstraint(['route_id'], ['routes.id'], name=op.f('fk_buses_route_id_routes')),
