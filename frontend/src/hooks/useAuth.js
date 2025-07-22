@@ -4,7 +4,7 @@ import { useMutation } from './useMutation';
 import { AuthContext } from '../context/AuthContext';
 
 export const useAuth = () => {
-  const { mutate } = useMutation('/api/auth');
+  const { mutate } = useMutation('http://localhost:5000/api/auth');
   const { user, setUser } = useContext(AuthContext);
   const [authError, setAuthError] = useState(null);
 

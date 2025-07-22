@@ -52,3 +52,5 @@ api = Api(app)
 
 # Instantiate CORS
 CORS(app, supports_credentials=True)
+
+# CORS(app, supports_credentials=True, origins=["http://localhost:3000"])

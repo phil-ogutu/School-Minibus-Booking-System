@@ -50,7 +50,6 @@ class Auth(Resource):
         role = data.get('role')
         password = data.get('password')
 
-
         if action == "register":
             if username == None and email == None and role == None and password == None:
                 return make_response("Required Inputs are required", 400)
@@ -124,7 +123,7 @@ class UserById(Resource):
         user=UserService.findById(id)
         if user:
             response=make_response(
-                jsonify(user.to_dict()),
+                jsonify(user.to_dict(rules=('-password_hash',))),
                 200
             )
   
@@ -143,7 +142,7 @@ class UserById(Resource):
                 setattr(user,attr,data[attr])
             db.session.commit()
             response=make_response(
-                jsonify(user.to_dict()),
+                jsonify(user.to_dict(rules=('-password_hash',))),
                 200
             )
             return response
@@ -164,6 +163,16 @@ class UserById(Resource):
             )
         return make_response(jsonify({'message':'user not found'}),404)
 
+# Get current user after log in
+class CurrentUser(Resource):
+    method_decorators = [token_required]
+
+    def get(self):
+        user = UserService.findById(g.user_id)
+        if user:
+            return make_response(jsonify(user.to_dict(rules=('-password_hash',))), 200)
+        return make_response(jsonify({'message': 'User not found'}), 404)
+    
 class Drivers(Resource):
     method_decorators = [token_required]
     def get(self):
@@ -446,7 +455,7 @@ class Routes(Resource):
 class RouteById(Resource):
     method_decorators = [token_required]
     def get(self, id):
-        route = RouteService.findById(id)
+        route = RouteService.findOne(id=id, increment_search=True)
         return make_response(
             jsonify(route.to_dict()),
             200        
@@ -483,6 +492,19 @@ class RouteById(Resource):
                 200
             )
         return make_response(jsonify({'message':'route not found'}),404)  
+
+# New route for top searched routes
+class TopRoutes(Resource):
+    method_decorators = [token_required]
+
+    def get(self):
+        try:
+            limit = int(request.args.get("limit", 6))
+        except ValueError:
+            return make_response({"message": "Invalid limit parameter"}, 400)
+
+        top_routes = RouteService.getTopSearched(limit=limit)
+        return make_response(jsonify(top_routes), 200)
 
 class Locations(Resource):
     method_decorators = [token_required]
@@ -634,6 +656,7 @@ def index():
 api.add_resource(Auth, '/api/auth')
 api.add_resource(Users, '/api/users')
 api.add_resource(UserById, '/api/users/<int:id>')
+api.add_resource(CurrentUser, '/api/users/me')
 api.add_resource(Drivers, '/api/drivers')
 api.add_resource(DriverById, '/api/drivers/<int:id>')
 api.add_resource(Owners, '/api/owners')
@@ -642,6 +665,7 @@ api.add_resource(Bookings, '/api/bookings')
 api.add_resource(BookingById, '/api/bookings/<int:id>')
 api.add_resource(Routes, '/api/routes')
 api.add_resource(RouteById, '/api/routes/<int:id>')
+api.add_resource(TopRoutes, '/api/routes/top')
 api.add_resource(Locations, '/api/locations')
 api.add_resource(LocationById, '/api/locations/<int:id>')
 api.add_resource(Buses, '/api/buses')
