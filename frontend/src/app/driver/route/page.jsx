@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
-import { busIcon, groupIcon, mapPinIcon, playIcon} from '@/components/ui/icons.js';
+import { busIcon, groupIcon, mapPinIcon, playIcon, arrowLocationIcon, flagIcon} from '@/components/ui/icons.js';
 import { getRouteFromStops } from '@/utils/route.js';
 import Container from '@/components/ui/Container';
 import Text from '@/components/ui/Text';
@@ -9,6 +9,7 @@ const SchoolBusRoute = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [startRide,setstartRide]=useState(false)
 
   const busStops = dummyData[Math.floor(Math.random() * 4) + 1]
   // Sample route data
@@ -159,14 +160,19 @@ const SchoolBusRoute = () => {
         {/* Mobile Route Info Overlay (Bottom) - Hidden on desktop */}
         <div className="md:hidden absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl border-t border-gray-200 z-1000">
           {/* <StartTripComponent routeData={routeData}/> */}
-          <InTripComponent routeData={routeData} className={'h-full flex flex-col'} busStops={busStops}/>
+          {!startRide ? 
+            <StartTripComponent routeData={routeData} setstartRide={setstartRide}/> :
+            <InTripComponent routeData={routeData} busStops={busStops} setstartRide={setstartRide}/>
+          }
         </div>
       </div>
 
       {/* Desktop Sidebar - Hidden on mobile */}
       <div className="hidden md:block w-80 bg-white shadow-xl">
-        {/* <StartTripComponent routeData={routeData} className={'h-full flex flex-col'}/> */}
-        <InTripComponent routeData={routeData} className={'h-full flex flex-col'} busStops={busStops}/>
+        {!startRide ? 
+          <StartTripComponent routeData={routeData} setstartRide={setstartRide}/> :
+          <InTripComponent routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setstartRide={setstartRide}/>
+        }
       </div>
     </div>
   );
@@ -175,7 +181,7 @@ const SchoolBusRoute = () => {
 export default SchoolBusRoute;
 
 
-const StartTripComponent=(({routeData, desktopClassName=''})=>{
+const StartTripComponent=(({routeData, desktopClassName='',setstartRide})=>{
   return(
     <Container>
       <div className={`p-6 ${desktopClassName}`}>
@@ -206,7 +212,7 @@ const StartTripComponent=(({routeData, desktopClassName=''})=>{
           </span>
         </div>
 
-        <button className="w-full bg-primary hover:bg-dark text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors">
+        <button className="w-full bg-primary hover:bg-dark text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors" onClick={()=>{setstartRide(true)}}>
           {playIcon()}
           Start Ride
         </button>
@@ -215,7 +221,7 @@ const StartTripComponent=(({routeData, desktopClassName=''})=>{
   )
 });
 
-const InTripComponent=(({routeData, desktopClassName='', busStops})=>{
+const InTripComponent=(({routeData, desktopClassName='', busStops, setstartRide})=>{
   return(
     <Container>
       <div className={`p-6 ${desktopClassName}`}>
@@ -229,16 +235,16 @@ const InTripComponent=(({routeData, desktopClassName='', busStops})=>{
           </div>
         </div>
 
-        <Container className='overflow-scroll h-50'>
+        <Container className={`no-scrollbar overflow-scroll ${desktopClassName ? 'h-100' :'h-50'}`}>
           {busStops?.length > 0 && busStops?.map((stop,index)=>{
             // Determine the position of the stop
             const isFirst = index === 0;
             const isLast = index === busStops.length - 1;
             const stopType = isFirst ? 'start' : isLast ? 'end' : 'onRoute';
             const icons = {
-              'start':mapPinIcon(),
-              'onRoute':mapPinIcon(),
-              'end':mapPinIcon()
+              'start':mapPinIcon('text-primary text-xl'),
+              'onRoute':arrowLocationIcon('text-dark text-xl'),
+              'end':flagIcon('text-secondary text-xl')
             }
             return(
               <Container className={`flex flex-col my-2 ${isFirst && 'bg-amber-100 p-1 rounded-md shadow-sm'}`} key={index}>
@@ -268,11 +274,11 @@ const InTripComponent=(({routeData, desktopClassName='', busStops})=>{
         </div>
 
         <Container className='flex flex-row gap-4 align-middle'>
-          <button className="w-full bg-red-400 hover:bg-red-400 text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors">
+          <button className="w-full bg-red-400 hover:bg-red-400 text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors" onClick={()=>{setstartRide(false)}}>
             Cancel
           </button>
           <button className="w-full bg-dark text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors">
-            Pause
+            Complete
           </button>
         </Container>
 
