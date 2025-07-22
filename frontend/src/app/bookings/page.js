@@ -1,38 +1,67 @@
 // Here is the Bookings page
-import TopSearchCard from "../../components/TopSearchCard";
+"use client";
+import dynamic from "next/dynamic";
+import TopSearchCard from "../../components/SearchCard";
 import SearchBus from "../../components/SearchBus";
 import Navbar from "@/components/Navbar";
+import MapComponent from "@/components/MapComponent";
+import { routesData } from "@/data/RoutesData";
+import { useEffect, useState } from "react";
+import { useTheContext } from "@/context/MapContext";
+
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function Booking() {
+  const [currentRoutes, setCurrentRoutes] = useState(routesData)
+  const { from, to } = useTheContext(); 
+  console.log("FROM", from)
+  console.log("TO", to)
+
+  console.log(Array.isArray(currentRoutes)) // true if it's an array
+
+  const filteredRoutes = currentRoutes.filter((route) => {
+    // return route.id > 0
+    // return route.start.toLowerCase().includes(from.toLowerCase())
+    // return route.end.toLowerCase().includes(to.toLowerCase())
+    const matchFrom = from ? route.start.toLowerCase().includes(from.toLowerCase()) : true;
+    const matchTo = to ? route.end.toLowerCase().includes(to.toLowerCase()) : true;
+
+    return matchFrom && matchTo;
+
+  })
+  console.log("Filtered routes", filteredRoutes)
+
+  // useEffect(() => {
+  //   setCurrentRoutes(routesData)
+  // }, [])
+
   return (
-    <div
-      className="min-h-screen bg-[url(/bus-hero.png)] bg-no-repeat bg-center"
-      style={{
-        backgroundSize: "700px 400px",
-        backgroundPosition: "center 30%",
-      }}
-    >
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="text-lg text-neutral-500 font-medium flex justify-center mt-5">
-        Get bus tickets
-      </div>
-      <h1 className="text-5xl text-neutral-700 font-semibold text-center mb-10">
-        Find the Best Bus for your Child
-      </h1>
+      <div className="flex-1 grid grid-cols-2">
+        <div className="p-5 flex flex-col space-y-5">
+          <SearchBus />
+          <div className="overflow-y-auto space-y-4 no-scrollbar h-[calc(100vh-220px)]">
 
-      <SearchBus />
+            {(filteredRoutes && filteredRoutes.length>0 ? filteredRoutes:currentRoutes).map((route) => (
+              <div key={route.id}>
+                <TopSearchCard route={route} />
+              </div>
+            ))}
 
-      <div className="text-center mt-100 text-3xl font-medium text-neutral-700">
-        Top Search Routes
+            {/* <TopSearchCard /> */}
+            {/* <TopSearchCard />
+            <TopSearchCard />
+            <TopSearchCard /> */}
+          </div>
+        </div>
+
+        <div className="w-full h-full p-2">
+          <MapComponent />
+        </div>
       </div>
-      <div className="w-full grid grid-cols-3 gap-5 p-10">
-        <TopSearchCard pickup={"Kitengela"} dropoff={"Imaara"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Syokimau"} dropoff={"Mlolongo"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Kileleshwa"} dropoff={"Westlands"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Roysambu"} dropoff={"Westlands"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Nairobi West"} dropoff={"Parkands"} time={"10:30pm"} price={"Ksh. 500"}/>
-        <TopSearchCard pickup={"Umoja"} dropoff={"Donholm"} time={"10:30pm"} price={"Ksh. 500"}/> 
-      </div>
+
+      {/* <SearchBus /> */}
     </div>
   );
 }

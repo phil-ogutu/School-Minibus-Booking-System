@@ -43,6 +43,7 @@ class Auth(Resource):
         data=request.get_json()
         action = data.get('action')
 
+
         username = data.get('username')
         email = data.get('email')
         mobile = data.get('mobile')
