@@ -1,8 +1,6 @@
 // src/hooks/useFetch.js
 import { useState, useEffect } from 'react';
 
-const BASE_URL = "http://127.0.0.1:5000"; // Later replace with process.env if needed
-
 export const useFetch = (url, options = {}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -35,7 +35,7 @@ class UserService():
     
     @staticmethod
     def findAll():
-        return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+        return [user.to_dict() for user in User.query.all()]
     
 class DriverService():
     @staticmethod
@@ -202,36 +202,18 @@ class RouteService():
             return Route.query.filter_by(id=id).first()
         return None
     
-    # Increment count on search
     @staticmethod
-    def findOne(id=None, start=None, end=None, increment_search=False):
-        route = None
-
+    def findOne(id=None, start=None, end=None):
         if id:
-            route = Route.query.filter_by(id=id).first()
-        elif start and end:
-            route = Route.query.filter_by(start=start, end=end).first()
-        elif start:
-            route = Route.query.filter_by(start=start).first()
-        elif end:
-            route = Route.query.filter_by(end=end).first()
-
-        if route and increment_search:
-            route.search_count += 1
-            db.session.commit()
-
-        return route
+            return Route.query.filter_by(id=id).first()
+        if start and end:
+            return Route.query.filter_by(start=start, end=end).first()
+        if start:
+            return Route.query.filter_by(start=start).first()
+        if end:
+            return Route.query.filter_by(end=end).first()
+        return None
     
-    # Get mostly searched routes
-    @staticmethod
-    def getTopSearched(limit=6):
-        routes = (
-            Route.query
-            .order_by(Route.search_count.desc())
-            .limit(limit)
-            .all()
-        )
-        return [route.to_dict() for route in routes]
     
     @classmethod
     def createRoute(cls,start, end ):

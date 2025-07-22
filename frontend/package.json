@@ -12,8 +12,6 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "framer-motion": "^12.23.6",
-    "react-countup": "^6.5.3",
     "date-fns": "^4.1.0",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "formik": "^2.4.6",

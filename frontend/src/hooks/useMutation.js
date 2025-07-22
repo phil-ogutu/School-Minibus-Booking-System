@@ -5,12 +5,13 @@ export const useMutation = (url, method = 'POST') => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const BASE_URL = "http://127.0.0.1:5000"
 
   const mutate = async (body, customUrl = null) => {
     setLoading(true);
     try {
       const finalUrl = customUrl || url;
-      const response = await fetch(finalUrl, {
+      const response = await fetch(`${BASE_URL}${finalUrl}`, {
         method,
         credentials: 'include',
         headers: {

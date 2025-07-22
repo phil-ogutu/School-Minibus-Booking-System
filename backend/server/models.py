@@ -104,7 +104,6 @@ class Route(db.Model,SerializerMixin):
     end = db.Column(db.String, nullable=False)
     status = db.Column(Enum(RouteStatus), default=RouteStatus.pending)
     created_at = db.Column(db.DateTime(), server_default=func.now())
-    search_count = db.Column(db.Integer, default=0)
 
     buses = db.relationship("Bus", back_populates="routes")
     locations = db.relationship("Location", back_populates="routes")
