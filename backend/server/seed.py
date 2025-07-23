@@ -50,6 +50,13 @@ dummy_data = [
     ],
 ]
 
+dummy_routes = [
+    {"start": "JKUAT Entry Road", "end": "Kimbo"},
+    {"start": "JKUAT Entry Road", "end": "Roysambu"},
+    {"start": "Thika Main Stage", "end": "Nairobi CBD"},
+    {"start": "Kencom", "end": "Uthiru"},
+]
+
 if __name__ == '__main__':
     fake = Faker()
 
@@ -116,10 +123,10 @@ if __name__ == '__main__':
         )
 
     # Helper function to generate random routes
-    def create_route():
+    def create_route(start, end):
         return Route(
-            start=fake.city(),
-            end=fake.city(),
+            start=start,
+            end=end,
             status=rc([RouteStatus.pending, RouteStatus.started, RouteStatus.ended]),
             created_at=fake.date_this_year()
         )
@@ -152,7 +159,9 @@ if __name__ == '__main__':
 
         # Seed Routes
         print("Seeding Routes...")
-        routes = [create_route() for _ in range(5)]  # 5 routes
+        routes = []
+        for r in dummy_routes:
+            routes.append(create_route(r["start"], r["end"]))
         db.session.add_all(routes)
         db.session.commit()
 

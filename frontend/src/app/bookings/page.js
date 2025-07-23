@@ -4,18 +4,17 @@ import dynamic from "next/dynamic";
 import SearchCard from "../../components/SearchCard";
 import SearchBus from "../../components/SearchBus";
 import Navbar from "@/components/Navbar";
-// import MapComponent from "@/components/MapComponent";
 import { useTheContext } from "@/context/MapContext";
 import { useRoutes } from "@/hooks/useRoutes";
+import { useState } from "react";
 
-const MapComponent = dynamic(() => import("@/components/MapComponent"), { ssr: false });
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function Booking() {
   const { routes, routesLoading, routesError } = useRoutes();
   const { from, to } = useTheContext();
 
-  // console.log("FROM", from);
-  // console.log("TO", to);
+  const [stops, setStops] = useState([]);
 
   const filteredRoutes = routes?.filter((route) => {
     const matchFrom = from
@@ -41,21 +40,24 @@ export default function Booking() {
           <SearchBus />
 
           <div className="overflow-y-auto space-y-4 no-scrollbar h-[calc(100vh-220px)]">
-
             {displayRoutes.map((route) => (
-              <div key={route.id}>
+              <div
+                key={route.id}
+                onClick={() => {
+                  console.log("Selected stops", route.locations);
+                  setStops(route.locations);
+                }}
+              >
                 <SearchCard route={route} />
               </div>
             ))}
-
           </div>
         </div>
 
         <div className="hidden md:block md:w-full md:h-full md:p-2">
-          <MapComponent />
+          <Map locations={stops}/>
         </div>
       </div>
     </div>
   );
 }
-
