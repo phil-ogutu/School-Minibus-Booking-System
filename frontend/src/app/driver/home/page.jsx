@@ -4,7 +4,7 @@ import Text from '@/components/ui/Text'
 import React from 'react'
 import {Header as DriverHeader} from '../components/Header'
 import Image from 'next/image'
-import RouteCard from '../components/route'
+import TripCard from '../components/trip'
 import { useFetch } from '@/hooks/useFetch'
 
 function page() {
@@ -23,7 +23,7 @@ function page() {
         </Container>
         <Container className='flex flex-row flex-wrap p-4'>
           {!tripsLoading && trips?.map((trip,i)=>{
-            return (<RouteCard trip={trip} key={trip?.id} index={i}/>)
+            return (<TripCard trip={trip} key={trip?.id} index={i}/>)
           })}
         </Container>
     </Container>

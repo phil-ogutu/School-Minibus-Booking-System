@@ -3,7 +3,7 @@ import { busIcon } from '@/components/ui/icons';
 import Text from '@/components/ui/Text';
 import { useRouter } from 'next/navigation';
 
-export default function RouteCard({trip,index}) {
+export default function TripCard({trip,index}) {
   const router = useRouter();
   return (
     <div onClick={()=>{router.push(`/driver/trip/${trip?.id}`)}} className={`bg-gradient-to-r from-[#2e2e2e] to-[#4d4d4d] text-white rounded-xl shadow-md p-4 w-full max-w-md m-1 cursor-pointer`}>
