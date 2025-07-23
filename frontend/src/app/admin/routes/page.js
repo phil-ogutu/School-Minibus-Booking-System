@@ -13,7 +13,6 @@ const routes = [
     endPoint: "CBD",
     commonStages: "Kitengela, Mlolongo, Syokimau, South B, CBD",
     distanceKm: 30,
-    busNumber: "KDA 123A",
   },
   {
     id: 2,
@@ -23,7 +22,6 @@ const routes = [
     endPoint: "Thika Road",
     commonStages: "Cabanas, Taj Mall, Pipeline, Allsops, Garden City",
     distanceKm: 18,
-    busNumber: "KDB 456B",
   },
   {
     id: 3,
@@ -33,7 +31,6 @@ const routes = [
     endPoint: "CBD",
     commonStages: "Thika, Juja, Ruiru, Githurai, Kasarani, CBD",
     distanceKm: 45,
-    busNumber: "KDC 789C",
   },
 ];
 
@@ -53,7 +50,7 @@ export default function ManageRoutes() {
               <th className="px-4 py-2 border">End Point</th>
               <th className="px-4 py-2 border">Common Stages</th>
               <th className="px-4 py-2 border">Distance (km)</th>
-              <th className="px-4 py-2 border">Bus Number</th>
+              {/* <th className="px-4 py-2 border">Bus Number</th> */}
               <th className="px-4 py-2 border">Actions</th>
             </tr>
           </thead>
@@ -66,7 +63,7 @@ export default function ManageRoutes() {
                 <td className="border px-4 py-2">{route.endPoint}</td>
                 <td className="border px-4 py-2">{route.commonStages}</td>
                 <td className="border px-4 py-2">{route.distanceKm} km</td>
-                <td className="border px-4 py-2">{route.busNumber}</td>
+                {/* <td className="border px-4 py-2">{route.busNumber}</td> */}
                 <td className="border px-4 py-2 space-x-2">
                   <button className="bg-sky-500 text-white p-1 rounded hover:bg-sky-600">
                     <FaEdit />

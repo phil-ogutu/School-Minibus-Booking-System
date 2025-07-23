@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
-const ownerships = [
+const initialOwnerships = [
   {
     id: 1,
     ownerName: "Green Transport Ltd",
@@ -38,12 +39,119 @@ const ownerships = [
 ];
 
 export default function BusOwners() {
+  const [ownerships, setOwnerships] = useState(initialOwnerships);
+  const [form, setForm] = useState({
+    ownerName: "",
+    contact: "",
+    makeModel: "",
+    yom: "",
+    busNumber: "",
+    capacity: "",
+    status: "Active",
+  });
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleAddOwner = (e) => {
+    e.preventDefault();
+    const newEntry = {
+      id: Date.now(),
+      ...form,
+      yom: Number(form.yom),
+      capacity: Number(form.capacity),
+    };
+    setOwnerships([...ownerships, newEntry]);
+    setForm({
+      ownerName: "",
+      contact: "",
+      makeModel: "",
+      yom: "",
+      busNumber: "",
+      capacity: "",
+      status: "Active",
+    });
+  };
+
   return (
     <div className="flex">
       <DashboardSidebar />
       <main className="flex-1 p-10 bg-gray-50 min-h-screen">
         <DashboardHeader title="Bus Ownership Management" />
 
+        {/* Add Owner & Bus Form */}
+        <form
+          onSubmit={handleAddOwner}
+          className="mb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end"
+        >
+          <input
+            name="ownerName"
+            placeholder="Owner Name"
+            value={form.ownerName}
+            onChange={handleChange}
+            className="p-2 border rounded"
+            required
+          />
+          <input
+            name="contact"
+            placeholder="Contact"
+            value={form.contact}
+            onChange={handleChange}
+            className="p-2 border rounded"
+            required
+          />
+          <input
+            name="makeModel"
+            placeholder="Make & Model"
+            value={form.makeModel}
+            onChange={handleChange}
+            className="p-2 border rounded"
+            required
+          />
+          <input
+            type="number"
+            name="yom"
+            placeholder="Year"
+            value={form.yom}
+            onChange={handleChange}
+            className="p-2 border rounded"
+            required
+          />
+          <input
+            name="busNumber"
+            placeholder="Plate Number"
+            value={form.busNumber}
+            onChange={handleChange}
+            className="p-2 border rounded"
+            required
+          />
+          <input
+            type="number"
+            name="capacity"
+            placeholder="Capacity"
+            value={form.capacity}
+            onChange={handleChange}
+            className="p-2 border rounded"
+            required
+          />
+          <select
+            name="status"
+            value={form.status}
+            onChange={handleChange}
+            className="p-2 border rounded"
+          >
+            <option>Active</option>
+            <option>Inactive</option>
+          </select>
+          <button
+            type="submit"
+            className="bg-green-600 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-700"
+          >
+            <FaPlus className="mr-2" /> Add
+          </button>
+        </form>
+
+        {/* Ownership Table */}
         <table className="min-w-full bg-white border rounded shadow">
           <thead className="bg-[#0F333F] text-white">
             <tr>
@@ -75,7 +183,6 @@ export default function BusOwners() {
                     {bus.status}
                   </span>
                 </td>
-
                 <td className="border px-4 py-2 space-x-2">
                   <button className="bg-sky-500 text-white p-1 rounded hover:bg-sky-600">
                     <FaEdit />

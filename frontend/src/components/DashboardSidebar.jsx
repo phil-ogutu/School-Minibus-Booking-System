@@ -39,6 +39,7 @@ import {
   FaSignOutAlt,
   FaClipboardList,
   FaUserCheck,
+  FaUserTie,
 } from "react-icons/fa";
 
 const navItems = [
@@ -48,6 +49,7 @@ const navItems = [
   { href: "/admin/routes", label: "Manage Routes", icon: FaRoute },
   { href: "/admin/bookings", label: "View Bookings", icon: FaClipboardList },
   { href: "/admin/parents", label: "Parents", icon: FaUserFriends },
+  { href: "/admin/drivers", label: "Drivers", icon: FaUserTie },
   { href: "/admin/profile", label: "Edit Profile", icon: FaUserFriends },
 ];
 
