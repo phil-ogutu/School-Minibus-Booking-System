@@ -4,7 +4,7 @@ import { useState } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { useTrips } from "@/hooks/useTrips";
+// import { useTrips } from "@/hooks/useTrips";
 
 const initialBuses = [
   { id: 1, numberPlate: "KDA 123A", capacity: 40, driver: "Peter Kamau" },
