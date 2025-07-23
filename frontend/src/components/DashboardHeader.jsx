@@ -35,7 +35,7 @@ export default function DashboardHeader({ title }) {
       <h1 className="text-3xl font-bold text-[#0F333F]">{title}</h1>
 
       <div className="flex items-center space-x-3">
-        <span className="text-gray-700">{user?.name || "Admin"}</span>
+        <span className="text-gray-700">{user?.name || "User"}</span>
         <img
           src={user?.image || "/fallback-avatar.png"}
           alt="avatar"
