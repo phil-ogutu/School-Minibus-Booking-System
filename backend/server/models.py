@@ -12,6 +12,7 @@ import enum
 class UserRole(enum.Enum):
     parent = "parent"
     admin = "admin"
+    driver = "driver"
 
 class TripStatus(enum.Enum):
     pending = "pending"
