@@ -4,12 +4,12 @@ import dynamic from "next/dynamic";
 import TopSearchCard from "../../components/SearchCard";
 import SearchBus from "../../components/SearchBus";
 import Navbar from "@/components/Navbar";
-import MapComponent from "@/components/MapComponent";
+// import MapComponent from "@/components/MapComponent";
 import { routesData } from "@/data/RoutesData";
 import { useEffect, useState } from "react";
 import { useTheContext } from "@/context/MapContext";
 
-const Map = dynamic(() => import("@/components/Map"), { ssr: false });
+const MapComponent = dynamic(() => import("@/components/MapComponent"), { ssr: false });
 
 export default function Booking() {
   const [currentRoutes, setCurrentRoutes] = useState(routesData)

@@ -51,8 +51,8 @@ const SearchCard = ({route}) => {
       {console.log("Search Card Locations", route.locations)}
       {
         route.locations.length > 0 && route.locations.map(
-          (location) => (
-            <div className="w-full flex items-center justify-center-safe gap-x-20">
+          (location,index) => (
+            <div key={location.id || index} className="w-full flex items-center justify-center-safe gap-x-20">
               <div className="flex flex-col items-center">
                 <FaCircle className="w-2.5 h-2.5 text-neutral-600"/>
                 <p className="text-sm text-neutral-600 font-normal">{location.location_name}</p>
