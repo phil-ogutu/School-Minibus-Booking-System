@@ -4,28 +4,28 @@ import { busIcon, groupIcon, mapPinIcon, playIcon, arrowLocationIcon, flagIcon} 
 import { getRouteFromStops } from '@/utils/route.js';
 import Container from '@/components/ui/Container';
 import Text from '@/components/ui/Text';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useFetch } from '@/hooks/useFetch';
 import { loadLeaflet, L_Instance } from '@/utils/leaflet';
+import { useMutation } from '@/hooks/useMutation';
 
 const SchoolBusRoute = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [startRide,setstartRide]=useState(false);
+  const [tripStatus,setTripStatus]=useState(false);
   const {id : trip_id} = useParams();
   
-  const { data, loading: tripsLoading, error: tripsError } = useFetch(`/api/drivers/1/trip/${trip_id}`);
+  const { data , loading: tripsLoading, error: tripsError } = useFetch(`/api/drivers/1/trip/${trip_id}`,tripStatus);
 
   const busStops = data?.routes?.locations ?? []
-  console.log(busStops)
-  // const busStops = data?.routes?.locations ?? dummyData[Math.floor(Math.random() * 4) + 1]
+  // console.log(busStops)
   const routeData = {
-    name: "Route Name",
-    date: "21 Nov 2024",
+    name: `${data?.routes?.start}-${data?.routes?.end}` ?? "Route Name",
+    date: data?.departure ?? 'date',
     stops: busStops?.length,
     children: 15,
-    status: "pending"
+    status: data?.status ?? 'pending'
   };
 
   const [routeCoordinates, setRouteCoordinates] = useState([]);
@@ -37,6 +37,7 @@ const SchoolBusRoute = () => {
       // Cleanup
       if (mapInstance.current) {
         mapInstance.current.remove();
+        mapInstance.current = null;
       }
     };
   }, [tripsLoading]);
@@ -51,9 +52,9 @@ const SchoolBusRoute = () => {
         attribution: '© OpenStreetMap contributors'
       }).addTo(mapInstance.current);
 
-      // // Get route that follows roads
+      // Get route that follows roads
       getRouteFromStops(busStops, setRouteCoordinates);
-      console.log('routeCoordinates',routeCoordinates);
+      // console.log('routeCoordinates',routeCoordinates);
 
       // // Add bus stop markers with validation
       busStops.forEach((stop, index) => {
@@ -84,7 +85,7 @@ const SchoolBusRoute = () => {
       
       if (validStops?.length > 0) {
         const bounds = L_Instance?.latLngBounds(validStops?.map(stop => [stop?.latitude, stop?.longitude]));
-        console.log(bounds)
+        // console.log(bounds)
         mapInstance.current.fitBounds(bounds, { padding: [20, 20] });
       }
     }
@@ -103,10 +104,10 @@ const SchoolBusRoute = () => {
         console.warn('No valid coordinates found for route');
         return;
       }
-      console.log(validCoordinates);
+      // console.log(validCoordinates);
       // Create route polyline
-      console.log('Map instance:', mapInstance.current);
-      console.log('Is valid Leaflet map:', mapInstance.current instanceof L_Instance.Map);
+      // console.log('Map instance:', mapInstance.current);
+      // console.log('Is valid Leaflet map:', mapInstance.current instanceof L_Instance.Map);
       if (
         typeof window !== 'undefined' &&
           mapInstance.current &&
@@ -155,19 +156,18 @@ const SchoolBusRoute = () => {
         
         {/* Mobile Route Info Overlay (Bottom) - Hidden on desktop */}
         <div className="md:hidden absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl border-t border-gray-200 z-1000">
-          {/* <StartTripComponent routeData={routeData}/> */}
-          {!startRide ? 
-            <StartTripComponent routeData={routeData} setstartRide={setstartRide}/> :
-            <InTripComponent routeData={routeData} busStops={busStops} setstartRide={setstartRide}/>
+          {routeData?.status === 'pending' ? 
+            <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id}/> :
+            <InTripComponent routeData={routeData} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id}/>
           }
         </div>
       </div>
 
       {/* Desktop Sidebar - Hidden on mobile */}
       <div className="hidden md:block w-80 bg-white shadow-xl">
-        {!startRide ? 
-          <StartTripComponent routeData={routeData} setstartRide={setstartRide}/> :
-          <InTripComponent routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setstartRide={setstartRide}/>
+        {routeData?.status === 'pending' ? 
+          <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id}/> :
+          <InTripComponent routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id}/>
         }
       </div>
     </div>
@@ -177,7 +177,18 @@ const SchoolBusRoute = () => {
 export default SchoolBusRoute;
 
 
-const StartTripComponent=(({routeData, desktopClassName='',setstartRide})=>{
+const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id})=>{
+  const router = useRouter()
+  const { mutate } = useMutation(`http://127.0.0.1:5000/api/drivers/1/trip/${trip_id}`,'PATCH');
+  const handleStartRide=async()=>{
+    try {
+      const data = await mutate({status: 'started'});
+      setTripStatus('started')
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
   return(
     <Container>
       <div className={`p-6 ${desktopClassName}`}>
@@ -203,21 +214,33 @@ const StartTripComponent=(({routeData, desktopClassName='',setstartRide})=>{
         </div>
 
         <div className="mb-4">
-          <span className="inline-block px-3 py-1 bg-primary text-dark rounded-full text-sm font-medium">
+          <span className={`inline-block px-3 py-1 ${routeData?.status !== 'ended' ? 'bg-primary': 'bg-green-400'} text-dark rounded-full text-sm font-medium`}>
             {routeData?.status}
           </span>
         </div>
+        {routeData?.status !== 'ended' && (
+          <button className="w-full bg-primary hover:bg-dark text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors" onClick={()=>{handleStartRide()}}>
+            {playIcon()}
+            Start Ride
+          </button>
+        )}
 
-        <button className="w-full bg-primary hover:bg-dark text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors" onClick={()=>{setstartRide(true)}}>
-          {playIcon()}
-          Start Ride
-        </button>
       </div>
     </Container>
   )
 });
 
-const InTripComponent=(({routeData, desktopClassName='', busStops, setstartRide})=>{
+const InTripComponent=(({routeData, desktopClassName='', busStops, setTripStatus, trip_id})=>{
+  const { mutate } = useMutation(`http://127.0.0.1:5000/api/drivers/1/trip/${trip_id}`,'PATCH');
+  const handleUpdateTripStatus=async(body)=>{
+    try {
+      const data = await mutate(body);
+      setTripStatus(body?.status)
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
   return(
     <Container>
       <div className={`p-6 ${desktopClassName}`}>
@@ -249,7 +272,7 @@ const InTripComponent=(({routeData, desktopClassName='', busStops, setstartRide}
                   {icons[stopType]}
                   {/* Details go here */}
                   <Container className='flex flex-col'>
-                    <Text>{stop?.name}</Text>
+                    <Text>{stop?.location_name}</Text>
                     <Text>{stop?.tta ?? '1 min'}</Text>
                   </Container>
                 </Container>
@@ -265,17 +288,21 @@ const InTripComponent=(({routeData, desktopClassName='', busStops, setstartRide}
 
         <div className="my-4">
           <span className="inline-block px-3 py-1 bg-secondary text-dark rounded-full text-sm font-medium">
-            in progress
+            {routeData?.status}
           </span>
         </div>
 
         <Container className='flex flex-row gap-4 align-middle'>
-          <button className="w-full bg-red-400 hover:bg-red-400 text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors" onClick={()=>{setstartRide(false)}}>
-            Cancel
-          </button>
-          <button className="w-full bg-dark text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors">
-            Complete
-          </button>
+          {routeData?.status !== 'ended' && (
+            <>
+              <button className="w-full bg-red-400 hover:bg-red-400 text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors" onClick={()=>{handleUpdateTripStatus({status: 'pending'})}}>
+                Cancel
+              </button>
+              <button className="w-full bg-dark text-white font-semibold py-2 px-6 rounded-lg flex items-center justify-center gap-2 transition-colors" onClick={()=>{handleUpdateTripStatus({status: 'ended'})}}>
+                Complete
+              </button>
+            </>
+          )}
         </Container>
 
       </div>

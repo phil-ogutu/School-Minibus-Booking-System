@@ -1,5 +1,5 @@
 from middleware.auth import token_required
-from service import DriverService, BusService, OwnerService
+from service import DriverService, BusService, OwnerService, UserService
 from flask import make_response, jsonify, request
 from flask_restful import Resource
 from config import db
@@ -143,5 +143,24 @@ class DriverTripById(Resource):
             return make_response(jsonify({'message':'bus not found'}),404)
         return make_response(jsonify({'message':'driver not found'}),404)
     
-    def post(self, id, trip_id):
-        pass
+    def patch(self, id, trip_id):
+        if id == None or trip_id == None:
+            return make_response(jsonify({'message':'missing id parameter'}),400)
+        
+        data=request.get_json()
+        driver=DriverService.findById(id)
+        if driver:
+            bus = BusService.findOne(id=trip_id)
+            if bus:
+                for attr in data:
+                    print(data[attr])
+                    setattr(bus,attr,data[attr])
+                db.session.commit()
+                response_body=jsonify(bus.to_dict(rules=('-bookings','-routes.buses')))
+                return make_response(
+                    response_body,
+                    200
+                )
+            return make_response(jsonify({'message':'bus not found'}),404)
+        return make_response(jsonify({'message':'driver not found'}),404)
+        

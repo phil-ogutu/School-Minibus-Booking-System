@@ -15,6 +15,9 @@ export default function TripCard({trip,index}) {
         <div>
           <div className="text-lg font-medium">{`${trip?.routes?.start}-${trip?.routes?.end}` ?? 'Route Name'}</div>
           <div className="text-sm text-gray-300">{trip?.departure ?? 'date'}</div>
+          <span className={`inline-block px-3 py-1 ${trip?.status !== 'ended' ? 'bg-primary': 'bg-green-400'} text-dark rounded-full text-sm font-medium`}>
+            {trip?.status}
+          </span>
         </div>
       </div>
 
