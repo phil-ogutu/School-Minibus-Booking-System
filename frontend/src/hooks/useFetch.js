@@ -1,21 +1,21 @@
 // src/hooks/useFetch.js
 import { useState, useEffect } from 'react';
 
-const BASE_URL = "http://127.0.0.1:5000"; // Later replace with process.env if needed
-
 export const useFetch = (url, options = {}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const BASE_URL = "http://127.0.0.1:5000"
-
+  const BASE_URL = "http://127.0.0.1:5000";
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
         const response = await fetch(`${BASE_URL}${url}`, {
           ...options,
-          credentials: 'include', // For cookies (JWT)
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             ...options.headers,
@@ -36,7 +36,7 @@ export const useFetch = (url, options = {}) => {
     };
 
     fetchData();
-  }, [url, options]);
+  }, [url, JSON.stringify(options)]);
 
   return { data, loading, error };
 };
