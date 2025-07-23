@@ -33,7 +33,9 @@ import { useBookings } from "@/hooks/useBookings";
 export default function ViewBookings() {
   const columns = [
     { header: "Student", accessor: "child_name" },
-    { header: "Parent", accessor: "parent.username" },
+    { header: "Parent Name", accessor: "parent.username" },
+    { header: "Parent Phone", accessor: "parent.phone" },
+    { header: "Parent Email", accessor: "parent.email" },
     { header: "Route", accessor: "bus.route.start" },
     { header: "Bus", accessor: "bus.plate" },
     { header: "Driver", accessor: "bus.driver.driver_name" },
@@ -41,6 +43,7 @@ export default function ViewBookings() {
     { header: "Drop-off", accessor: "dropoff" },
     { header: "Date & Time", accessor: "dateTime" },
     { header: "Status", accessor: "status" },
+    { header: "Actions", accessor: "actions" }, // Placeholder for actions like edit/delete
   ];
   const { bookings } = useBookings();
 
