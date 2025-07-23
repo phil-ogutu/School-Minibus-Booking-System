@@ -1,7 +1,7 @@
 // Here is the Bookings page
 "use client";
 import dynamic from "next/dynamic";
-import TopSearchCard from "../../components/SearchCard";
+import SearchCard from "../../components/SearchCard";
 import SearchBus from "../../components/SearchBus";
 import Navbar from "@/components/Navbar";
 // import MapComponent from "@/components/MapComponent";
@@ -36,7 +36,7 @@ export default function Booking() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <div className="flex-1 grid grid-cols-2">
+      <div className="flex-1 md:grid md:grid-cols-2">
         <div className="p-5 flex flex-col space-y-5">
           <SearchBus />
 
@@ -44,14 +44,14 @@ export default function Booking() {
 
             {displayRoutes.map((route) => (
               <div key={route.id}>
-                <TopSearchCard route={route} />
+                <SearchCard route={route} />
               </div>
             ))}
 
           </div>
         </div>
 
-        <div className="w-full h-full p-2">
+        <div className="hidden md:block md:w-full md:h-full md:p-2">
           <MapComponent />
         </div>
       </div>

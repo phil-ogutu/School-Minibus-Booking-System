@@ -36,8 +36,8 @@ const SearchCard = ({ route }) => {
             <p className="text-xs text-neutral-400 font-normal">To</p>
           </div>
 
-          <div className="w-full flex items-center justify-between gap-x-5">
-            <h1 className="text-xl text-neutral-600 font-semibold w-1/4">
+          <div className="flex items-center justify-between gap-x-5">
+            <h1 className="text-lg md:text-xl text-neutral-600 font-semibold w-1/3">
               {route.start}
             </h1>
 
@@ -47,7 +47,7 @@ const SearchCard = ({ route }) => {
               </div>
             </div>
 
-            <h1 className="text-xl text-neutral-600 font-semibold w-1/4 text-right">
+            <h1 className="text-lg md:text-xl text-neutral-600 font-semibold w-1/3 text-right">
               {route.end}
             </h1>
           </div>
