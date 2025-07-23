@@ -1,8 +1,9 @@
 'use client'
 import { busIcon } from '@/components/ui/icons';
+import Text from '@/components/ui/Text';
 import { useRouter } from 'next/navigation';
 
-export default function RouteCard({index}) {
+export default function RouteCard({trip,index}) {
   const router = useRouter();
   return (
     <div onClick={()=>{router.push('/driver/route')}} className={`bg-gradient-to-r from-[#2e2e2e] to-[#4d4d4d] text-white rounded-xl shadow-md p-4 w-full max-w-md m-1 cursor-pointer`}>
@@ -12,30 +13,30 @@ export default function RouteCard({index}) {
           {busIcon('text-dark','text-2xl')}
         </div>
         <div>
-          <div className="text-lg font-medium">Route Name</div>
-          <div className="text-sm text-gray-300">24, Feb 2025</div>
+          <div className="text-lg font-medium">{`${trip?.routes?.start}-${trip?.routes?.end}` ?? 'Route Name'}</div>
+          <div className="text-sm text-gray-300">{trip?.departure ?? 'date'}</div>
         </div>
       </div>
 
       <hr className="border-gray-400 border-opacity-30 my-2" />
 
       {/* Locations */}
-      <div className="flex justify-between items-center mt-4">
-        {/* Origin */}
-        <div>
-          <div className="text-xl font-semibold">Juja</div>
-          <div className="text-sm text-gray-300">Gate C</div>
-        </div>
+      {trip?.routes?.locations?.length > 0 ? (
+        <div className="flex justify-between items-center mt-4">
+          {/* Origin */}
+          <div>
+            <div className="text-xl font-semibold">{trip?.routes?.locations[0]?.location_name}</div>
+          </div>
 
-        {/* Arrow */}
-        <div className="text-2xl">→</div>
+          {/* Arrow */}
+          <div className="text-2xl">→</div>
 
-        {/* Destination */}
-        <div className="text-right">
-          <div className="text-xl font-semibold">Nairobi</div>
-          <div className="text-sm text-gray-300">CBD, Koja</div>
+          {/* Destination */}
+          <div className="text-right">
+            <div className="text-xl font-semibold">{trip?.routes?.locations.at(-1)?.location_name}</div>
+          </div>
         </div>
-      </div>
+      ): <Text className='my-1'>No stops added</Text>}
     </div>
   );
 }

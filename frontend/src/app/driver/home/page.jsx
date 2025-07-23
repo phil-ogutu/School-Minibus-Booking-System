@@ -1,14 +1,14 @@
+'use client'
 import Container from '@/components/ui/Container'
 import Text from '@/components/ui/Text'
 import React from 'react'
 import {Header as DriverHeader} from '../components/Header'
 import Image from 'next/image'
 import RouteCard from '../components/route'
+import { useFetch } from '@/hooks/useFetch'
 
 function page() {
-  const routes = [
-
-  ]
+  const { data: trips, loading: tripsLoading, error: tripsError } = useFetch('/api/drivers/1/trips');
   return (
     <Container className={'flex-col'}>
         <DriverHeader/>
@@ -22,8 +22,8 @@ function page() {
           <Text className='p-1 bg-secondary rounded-full w-50 align-middle '>Completed</Text>
         </Container>
         <Container className='flex flex-row flex-wrap p-4'>
-          {Array.from({length:10}).map((_,i)=>{
-            return (<RouteCard key={i} index={i}/>)
+          {!tripsLoading && trips?.map((trip,i)=>{
+            return (<RouteCard trip={trip} key={i} index={i}/>)
           })}
         </Container>
     </Container>
