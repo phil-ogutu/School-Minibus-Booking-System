@@ -4,15 +4,22 @@ import { busIcon, groupIcon, mapPinIcon, playIcon, arrowLocationIcon, flagIcon} 
 import { getRouteFromStops } from '@/utils/route.js';
 import Container from '@/components/ui/Container';
 import Text from '@/components/ui/Text';
+import { useParams } from 'next/navigation';
+import { useFetch } from '@/hooks/useFetch';
+import { loadLeaflet, L_Instance } from '@/utils/leaflet';
 
 const SchoolBusRoute = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [startRide,setstartRide]=useState(false)
+  const [startRide,setstartRide]=useState(false);
+  const {id : trip_id} = useParams();
+  
+  const { data, loading: tripsLoading, error: tripsError } = useFetch(`/api/drivers/1/trip/${trip_id}`);
 
-  const busStops = dummyData[Math.floor(Math.random() * 4) + 1]
-  // Sample route data
+  const busStops = data?.routes?.locations ?? []
+  console.log(busStops)
+  // const busStops = data?.routes?.locations ?? dummyData[Math.floor(Math.random() * 4) + 1]
   const routeData = {
     name: "Route Name",
     date: "21 Nov 2024",
@@ -21,33 +28,10 @@ const SchoolBusRoute = () => {
     status: "pending"
   };
 
-  // const busStops = [
-  //   { lat: -1.105225, lng: 37.016789, name: "JKUAT Entry road" },
-  //   { lat: -1.120837, lng: 37.008421, name: "Thika Super Highway, Kalimoni" }, 
-  //   { lat: -1.131100, lng: 36.981719, name: "Rubis Kimbo Service Station" }
-  // ];
-
   const [routeCoordinates, setRouteCoordinates] = useState([]);
 
   useEffect(() => {
-    // Load Leaflet CSS and JS
-    const loadLeaflet = async () => {
-      // Load CSS
-      const cssLink = document.createElement('link');
-      cssLink.rel = 'stylesheet';
-      cssLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';
-      document.head.appendChild(cssLink);
-
-      // Load JS
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
-      script.onload = () => {
-        setIsMapLoaded(true);
-      };
-      document.head.appendChild(script);
-    };
-
-    loadLeaflet();
+    loadLeaflet(setIsMapLoaded);
 
     return () => {
       // Cleanup
@@ -55,30 +39,31 @@ const SchoolBusRoute = () => {
         mapInstance.current.remove();
       }
     };
-  }, []);
+  }, [tripsLoading]);
 
   useEffect(() => {
-    if (isMapLoaded && mapRef.current && !mapInstance.current) {
+    if (!tripsLoading && isMapLoaded && mapRef.current && !mapInstance.current) {
       // Initialize the map with Nairobi center
-      mapInstance.current = window.L.map(mapRef.current).setView([-1.092, 36.982], 12);
+      mapInstance.current = L_Instance.map(mapRef.current).setView([-1.092, 36.982], 12);
 
       // Add tile layer
-      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L_Instance.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
       }).addTo(mapInstance.current);
 
-      // Get route that follows roads
+      // // Get route that follows roads
       getRouteFromStops(busStops, setRouteCoordinates);
+      console.log('routeCoordinates',routeCoordinates);
 
-      // Add bus stop markers with validation
+      // // Add bus stop markers with validation
       busStops.forEach((stop, index) => {
         // Validate stop coordinates
-        if (!stop || typeof stop?.lat !== 'number' || typeof stop.lng !== 'number') {
+        if (!stop || typeof stop?.latitude !== 'number' || typeof stop?.longitude !== 'number') {
           console.warn(`Invalid stop data at index ${index}:`, stop);
           return;
         }
 
-        const stopIcon = window.L.divIcon({
+        const stopIcon = L_Instance.divIcon({
           html: `<div class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-md">
                    ${index + 1}
                  </div>`,
@@ -87,43 +72,54 @@ const SchoolBusRoute = () => {
           iconAnchor: [12, 12]
         });
 
-        window.L.marker([stop?.lat, stop.lng], { icon: stopIcon })
-          .bindPopup(stop.name || `Stop ${index + 1}`)
+        L_Instance.marker([stop?.latitude, stop?.longitude], { icon: stopIcon })
+          .bindPopup(stop?.location_name || `Stop ${index + 1}`)
           .addTo(mapInstance.current);
       });
 
       // Fit map to show the bus stops initially
-      const validStops = busStops.filter(stop => 
-        stop && typeof stop?.lat === 'number' && typeof stop.lng === 'number'
+      const validStops = busStops?.filter(stop => 
+        stop && typeof stop?.latitude === 'number' && typeof stop?.longitude === 'number'
       );
       
-      if (validStops.length > 0) {
-        const bounds = window.L?.latLngBounds(validStops.map(stop => [stop?.lat, stop.lng]));
+      if (validStops?.length > 0) {
+        const bounds = L_Instance?.latLngBounds(validStops?.map(stop => [stop?.latitude, stop?.longitude]));
+        console.log(bounds)
         mapInstance.current.fitBounds(bounds, { padding: [20, 20] });
       }
     }
-  }, [isMapLoaded]);
+  }, [isMapLoaded, tripsLoading]);
 
-  // Effect to add route line when coordinates are available
+  // // Effect to add route line when coordinates are available
   useEffect(() => {
-    if (mapInstance.current && routeCoordinates.length > 0) {
+    if (mapInstance.current && routeCoordinates?.length > 0) {
       // Validate coordinates before using them
-      const validCoordinates = routeCoordinates.filter(coord => 
-        coord && Array.isArray(coord) && coord.length >= 2 && 
+      const validCoordinates = routeCoordinates?.filter(coord => 
+        coord && Array.isArray(coord) && coord?.length >= 2 && 
         typeof coord[0] === 'number' && typeof coord[1] === 'number'
       );
 
-      if (validCoordinates.length === 0) {
+      if (validCoordinates?.length === 0) {
         console.warn('No valid coordinates found for route');
         return;
       }
-
+      console.log(validCoordinates);
       // Create route polyline
-      const routeLine = window.L.polyline(validCoordinates, {
-        color: '#8B5CF6',
-        weight: 4,
-        opacity: 0.8
-      }).addTo(mapInstance.current);
+      console.log('Map instance:', mapInstance.current);
+      console.log('Is valid Leaflet map:', mapInstance.current instanceof L_Instance.Map);
+      if (
+        typeof window !== 'undefined' &&
+          mapInstance.current &&
+          mapInstance.current instanceof L_Instance.Map
+      ) {
+        const routeLine = L_Instance.polyline(validCoordinates, {
+          color: '#8B5CF6',
+          weight: 4,
+          opacity: 0.8
+        }).addTo(mapInstance.current);
+      } else {
+        console.warn("Invalid or empty coordinates", validCoordinates);
+      }
 
       // Create custom bus icon
       const busIconPinned = window.L.divIcon({
@@ -136,7 +132,7 @@ const SchoolBusRoute = () => {
       });
 
       // Add bus marker at the end of route (use last valid coordinate)
-      const lastCoord = validCoordinates[validCoordinates.length - 1];
+      const lastCoord = validCoordinates[validCoordinates?.length - 1];
       if (lastCoord) {
         window.L.marker(lastCoord, { icon: busIconPinned })
           .addTo(mapInstance.current);

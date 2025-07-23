@@ -23,7 +23,7 @@ function page() {
         </Container>
         <Container className='flex flex-row flex-wrap p-4'>
           {!tripsLoading && trips?.map((trip,i)=>{
-            return (<RouteCard trip={trip} key={i} index={i}/>)
+            return (<RouteCard trip={trip} key={trip?.id} index={i}/>)
           })}
         </Container>
     </Container>
