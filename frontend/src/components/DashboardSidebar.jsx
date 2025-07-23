@@ -38,14 +38,16 @@ import {
   FaHome,
   FaSignOutAlt,
   FaClipboardList,
+  FaUserCheck,
 } from "react-icons/fa";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: FaHome },
   { href: "/admin/buses", label: "Manage Buses", icon: FaBus },
+  { href: "/admin/bus-ownership", label: "Bus Ownership", icon: FaUserCheck },
   { href: "/admin/routes", label: "Manage Routes", icon: FaRoute },
   { href: "/admin/bookings", label: "View Bookings", icon: FaClipboardList },
-  { href: "/admin/parents", label: "Parents & Children", icon: FaUserFriends },
+  { href: "/admin/parents", label: "Parents", icon: FaUserFriends },
   { href: "/admin/profile", label: "Edit Profile", icon: FaUserFriends },
 ];
 
