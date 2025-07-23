@@ -17,7 +17,6 @@ faker = "*"
 flask = "2.3.3"
 flask-cors = "*"
 flask-migrate = "*"
-flask-restful = "*"
 flask-sqlalchemy = "3.1.1"
 gunicorn = "*"
 honcho = "*"
@@ -60,6 +59,7 @@ flask-bcrypt = "1.0.1"
 flask-jwt-extended = "*"
 marshmallow = "*"
 flask-marshmallow = "*"
+flask-restful = "*"
 
 [dev-packages]
 
