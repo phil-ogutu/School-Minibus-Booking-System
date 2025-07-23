@@ -12,6 +12,12 @@ import enum
 class UserRole(enum.Enum):
     parent = "parent"
     admin = "admin"
+    driver = "driver"
+
+class TripStatus(enum.Enum):
+    pending = "pending"
+    started = "started"
+    ended = "ended"
 
 class RouteStatus(enum.Enum):
     pending = "pending"
@@ -68,8 +74,10 @@ class Bus(db.Model,SerializerMixin):
     owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))  # FK for owner
     plate = db.Column(db.String, unique=True)
     capacity = db.Column(db.Integer)
-    status = db.Column(db.Boolean)
+    status = db.Column(Enum(TripStatus), default=TripStatus.pending)
     created_at = db.Column(db.DateTime(), server_default= func.now())
+    arrived = db.Column(db.DateTime())
+    departure = db.Column(db.DateTime())
 
     bookings = db.relationship("Booking", back_populates="bus")
     routes = db.relationship("Route", back_populates="buses")
@@ -80,9 +88,9 @@ class Driver(db.Model,SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     driver_name = db.Column(db.String, nullable=False)
+    bio = db.Column(db.String)
 
     # buses = db.relationship("Bus", backref="driver", lazy=True)
-
 
 #Owner Table
 class Owner(db.Model,SerializerMixin):
