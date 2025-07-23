@@ -1,8 +1,6 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
-
 from config import db
-
 from sqlalchemy import func # from sqlalchemy
 from sqlalchemy import Enum
 import enum
@@ -16,6 +14,7 @@ class UserRole(enum.Enum):
 
 class TripStatus(enum.Enum):
     pending = "pending"
+    rescheduled = "rescheduled"
     started = "started"
     ended = "ended"
 
@@ -24,12 +23,9 @@ class RouteStatus(enum.Enum):
     started = "started"
     ended = "ended"
 
-# Models go here!
-
 # Users Table
 class User(db.Model,SerializerMixin):
     __tablename__ = 'users'
-    serialize_rules = ('-bookings.parent',)
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
@@ -40,59 +36,30 @@ class User(db.Model,SerializerMixin):
     role = db.Column(Enum(UserRole), nullable=False)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
+class Admin(db.Model,SerializerMixin):
+    __tablename__='admins'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+class Parent(db.Model,SerializerMixin):
+    __tablename__='parents'
+    serialize_rules = ('-bookings.parent',)
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
     bookings = db.relationship("Booking", back_populates="parent")
 
-
-# Bookings Table
-class Booking(db.Model,SerializerMixin):
-    __tablename__ = 'bookings'
-    serialize_rules = ('-parent.bookings', '-bus.bookings')
-    
-    id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey('users.id'))  # FK for parent (user_id)
-    bus_id = db.Column(db.Integer, db.ForeignKey('buses.id'))  # FK for bus
-    title = db.Column(db.String)
-    child_name = db.Column(db.String)
-    pickup = db.Column(db.String)
-    dropoff = db.Column(db.String)
-    price = db.Column(db.Float)
-    status = db.Column(db.Boolean)
-    created_at = db.Column(db.DateTime(), server_default= func.now())
-    updated_at = db.Column(db.DateTime(), onupdate=func.now())
-    
-    parent = db.relationship("User", back_populates="bookings")
-    bus = db.relationship("Bus", back_populates="bookings")
-
-# Buses Table
-class Bus(db.Model,SerializerMixin):
-    __tablename__ = 'buses'
-    serialize_rules = ('-bookings.bus','-routes.bus')
-    
-    id = db.Column(db.Integer, primary_key=True)
-    route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))  # FK for route
-    driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))  # FK for driver
-    owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))  # FK for owner
-    plate = db.Column(db.String, unique=True)
-    capacity = db.Column(db.Integer)
-    status = db.Column(Enum(TripStatus), default=TripStatus.pending)
-    created_at = db.Column(db.DateTime(), server_default= func.now())
-    arrived = db.Column(db.DateTime())
-    departure = db.Column(db.DateTime())
-
-    bookings = db.relationship("Booking", back_populates="bus")
-    routes = db.relationship("Route", back_populates="buses")
-
-#Driver Table
 class Driver(db.Model,SerializerMixin):
-    __tablename__ = 'drivers'
+    __tablename__='drivers'
+    serialize_rules = ('-trips.driver',)
 
     id = db.Column(db.Integer, primary_key=True)
-    driver_name = db.Column(db.String, nullable=False)
-    bio = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    # buses = db.relationship("Bus", backref="driver", lazy=True)
+    trips = db.relationship("Trip", back_populates="driver")
 
-#Owner Table
 class Owner(db.Model,SerializerMixin):
     __tablename__ = 'owners'
     serialize_rules = ('-buses.routes','-locations.routes')
@@ -100,21 +67,78 @@ class Owner(db.Model,SerializerMixin):
     id=db.Column(db.Integer, primary_key=True)
     owner_name=db.Column(db.String, nullable=False)
 
-    # buses = db.relationship("Bus", back_populates="owner")
+    buses=db.relationship("Bus",back_populates="owner")
+
+# Bookings Table
+class Booking(db.Model,SerializerMixin):
+    __tablename__ = 'bookings'
+    serialize_rules = ('-parent.bookings', '-trip.bookings')
+    
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('parents.id'))  # FK for parent (user_id)
+    student_name = db.Column(db.String)
+    student_number = db.Column(db.String)
+    trip_id = db.Column(db.Integer, db.ForeignKey('trips.id'))  # FK for bus
+    title = db.Column(db.String)
+    pickup = db.Column(db.String)
+    dropoff = db.Column(db.String)
+    price = db.Column(db.Float)
+    status = db.Column(db.Boolean)
+    created_at = db.Column(db.DateTime(), server_default= func.now())
+    updated_at = db.Column(db.DateTime(), onupdate=func.now())
+    
+    parent = db.relationship("Parent", back_populates="bookings")
+    trip = db.relationship("Trip", back_populates="trips")
+
+# Trips Table
+class Trip(db.Model,SerializerMixin):
+    __tablename__ = 'trips'
+    serialize_rules = ('-bookings.trip','-driver.trips','-route.trips','bus.trips')
+    
+    id = db.Column(db.Integer, primary_key=True)
+    driver_id = db.Column(db.Integer, db.ForeignKey('drivers.id'))  # FK for driver
+    bus_id = db.Column(db.Integer, db.ForeignKey('buses.id'))  # FK for bus
+    route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))  # FK for route
+
+    status = db.Column(Enum(TripStatus), default=TripStatus.pending)
+    arrived = db.Column(db.DateTime())
+    departure = db.Column(db.DateTime())
+    created_at = db.Column(db.DateTime(), server_default= func.now())
+    updated_at = db.Column(db.DateTime(), onupdate=func.now())
+
+    bookings = db.relationship("Booking", back_populates="trip")
+    route = db.relationship("Route", back_populates="trips")
+    driver = db.relationship('Driver', back_populates="trips")
+    bus = db.relationship('Bus', back_populates="trips")
+
+class Bus(db.Model,SerializerMixin):
+    __tablename__= 'buses'
+    serialize_rules = ('-trips.bus','-owner.buses')
+
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('owners.id'))  # FK for owner
+    plate = db.Column(db.String, unique=True)
+    capacity = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime(), server_default= func.now())
+    updated_at = db.Column(db.DateTime(), onupdate=func.now())
+    status=db.Column(db.Boolean, default=True)
+
+    owner = db.relationship('Owner', back_populates='bus')
+    trips = db.relationship('Trip', back_populates='bus')
 
 #Route Table
 class Route(db.Model,SerializerMixin):
     __tablename__ = 'routes'
-    serialize_rules = ('-buses.routes','-locations.routes')
+    serialize_rules = ('-trips.route','-locations.routes')
 
     id = db.Column(db.Integer, primary_key=True)
     start = db.Column(db.String, nullable=False)
     end = db.Column(db.String, nullable=False)
-    status = db.Column(Enum(RouteStatus), default=RouteStatus.pending)
+    status = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime(), server_default=func.now())
     search_count = db.Column(db.Integer, default=0)
 
-    buses = db.relationship("Bus", back_populates="routes")
+    trips = db.relationship("Trip", back_populates="routes")
     locations = db.relationship("Location", back_populates="routes")
 
 #Location Table
@@ -125,8 +149,6 @@ class Location(db.Model,SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))
     location_name = db.Column(db.String, nullable=False)
-    
-
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
 

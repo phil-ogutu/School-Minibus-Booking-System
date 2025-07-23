@@ -1,5 +1,5 @@
 /frontend/node_modules
 /frontend/package-lock.json
 
-/backend/server/instance
-/backend/server/migrations
+backend/server/instance
+backend/server/migrations
