@@ -5,11 +5,6 @@ import SearchCard from "../../components/SearchCard";
 import SearchBus from "../../components/SearchBus";
 import Navbar from "@/components/Navbar";
 // import MapComponent from "@/components/MapComponent";
-<<<<<<< HEAD
-import { routesData } from "@/data/RoutesData";
-import { useEffect, useState } from "react";
-=======
->>>>>>> 9c17f6185d1e1fb3adafd4e55dfb1144f7cdacc3
 import { useTheContext } from "@/context/MapContext";
 import { useRoutes } from "@/hooks/useRoutes";
 
@@ -63,4 +58,3 @@ export default function Booking() {
     </div>
   );
 }
-

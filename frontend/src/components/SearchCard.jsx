@@ -68,17 +68,6 @@ const SearchCard = ({ route }) => {
         )}
       </div>
 
-<<<<<<< HEAD
-      {console.log("Search Card Locations", route.locations)}
-      {
-        route.locations.length > 0 && route.locations.map(
-          (location,index) => (
-            <div key={location.id || index} className="w-full flex items-center justify-center-safe gap-x-20">
-              <div className="flex flex-col items-center">
-                <FaCircle className="w-2.5 h-2.5 text-neutral-600"/>
-                <p className="text-sm text-neutral-600 font-normal">{location.location_name}</p>
-              </div>
-=======
       {showStops && route.locations.length > 0 && (
         <div className="w-[95%] mt-2 bg-neutral-300/20 space-y-2 pl-10 mx-auto rounded-md">
           {route.locations.map((location) => (
@@ -87,7 +76,6 @@ const SearchCard = ({ route }) => {
               <p className="text-sm text-neutral-600">
                 {location.location_name}
               </p>
->>>>>>> 9c17f6185d1e1fb3adafd4e55dfb1144f7cdacc3
             </div>
           ))}
         </div>
@@ -114,4 +102,3 @@ const SearchCard = ({ route }) => {
 };
 
 export default SearchCard;
-
