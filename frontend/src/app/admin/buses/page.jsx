@@ -5,6 +5,7 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useTrips } from "@/hooks/useTrips";
+import { v4 as uuidv4 } from "uuid";
 
 const initialBuses = [
   { id: 1, numberPlate: "KDA 123A", capacity: 40, driver: "Peter Kamau" },
@@ -27,7 +28,7 @@ export default function ManageBuses() {
   const handleAddBus = () => {
     const bus = {
       ...newBus,
-      id: Date.now(),
+      id: uuidv4(), // generates a stable unique ID on client
       capacity: parseInt(newBus.capacity),
     };
     setBuses((prev) => [...prev, bus]);

@@ -19,7 +19,7 @@ const ownerships = [
   },
 ];
 
-export default function BusOwnershipPage() {
+export default function BusOwners() {
   const columns = [
     { header: "Owner Name", accessor: "ownerName" },
     { header: "Bus Number", accessor: "busNumber" },
