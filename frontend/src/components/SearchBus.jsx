@@ -64,7 +64,7 @@ const SearchBus = () => {
         </div>
 
         {/* Search Button */}
-        <div className="flex justify-center">
+        <div className="hidden md:block flex justify-center">
           <button 
             type="submit" 
             className="bg-yellow-500 text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-yellow-600 transition"
