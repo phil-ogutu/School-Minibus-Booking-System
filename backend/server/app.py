@@ -113,7 +113,7 @@ class Users(Resource):
             200        
         )
 class UserById(Resource):
-    method_decorators = [token_required]
+    # method_decorators = [token_required]
     def get(self,id):
         print('I got hit')
         if id is None:
@@ -134,12 +134,16 @@ class UserById(Resource):
             return make_response(jsonify({'message':'missing id parameter'}),400)
         
         data=request.get_json()
+        print('PATCH USER DATA', data)
         user=UserService.findById(id)
         if user:
             for attr in data:
-                print(data[attr])
+                print('PATCH USER ATTR', data[attr])
                 setattr(user,attr,data[attr])
+            print("User after patch:", user)
+            db.session.add(user)  # Explicitly add to session
             db.session.commit()
+            print("Changes committed to the database.")
             response=make_response(
                 jsonify(user.to_dict(rules=('-password_hash',))),
                 200
@@ -351,7 +355,7 @@ class OwnerById(Resource):
         return make_response(jsonify({'message':'owner not found'}),404)
 
 class Bookings(Resource):
-    method_decorators = [token_required]
+    # method_decorators = [token_required]
     def get(self):
         bookings = BookingService.findAll()
         return make_response(
@@ -380,7 +384,7 @@ class Bookings(Resource):
         return response
 
 class BookingById(Resource):
-    method_decorators = [token_required]
+    # method_decorators = [token_required]
     def get(self,id):
         if id is None:
             return make_response(jsonify({'message':'missing id parameter'}),400)
