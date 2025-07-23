@@ -53,33 +53,30 @@ if __name__ == '__main__':
     fake = Faker()
 
     # Helper function to generate random users
-    def create_user():
+    def create_user(role):
         return User(
             username=fake.user_name(),
             email=fake.email(),
             mobile=fake.phone_number(),
             password_hash=bcrypt.generate_password_hash(fake.password()).decode('utf-8'),  # Generating a fake password hash (for example purposes)
             photo_url=fake.image_url(),
-            role=rc([UserRoleEnum.parent, UserRoleEnum.admin, UserRoleEnum.driver]),
+            role=role,
             created_at=fake.date_this_year()  # Random date within this year
         )
 
     def create_parent(user_id):
         return Parent(
             user_id=user_id,
-            created_at=fake.date_this_year()
         )
     
     def create_driver(user_id):
         return Driver(
             user_id=user_id,
-            created_at=fake.date_this_year()
         )
     
     def create_admin(user_id):
         return Admin(
             user_id=user_id,
-            created_at=fake.date_this_year()
         )
     
     # Helper function to generate random buses
@@ -154,20 +151,25 @@ if __name__ == '__main__':
         drivers = []
         parents = []
         admins = []
+        roles = (
+            ['parent'] * 10 +
+            ['driver'] * 5 +
+            ['admin'] * 5
+        )
         # Let's create 10 users
-        for _ in range(10):
-            user = create_user()
+        for role in roles:
+            user = create_user(role)
             db.session.add(user)
             db.session.commit()
-            if user.role == 'parent':
+            if role == 'parent':
                 parent = create_parent(user.id)
                 db.session.add(parent)
                 parents.append(parent)
-            if user.role == 'admin':
+            if role == 'admin':
                 admin = create_admin(user.id)
                 db.session.add(admin)
                 admins.append(admin)
-            if user.role == 'driver':
+            if role == 'driver':
                 driver = create_driver(user.id)
                 db.session.add(driver)
                 drivers.append(driver)
@@ -178,11 +180,12 @@ if __name__ == '__main__':
         # Seed Buses
         print("Seeding Owners and Buses...")
         owners = [create_owner() for _ in range(5)]
+        db.session.add_all(owners)
+        db.session.commit()
         buses = []
         for owner in owners:
             buses.append(create_bus(owner.id))
 
-        db.session.add_all(owners)
         db.session.add_all(buses)
         db.session.commit()
         
@@ -212,18 +215,23 @@ if __name__ == '__main__':
         print("Seeding Trips...")
         trips = []
         for _ in range(20):
-            trip = create_trip(rc(drivers.id),rc(buses.id),rc(routes.id))
-            trips.append(trip)
+            driver = rc(drivers)
+            bus = rc(buses)
+            route = rc(routes)
 
-        db.session.add(trips)
+            trip = create_trip(driver.id, bus.id, route.id)
+            db.session.add(trip)
+            trips.append(trip)
         db.session.commit()
         # Seed Bookings
         print("Seeding Bookings...")
         bookings = []
         for _ in range(20):
-            booking = create_booking(rc(parents.id),rc(trips.id))
+            parent = rc(parents)
+            trip = rc(trips)
+            booking = create_booking(parent.id,trip.id)
             bookings.append(booking)
+            db.session.add(booking)
             
-        db.session.add(bookings)
         db.session.commit()
         print("Seeding complete!")
