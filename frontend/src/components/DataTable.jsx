@@ -14,18 +14,18 @@ export default function DataTable({ columns, data }) {
           </tr>
         </thead>
         <tbody>
-          {data.length === 0 ? (
+          {data?.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="text-center py-4">
                 No data available
               </td>
             </tr>
           ) : (
-            data.map((row, idx) => (
+            data?.map((booking, idx) => (
               <tr key={idx} className="hover:bg-gray-100">
                 {columns.map((col) => (
                   <td key={col.accessor} className="border px-4 py-2">
-                    {row[col.accessor]}
+                    {booking[col.accessor]}
                   </td>
                 ))}
               </tr>

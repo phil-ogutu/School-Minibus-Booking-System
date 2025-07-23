@@ -69,6 +69,7 @@ const Login = () => {
   };
 
   return (
+    <div className="login-page">
     <div className="container">
       <div className="background-image"></div>
 
@@ -230,6 +231,7 @@ const Login = () => {
           priority
         />
       </div>
+    </div>
     </div>
   );
 };
