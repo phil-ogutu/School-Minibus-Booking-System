@@ -7,21 +7,22 @@ import enum
 
 
 # Enum definitions
-class UserRole(enum.Enum):
+class UserRoleEnum(enum.Enum):
     parent = "parent"
     admin = "admin"
     driver = "driver"
 
-class TripStatus(enum.Enum):
+class TripStatusEnum(enum.Enum):
     pending = "pending"
     rescheduled = "rescheduled"
     started = "started"
     ended = "ended"
 
-class RouteStatus(enum.Enum):
+class BookingStatusEnum(enum.Enum):
+    assigned = "assigned"
     pending = "pending"
-    started = "started"
-    ended = "ended"
+    boarded = "boarded"
+    completed = "completed"
 
 # Users Table
 class User(db.Model,SerializerMixin):
@@ -33,7 +34,7 @@ class User(db.Model,SerializerMixin):
     mobile = db.Column(db.String, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
     photo_url = db.Column(db.String)
-    role = db.Column(Enum(UserRole), nullable=False)
+    role = db.Column(Enum(UserRoleEnum), nullable=False)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
 class Admin(db.Model,SerializerMixin):
@@ -83,12 +84,12 @@ class Booking(db.Model,SerializerMixin):
     pickup = db.Column(db.String)
     dropoff = db.Column(db.String)
     price = db.Column(db.Float)
-    status = db.Column(db.Boolean)
+    status = db.Column(Enum(BookingStatusEnum), nullable=False, default=BookingStatusEnum.pending)
     created_at = db.Column(db.DateTime(), server_default= func.now())
     updated_at = db.Column(db.DateTime(), onupdate=func.now())
     
     parent = db.relationship("Parent", back_populates="bookings")
-    trip = db.relationship("Trip", back_populates="trips")
+    trip = db.relationship("Trip", back_populates="bookings")
 
 # Trips Table
 class Trip(db.Model,SerializerMixin):
@@ -100,7 +101,7 @@ class Trip(db.Model,SerializerMixin):
     bus_id = db.Column(db.Integer, db.ForeignKey('buses.id'))  # FK for bus
     route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))  # FK for route
 
-    status = db.Column(Enum(TripStatus), default=TripStatus.pending)
+    status = db.Column(Enum(TripStatusEnum), default=TripStatusEnum.pending)
     arrived = db.Column(db.DateTime())
     departure = db.Column(db.DateTime())
     created_at = db.Column(db.DateTime(), server_default= func.now())
@@ -123,7 +124,7 @@ class Bus(db.Model,SerializerMixin):
     updated_at = db.Column(db.DateTime(), onupdate=func.now())
     status=db.Column(db.Boolean, default=True)
 
-    owner = db.relationship('Owner', back_populates='bus')
+    owner = db.relationship('Owner', back_populates='buses')
     trips = db.relationship('Trip', back_populates='bus')
 
 #Route Table
@@ -138,7 +139,7 @@ class Route(db.Model,SerializerMixin):
     created_at = db.Column(db.DateTime(), server_default=func.now())
     search_count = db.Column(db.Integer, default=0)
 
-    trips = db.relationship("Trip", back_populates="routes")
+    trips = db.relationship("Trip", back_populates="route")
     locations = db.relationship("Location", back_populates="routes")
 
 #Location Table

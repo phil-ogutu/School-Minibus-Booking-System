@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-
-# Standard library imports
 from random import randint, choice as rc
-
 # Remote library imports
 from faker import Faker
-from config import bcrypt
-
-# Local imports
-from config import app
-from models import db, User, UserRole, Booking, Bus, Location, Driver, Owner, Route, RouteStatus, TripStatus
+from config import bcrypt, app, db
+from models import (
+    User, Parent, Driver, Admin, Owner, 
+    UserRoleEnum, TripStatusEnum, BookingStatusEnum, 
+    Booking, Trip, Bus,
+    Location, Route
+)
 
 dummy_data = [
     [
@@ -61,35 +60,58 @@ if __name__ == '__main__':
             mobile=fake.phone_number(),
             password_hash=bcrypt.generate_password_hash(fake.password()).decode('utf-8'),  # Generating a fake password hash (for example purposes)
             photo_url=fake.image_url(),
-            role=rc([UserRole.parent, UserRole.admin]),
+            role=rc([UserRoleEnum.parent, UserRoleEnum.admin, UserRoleEnum.driver]),
             created_at=fake.date_this_year()  # Random date within this year
+        )
+
+    def create_parent(user_id):
+        return Parent(
+            user_id=user_id,
+            created_at=fake.date_this_year()
+        )
+    
+    def create_driver(user_id):
+        return Driver(
+            user_id=user_id,
+            created_at=fake.date_this_year()
+        )
+    
+    def create_admin(user_id):
+        return Admin(
+            user_id=user_id,
+            created_at=fake.date_this_year()
         )
     
     # Helper function to generate random buses
-    def create_bus(route_id, driver_id, owner_id):
+    def create_bus(owner_id):
         return Bus(
-            route_id=route_id,
-            driver_id=driver_id,
             owner_id=owner_id,
             plate=fake.license_plate(),
             capacity=str(randint(10, 50)),  # Random capacity between 10 and 50
-            status=rc([TripStatus.pending, TripStatus.started, TripStatus.ended]), # Random bus status
             created_at=fake.date_this_year(),
+        )
+    
+    def create_trip(driver_id,bus_id, route_id):
+        return Trip(
+            driver_id=driver_id,
+            bus_id=bus_id,
+            route_id=route_id,
             arrived=fake.date_this_year(),
-            departure=fake.date_this_year()
+            departure=fake.date_this_year(),
         )
 
     # Helper function to generate random bookings
-    def create_booking(parent_id, bus_id):
+    def create_booking(parent_id, trip_id):
         return Booking(
             parent_id=parent_id,
-            bus_id=bus_id,
+            trip_id=trip_id,
             title=fake.bs(),
-            child_name=fake.name(),
+            student_name=fake.name(),
+            student_number=fake.name(),
             pickup=fake.city(),
             dropoff=fake.city(),
             price=round(randint(1000, 5000) / 100, 2),  # Random price between 10.00 and 50.00
-            status=rc([True, False]),
+            status=rc([BookingStatusEnum.assigned, BookingStatusEnum.pending, BookingStatusEnum.boarded, BookingStatusEnum.completed]),
             created_at=fake.date_this_year(),
             updated_at=fake.date_this_year()
         )
@@ -103,11 +125,6 @@ if __name__ == '__main__':
             latitude=str(latitude)
         )
 
-    # Helper function to generate random drivers
-    def create_driver():
-        return Driver(
-            driver_name=fake.name()
-        )
 
     # Helper function to generate random owners
     def create_owner():
@@ -120,7 +137,6 @@ if __name__ == '__main__':
         return Route(
             start=fake.city(),
             end=fake.city(),
-            status=rc([RouteStatus.pending, RouteStatus.started, RouteStatus.ended]),
             created_at=fake.date_this_year()
         )
 
@@ -135,37 +151,47 @@ if __name__ == '__main__':
         # Seed Users
         print("Seeding Users...")
         users = []
-        for _ in range(10):  # Let's create 10 users
-            users.append(create_user())
-        # db.session.bulk_save_objects(users)  # Efficient insert
-        db.session.add_all(users)
-        db.session.commit()
+        drivers = []
+        parents = []
+        admins = []
+        # Let's create 10 users
+        for _ in range(10):
+            user = create_user()
+            db.session.add(user)
+            db.session.commit()
+            if user.role == 'parent':
+                parent = create_parent(user.id)
+                db.session.add(parent)
+                parents.append(parent)
+            if user.role == 'admin':
+                admin = create_admin(user.id)
+                db.session.add(admin)
+                admins.append(admin)
+            if user.role == 'driver':
+                driver = create_driver(user.id)
+                db.session.add(driver)
+                drivers.append(driver)
+
+            db.session.commit()
 
         print(f"Seeded {len(users)} users")
+        # Seed Buses
+        print("Seeding Owners and Buses...")
+        owners = [create_owner() for _ in range(5)]
+        buses = []
+        for owner in owners:
+            buses.append(create_bus(owner.id))
 
-        # Seed Drivers and Owners
-        print("Seeding Drivers and Owners...")
-        drivers = [create_driver() for _ in range(5)]  # 5 drivers
-        owners = [create_owner() for _ in range(5)]  # 5 owners
-        db.session.add_all(drivers + owners)  # Using add_all to keep identity
-        db.session.commit() # Ensures driver.id and owner.id are populate
-
-        # Seed Routes
+        db.session.add_all(owners)
+        db.session.add_all(buses)
+        db.session.commit()
+        
+        # Seed Routes And Locations
         print("Seeding Routes...")
-        routes = [create_route() for _ in range(5)]  # 5 routes
+        routes = [create_route() for _ in range(20)]  # 5 routes
         db.session.add_all(routes)
         db.session.commit()
 
-        # Seed Buses
-        print("Seeding Buses...")
-        buses = []
-        for route in routes:
-            # Randomly choose a driver and owner for each bus
-            driver = rc(drivers)
-            owner = rc(owners)
-            buses.append(create_bus(route.id, driver.id, owner.id))
-        db.session.add_all(buses)
-        db.session.commit()
 
         # Seed Locations
         print("Seeding Locations...")
@@ -182,14 +208,22 @@ if __name__ == '__main__':
         db.session.bulk_save_objects(locations)
         db.session.commit()
 
+        # Seed Trips
+        print("Seeding Trips...")
+        trips = []
+        for _ in range(20):
+            trip = create_trip(rc(drivers.id),rc(buses.id),rc(routes.id))
+            trips.append(trip)
+
+        db.session.add(trips)
+        db.session.commit()
         # Seed Bookings
         print("Seeding Bookings...")
         bookings = []
-        for user in users:
-            # Randomly choose a bus for the booking
-            bus = rc(buses)
-            bookings.append(create_booking(user.id, bus.id))
-        db.session.bulk_save_objects(bookings)
+        for _ in range(20):
+            booking = create_booking(rc(parents.id),rc(trips.id))
+            bookings.append(booking)
+            
+        db.session.add(bookings)
         db.session.commit()
-
         print("Seeding complete!")
