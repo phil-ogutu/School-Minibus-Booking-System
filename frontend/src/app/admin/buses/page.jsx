@@ -1,34 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-
-const initialBuses = [
-  { id: 1, numberPlate: "KDA 123A", capacity: 40, driver: "Peter Kamau" },
-  { id: 2, numberPlate: "KDB 456B", capacity: 30, driver: "Mary Otieno" },
-];
+import { useBuses } from "@/hooks/useBuses"; // Import the hook
+import axiosInstance from "@/lib/api";
 
 export default function ManageBuses() {
-  const [buses, setBuses] = useState(initialBuses);
+  const { buses, busesLoading, busesError, createNewBus, deleteExistingBus } = useBuses(); // Using the hook
+
   const [newBus, setNewBus] = useState({
-    numberPlate: "",
+    plate: "",
     capacity: "",
     driver: "",
   });
 
-  const handleAddBus = () => {
-    const bus = {
-      ...newBus,
-      id: Date.now(),
-      capacity: parseInt(newBus.capacity),
-    };
-    setBuses([...buses, bus]);
-    setNewBus({ numberPlate: "", capacity: "", driver: "" });
+  const [driverNames, setDriverNames] = useState({});
+
+  // Fetch driver names for all buses
+  const fetchDriverNames = async () => {
+    try {
+      const driverIds = buses.map((bus) => bus.driver_id);
+      const uniqueDriverIds = [...new Set(driverIds)]; // Remove duplicate driver IDs
+
+      // Fetch names for all unique driver IDs
+      const driverResponses = await Promise.all(
+        uniqueDriverIds.map((id) =>
+          axiosInstance.get(`/drivers/${id}`).then((response) => ({
+            id,
+            name: response.data.driver_name,
+          }))
+        )
+      );
+
+      // Map the driver data into an object for quick lookup
+      const driversMap = driverResponses.reduce((acc, { id, name }) => {
+        acc[id] = name;
+        return acc;
+      }, {});
+
+      setDriverNames(driversMap);
+    } catch (error) {
+      console.error("Error fetching drivers:", error);
+    }
   };
 
-  const handleDelete = (id) => setBuses(buses.filter((bus) => bus.id !== id));
+  useEffect(() => {
+    if (!busesLoading && buses && buses.length > 0) {
+      fetchDriverNames();
+    }
+  }, [busesLoading, buses]);
+
+  const handleAddBus = async () => {
+    const bus = {
+      ...newBus,
+      capacity: parseInt(newBus.capacity),
+    };
+
+    try {
+      await createNewBus(bus); // Create bus via API
+      setNewBus({ plate: "", capacity: "", driver: "" }); // Reset input fields after adding
+    } catch (error) {
+      console.error("Error creating bus:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteExistingBus(id); // Delete bus via API
+    } catch (error) {
+      console.error("Error deleting bus:", error);
+    }
+  };
+
+  if (busesLoading) {
+    return <div>Loading buses...</div>; // Loading state
+  }
+
+  if (busesError) {
+    return <div>Error loading buses: {busesError}</div>; // Error state
+  }
 
   return (
     <div className="flex">
@@ -42,9 +94,9 @@ export default function ManageBuses() {
             <input
               type="text"
               placeholder="Number Plate"
-              value={newBus.numberPlate}
+              value={newBus.plate}
               onChange={(e) =>
-                setNewBus({ ...newBus, numberPlate: e.target.value })
+                setNewBus({ ...newBus, plate: e.target.value })
               }
               className="p-2 border rounded"
             />
@@ -85,9 +137,11 @@ export default function ManageBuses() {
           <tbody>
             {buses.map((bus) => (
               <tr key={bus.id} className="hover:bg-gray-100">
-                <td className="border px-4 py-2">{bus.numberPlate}</td>
+                <td className="border px-4 py-2">{bus.plate}</td>
                 <td className="border px-4 py-2">{bus.capacity}</td>
-                <td className="border px-4 py-2">{bus.driver}</td>
+                <td className="border px-4 py-2">
+                  {driverNames[bus.driver_id] || "Loading..."}
+                </td>
                 <td className="border px-4 py-2 space-x-2">
                   <button className="bg-sky-500 text-white p-1 rounded hover:bg-sky-600">
                     <FaEdit />
