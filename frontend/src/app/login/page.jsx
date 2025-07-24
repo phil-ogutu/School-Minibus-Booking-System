@@ -43,13 +43,19 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // send the data to backend
-    await login(loginData).then(() => {
-    console.log(
-      "Login functionality will be implemented here\nEmail: " + loginData.email
-    );
-    router.push("/bookings");
-  });
+  //   // send the data to backend
+  //   await login(loginData).then(() => {
+  //   console.log(
+  //     "Login functionality will be implemented here\nEmail: " + loginData.email
+  //   );
+  //   router.push("/bookings");
+  // });
+    try {
+      await login(loginData); // Call login function, it will handle fetching user details
+      router.push("/bookings"); // Redirect after successful login
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
 };
 
 
@@ -69,6 +75,7 @@ const Login = () => {
   };
 
   return (
+    <div className="login-page">
     <div className="container">
       <div className="background-image"></div>
 
@@ -230,6 +237,7 @@ const Login = () => {
           priority
         />
       </div>
+    </div>
     </div>
   );
 };

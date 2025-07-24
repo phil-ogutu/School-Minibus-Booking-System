@@ -12,98 +12,14 @@ from service import (
     BusService,
     RouteService, LocationService
 )
-import jwt
-from functools import wraps
 
+from controllers.drivers import Drivers, DriverById, DriverTrips, DriverTripById
+from controllers.auth import Auth
 # Local imports
 from config import app, db, api
+from middleware.auth import token_required
 
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.cookies.get('token')
-
-        if not token:
-            return {"message": "Token is missing!"}, 401
-
-        try:
-            data = jwt.decode(token, 'secret', algorithms=["HS256"])
-            g.user_id = data['id']
-            g.username = data['name']
-        except jwt.ExpiredSignatureError:
-            return {"message": "Token expired!"}, 401
-        except jwt.InvalidTokenError:
-            return {"message": "Invalid token!"}, 401
-
-        return f(*args, **kwargs)
-    return decorated
 # Add your model imports
-class Auth(Resource):
-    def post(self):
-        data=request.get_json()
-        action = data.get('action')
-
-
-        username = data.get('username')
-        email = data.get('email')
-        mobile = data.get('mobile')
-        role = data.get('role')
-        password = data.get('password')
-
-        if action == "register":
-            if username == None and email == None and role == None and password == None:
-                return make_response("Required Inputs are required", 400)
-            
-            if UserService.findByEmail(email):
-                return make_response("This User already Exists", 400)
-            
-            password_hash = AuthService.hashPassword(password)
-            new_user = UserService.createUser(username, mobile, email, password_hash, role)
-            db.session.add(new_user)
-            db.session.commit()
-
-            encoded_jwt = AuthService.jwtTokenEncoder({"name": new_user.username,"id":new_user.id,"role":new_user.role.value})
-            response=make_response(
-                {"token":encoded_jwt,"message":"User created successfully"},
-                201
-            )
-            response.set_cookie(
-                'token',  # cookie name
-                encoded_jwt,  # cookie value
-                httponly=True,  # prevent JS access
-                samesite='Lax',  # adjust depending on cross-site needs
-                secure=False  # set to True if using HTTPS in production
-            )
-            return response
-        elif action == "login":
-            if email == None and password == None:
-                return make_response("Required Inputs are required", 400)
-            
-            user = UserService.findByEmail(email)
-            if not user:
-                return make_response("This User does not exist", 400)
-            
-            if not AuthService.checkPassword(password, user.password_hash):
-                return make_response("Wrong Credentials", 400)
-            
-            encoded_jwt = AuthService.jwtTokenEncoder({"name": user.username,"id":user.id,"role":user.role.value})
-            response=make_response(
-                {"token":encoded_jwt,"message":"User Logged in successfully"},
-                201
-            )
-            response.set_cookie(
-                'token',
-                encoded_jwt,
-                httponly=True,
-                samesite='Lax',
-                secure=False
-            )
-            return response
-        else:
-            response=make_response(
-                {"message":"unknown auth action"},
-                400
-            )
 
 class Users(Resource):
     method_decorators = [token_required]
@@ -173,111 +89,6 @@ class CurrentUser(Resource):
             return make_response(jsonify(user.to_dict(rules=('-password_hash',))), 200)
         return make_response(jsonify({'message': 'User not found'}), 404)
     
-class Drivers(Resource):
-    method_decorators = [token_required]
-    def get(self):
-        drivers = DriverService.findAll()
-        return make_response(
-            jsonify(drivers),
-            200        
-        )
-    def post(self):
-        data=request.get_json()
-        driver_name = data['driver_name']
-        if driver_name == None:
-            return make_response("Required Inputs are required", 400)
-        
-        new_driver = DriverService.createDriver(driver_name)
-        db.session.add(new_driver)
-        db.session.commit()
-        response=make_response(
-            {"driver":new_driver.to_dict(),"message":"Driver created successfully"},
-            201
-        )
-        return response
-    
-class DriverById(Resource):
-    method_decorators = [token_required]
-    def get(self,id):
-        if id is None:
-            return make_response(jsonify({'message':'missing id parameter'}),400)
-        
-        driver=DriverService.findById(id)
-        if driver:
-            response=make_response(
-                jsonify(driver.to_dict()),
-                200
-            )
-  
-            return response
-        return make_response(jsonify({'message':'driver not found'}),404)
-    
-    def post(self,id):
-        data=request.get_json()
-        action=data['action']
-        owner_id=data['owner_id']
-        bus_id=data['bus_id']
-
-        if not action or not bus_id:
-            return {"error": "Missing 'action' or 'bus_id'"}, 400
-        
-        # check if driver exists
-        driver = DriverService.findById(id)
-        if not driver:
-            return {"error": f"Driver with ID {id} not found"}, 404
-
-        # check if bus exists
-        bus = BusService.findById(id=bus_id)
-        if not bus:
-            return {"error": f"Bus with ID {bus_id} not found"}, 404
-        # check if owner exists 
-        if action == 'assign':
-            if not owner_id:
-                return {"error": "Missing 'owner_id' for assignment"}, 400
-
-            owner = OwnerService.findById(id=owner_id)
-            if not owner:
-                return {"error": f"Owner with ID {owner_id} not found"}, 404
-
-            bus.driver_id = id
-            db.session.commit()
-            return {"message": f"Driver {driver.driver_name} assigned to bus {bus_id}"}, 200
-        elif action == 'release':
-            pass
-        else:
-            pass
-
-    def patch(self,id):
-        if id is None:
-            return make_response(jsonify({'message':'missing id parameter'}),400)
-        
-        data=request.get_json()
-        driver=DriverService.findById(id)
-        if driver:
-            for attr in data:
-                setattr(driver,attr,data[attr])
-            db.session.commit()
-            response=make_response(
-                jsonify(driver.to_dict()),
-                200
-            )
-            return response
-        return make_response(jsonify({'message':'driver not found'}),404)
-    
-    def delete(self,id):
-        if id is None:
-            return make_response(jsonify({'message':'missing id parameter'}),400)
-              
-        driver=DriverService.findById(id)
-        if driver:
-            db.session.delete(driver)
-            db.session.commit()
-            response_body=jsonify({'Message':f'driver : *{driver.driver_name}* is deleted successfully'})
-            return make_response(
-                response_body,
-                200
-            )
-        return make_response(jsonify({'message':'user not found'}),404)
 
 class Owners(Resource):
     method_decorators = [token_required]
@@ -657,8 +468,12 @@ api.add_resource(Auth, '/api/auth')
 api.add_resource(Users, '/api/users')
 api.add_resource(UserById, '/api/users/<int:id>')
 api.add_resource(CurrentUser, '/api/users/me')
+#  Drivers endpoint
 api.add_resource(Drivers, '/api/drivers')
 api.add_resource(DriverById, '/api/drivers/<int:id>')
+api.add_resource(DriverTrips, '/api/drivers/<int:id>/trips')
+api.add_resource(DriverTripById, '/api/drivers/<int:id>/trip/<int:trip_id>')
+
 api.add_resource(Owners, '/api/owners')
 api.add_resource(OwnerById, '/api/owners/<int:id>')
 api.add_resource(Bookings, '/api/bookings')

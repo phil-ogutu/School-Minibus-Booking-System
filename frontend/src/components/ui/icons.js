@@ -1,7 +1,7 @@
 import { MdNotifications, MdAccountCircle, MdDirectionsBus } from 'react-icons/md';
 import { TiGroup } from "react-icons/ti";
 import { RiMapPin2Fill } from "react-icons/ri";
-import { FaPlay } from "react-icons/fa";
+import { FaPlay, FaArrowRight, FaFlag, FaLocationArrow } from "react-icons/fa";
 
 /**
  * Generic icon renderer
@@ -32,3 +32,12 @@ export const mapPinIcon = (color = '', size = '', style = {}) =>
 
 export const playIcon = (color = '', size = '', style = {}) =>
   renderIcon(FaPlay, color, size, style);
+
+export const arrowRightIcon = (color = '', size = '', style = {}) =>
+  renderIcon(FaArrowRight, color, size, style);
+
+export const flagIcon = (color = '', size = '', style = {}) =>
+  renderIcon(FaFlag, color, size, style);
+
+export const arrowLocationIcon = (color = '', size = '', style = {}) =>
+  renderIcon(FaLocationArrow, color, size, style);
