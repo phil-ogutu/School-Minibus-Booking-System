@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 
 export const useAuth = () => {
   const { mutate } = useMutation('http://localhost:5000/api/auth');
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser, checkAuth } = useContext(AuthContext);
   const [authError, setAuthError] = useState(null);
 
   const login = async (credentials) => {
@@ -14,7 +14,8 @@ export const useAuth = () => {
         ...credentials,
         action: 'login',
       });
-      setUser(data.user);
+      setUser(data.user); // Optional
+      await checkAuth(); // Fetch user details from /me endpoint after login
       return data;
     } catch (error) {
       setAuthError(error.message);
