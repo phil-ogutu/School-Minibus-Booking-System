@@ -25,7 +25,9 @@ export default function DataTable({ columns, data }) {
               <tr key={idx} className="hover:bg-gray-100">
                 {columns.map((col) => (
                   <td key={col.accessor} className="border px-4 py-2">
-                    {booking[col.accessor]}
+                    {col.render
+                      ? col.render(booking[col.accessor], booking)
+                      : booking[col.accessor]}
                   </td>
                 ))}
               </tr>
