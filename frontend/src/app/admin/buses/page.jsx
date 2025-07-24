@@ -191,6 +191,10 @@ export default function ManageBuses() {
               <td className="border px-4 py-2">{trip.trip_date}</td>
               <td className="border px-4 py-2">{trip.trip_time}</td>
               <td className="border px-4 py-2">
+                <button className="bg-sky-500 text-white p-1 rounded hover:bg-sky-600">
+                  <FaEdit />
+                </button>
+
                 <button
                   onClick={() => deleteTrip(trip.id)}
                   className="bg-red-500 text-white p-1 rounded hover:bg-red-600"
