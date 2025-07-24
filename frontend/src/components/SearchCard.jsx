@@ -68,9 +68,9 @@ const SearchCard = ({ route }) => {
         )}
       </div>
 
-      {showStops && route.locations.length > 0 && (
+      {showStops && route.locations.length > 2 && (
         <div className="w-[95%] mt-2 bg-neutral-300/20 space-y-2 pl-10 mx-auto rounded-md">
-          {route.locations.map((location) => (
+          {route.locations.slice(1, -1).map((location) => (
             <div key={location.id} className="flex items-center gap-x-2">
               <FaCircle className="w-2 h-2 text-neutral-500" />
               <p className="text-sm text-neutral-600">
@@ -81,9 +81,9 @@ const SearchCard = ({ route }) => {
         </div>
       )}
 
-      <div className="w-full flex items-center justify-between">
+      <div className="w-full flex items-center justify-end">
         {/* <h1 className="text-lg text-neutral-700 font-semibold">{() =>handleGetPrice}</h1> */}
-        <h1 className="text-lg text-neutral-700 font-semibold">Ksh 100</h1>
+        {/* <h1 className="text-lg text-neutral-700 font-semibold">Ksh 100</h1> */}
 
         <button
           onClick={() => setModalOpen(true)}
@@ -94,6 +94,7 @@ const SearchCard = ({ route }) => {
 
         <BookBusModal
           isOpen={isModalOpen}
+          route={route}
           onClose={() => setModalOpen(false)}
         />
       </div>
