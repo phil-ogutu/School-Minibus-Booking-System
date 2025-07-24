@@ -5,7 +5,6 @@ from sqlalchemy import func # from sqlalchemy
 from sqlalchemy import Enum
 import enum
 
-
 # Enum definitions
 class UserRoleEnum(enum.Enum):
     parent = "parent"
