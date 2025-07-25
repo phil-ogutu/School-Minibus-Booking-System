@@ -46,6 +46,7 @@ export default function ViewBookings() {
     { header: "Actions", accessor: "actions" }, // Placeholder for actions like edit/delete
   ];
   const { bookings } = useBookings();
+  console.log('admin-bookings: ', bookings)
 
   return (
     <div className="flex">

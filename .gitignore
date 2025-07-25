@@ -2,3 +2,4 @@
 /frontend/package-lock.json
 
 /backend/server/instance
+/backend/server/migrations

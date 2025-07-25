@@ -4,8 +4,11 @@ import { useMutation } from './useMutation';
 import { AuthContext } from '../context/AuthContext';
 
 export const useAuth = () => {
-  const { mutate } = useMutation('http://localhost:5000/api/auth');
-  const { user, setUser } = useContext(AuthContext);
+  // const BASE_URL = "http://localhost:5000"
+  // const BASE_URL = "http://127.0.0.1:5000";
+  
+  const { mutate } = useMutation(`/api/auth`);
+  const { user, setUser, checkAuth } = useContext(AuthContext);
   const [authError, setAuthError] = useState(null);
 
   const login = async (credentials) => {
@@ -14,7 +17,8 @@ export const useAuth = () => {
         ...credentials,
         action: 'login',
       });
-      setUser(data.user);
+      setUser(data.user); // This may not be needed if checkAuth refetches user data
+      await checkAuth(); // Fetch user details from /me endpoint after login
       return data;
     } catch (error) {
       setAuthError(error.message);
@@ -39,7 +43,7 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       // logout endpoin later implementation
-      setUser(null);
+      setUser(null); // Reset user state
     } catch (error) {
       setAuthError(error.message);
       throw error;
