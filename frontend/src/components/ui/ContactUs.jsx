@@ -150,7 +150,7 @@ const ContactUs = () => {
             Get in Touch with SkoolaBus
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            We're here to help make your child's journey to school safe, reliable, and worry-free. 
+            Make your child's journey to school safe, reliable, and worry-free. 
             Contact us anytime for any support, bookings, or questions.
           </p>
         </div>
