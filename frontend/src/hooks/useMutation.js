@@ -1,9 +1,10 @@
 // src/hooks/useMutation.js
 import { useState } from 'react';
+import { BASE_URL } from '@/utils/constants';
+
 
 export const useMutation = (url, method = 'POST') => {
-  const BASE_URL = "http://localhost:5000"
-  // const BASE_URL = "http://127.0.0.1:5000";
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
