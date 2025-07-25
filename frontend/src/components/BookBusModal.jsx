@@ -12,7 +12,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
   const { user } = useAuthContext();
   const { creatingBooking } = useBookings();
 
-  const { mutate } = useMutation("http://localhost:5000/api/bookings");
+  const { mutate } = useMutation("/api/bookings");
 
   const [formData, setFormData] = useState({
     passengerName: "",
