@@ -43,7 +43,7 @@ const ContactUs = () => {
     
     if (!formData.message.trim()) {
       newErrors.message = 'Message is required';
-    } else if (formData.message.length < 10) {
+    } else if (formData.message.length < 15) {
       newErrors.message = 'Message must be at least 15 characters long';
     }
     
