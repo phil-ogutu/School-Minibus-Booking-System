@@ -161,7 +161,7 @@ const ContactUs = () => {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Send us a Message</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Send us a Message!</h2>
               <p className="text-gray-600 mb-8">
                 Fill out the form below and we'll respond as quickly as possible.
               </p>
