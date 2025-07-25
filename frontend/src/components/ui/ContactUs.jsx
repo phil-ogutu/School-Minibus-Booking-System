@@ -409,9 +409,9 @@ const ContactUs = () => {
                 <h3 className="text-xl font-bold text-red-900">Emergency Contact</h3>
               </div>
               <p className="text-red-800 font-semibold mb-2">24/7 Emergency Line:</p>
-              <p className="text-2xl font-bold text-red-900">+1 (555) 911-HELP</p>
+              <p className="text-2xl font-bold text-red-900">+254 723456789-HELP</p>
               <p className="text-sm text-red-700 mt-2">
-                For immediate safety concerns or bus emergencies only
+                For immediate safety concerns or bus emergencies only!
               </p>
             </div>
           </div>
