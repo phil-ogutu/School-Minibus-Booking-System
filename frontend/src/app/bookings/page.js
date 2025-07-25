@@ -7,12 +7,18 @@ import Navbar from "@/components/Navbar";
 import { useTheContext } from "@/context/MapContext";
 import { useRoutes } from "@/hooks/useRoutes";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function Booking() {
   const { routes, routesLoading, routesError } = useRoutes();
   const { from, to } = useTheContext();
+
+  const router = useRouter();
+  const navigateToBuses = (routeId) => {
+    router.push( `/bookings/trips/${routeId}`)
+  }
 
   const [stops, setStops] = useState([]);
 
@@ -38,18 +44,16 @@ export default function Booking() {
       <div className="flex-1 md:grid md:grid-cols-2">
         <div className="p-5 flex flex-col space-y-5">
           <SearchBus />
-
-          <div className="overflow-y-auto space-y-4 no-scrollbar h-[calc(100vh-220px)]">
+          
+          <div className="grid grid-cols-2 items-start gap-x-5 overflow-y-auto no-scrollbar">
             {displayRoutes.map((route) => (
-              <div
+              <SearchCard
                 key={route.id}
-                onClick={() => {
-                  console.log("Selected stops", route.locations);
-                  setStops(route.locations);
-                }}
-              >
-                <SearchCard route={route} />
-              </div>
+                route={route}                
+                onPreview={() => setStops(route.locations)}
+                onSelect={() => navigateToBuses(route.id)}
+              />
+    
             ))}
           </div>
         </div>

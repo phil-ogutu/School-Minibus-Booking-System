@@ -3,11 +3,16 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { useState } from "react";
 import { useBookings } from "@/hooks/useBookings";
+import { useMutation } from "@/hooks/useMutation";
+import { useAuthContext } from "@/context/AuthContext";
 
-const BookBusModal = ({ isOpen, onClose, route }) => {
-  if (!isOpen) return null;
+const BookBusModal = ({ isOpen, onClose, route, bus }) => {
+  if (!isOpen || !route || !bus) return null;
 
-  const { createNewBooking, creatingBooking } = useBookings();
+  const { user } = useAuthContext();
+  const { creatingBooking } = useBookings();
+
+  const { mutate } = useMutation("http://localhost:5000/api/bookings");
 
   const [formData, setFormData] = useState({
     passengerName: "",
@@ -18,7 +23,7 @@ const BookBusModal = ({ isOpen, onClose, route }) => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -26,32 +31,36 @@ const BookBusModal = ({ isOpen, onClose, route }) => {
     e.preventDefault();
 
     const bookingData = {
-      bus_id: route.id,
-      parent_id :1,
-      passengerName: formData.passengerName,
+      title: "New",
+      bus_id: bus.id,
+      parent_id: user?.id,
+      child_name: formData.passengerName,
       pickup: formData.pickup,
       dropoff: formData.dropoff,
+      price: 500,
     };
 
-    try {
-      await createNewBooking(bookingData);
-      alert("Booking successful!");
+    mutate(bookingData)
+    .then((response) => {
+      console.log("Booking successful:", response);
+      alert("Booking successful");
       onClose();
-    } catch (error) {
-      console.error(error);
+    })
+    .catch((error) => {
+      console.error("Booking failed:", error);
       alert("Booking failed");
-
-    }
-  }
+    });
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md relative">
-        <h2 className="text-xl font-semibold mb-4">Book This Bus</h2>
+        <h2 className="text-xl text-center font-semibold mb-4">
+          Book Bus: {bus?.plate}
+        </h2>
 
-        <form>
-          <input type="hidden" name="bus_id" value={route.id} />
-          <input type="hidden" name="parent_id" value={parent.id} />
+        <form onSubmit={handleSubmit}>
+          <input type="hidden" name="bus_id" value={bus.id} />
 
           <label className="block mb-2">Route Name</label>
           <input
@@ -105,7 +114,7 @@ const BookBusModal = ({ isOpen, onClose, route }) => {
                 <option
                   key={location.id}
                   value={location.location_name}
-                  disabled={pickupIndex >= 0 && idx <= pickupIndex} 
+                  disabled={pickupIndex >= 0 && idx <= pickupIndex}
                 >
                   {location.location_name}
                 </option>
