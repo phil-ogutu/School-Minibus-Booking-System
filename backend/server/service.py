@@ -1,5 +1,5 @@
 import bcrypt
-from models import db, User, Booking, Driver, Owner, Bus, Route, Location
+from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location
 import jwt
 from flask import abort
 
@@ -184,7 +184,7 @@ class BusService():
             owner_id=owner_id,
             plate=plate,
             capacity=capacity,
-            status=True
+            status=TripStatus.pending
         )
     
 class RouteService():
