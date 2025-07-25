@@ -428,7 +428,7 @@ const ContactUs = () => {
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Quick answers to common questions about SkoolaBus services
+                Quick answers to common questions about SkoolaBus services.
               </p>
             </div>
 
