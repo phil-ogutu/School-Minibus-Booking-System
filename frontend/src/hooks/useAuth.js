@@ -3,10 +3,7 @@ import { useState, useContext } from 'react';
 import { useMutation } from './useMutation';
 import { AuthContext } from '../context/AuthContext';
 
-export const useAuth = () => {
-  // const BASE_URL = "http://localhost:5000"
-  // const BASE_URL = "http://127.0.0.1:5000";
-  
+export const useAuth = () => {  
   const { mutate } = useMutation(`/api/auth`);
   const { user, setUser, checkAuth } = useContext(AuthContext);
   const [authError, setAuthError] = useState(null);
@@ -41,8 +38,12 @@ export const useAuth = () => {
   };
 
   const logout = async () => {
+    // const { mutate } = useMutation(`/api/auth`,'DELETE');
     try {
-      // logout endpoin later implementation
+      // const response = await mutate();
+      // if (response.ok){
+        
+      // }
       setUser(null); // Reset user state
     } catch (error) {
       setAuthError(error.message);
