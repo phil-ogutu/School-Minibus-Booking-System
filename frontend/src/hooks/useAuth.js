@@ -3,8 +3,8 @@ import { useState, useContext } from 'react';
 import { useMutation } from './useMutation';
 import { AuthContext } from '../context/AuthContext';
 
-export const useAuth = () => {
-  const { mutate } = useMutation('http://localhost:5000/api/auth');
+export const useAuth = () => {  
+  const { mutate } = useMutation(`/api/auth`);
   const { user, setUser, checkAuth } = useContext(AuthContext);
   const [authError, setAuthError] = useState(null);
 
@@ -38,8 +38,12 @@ export const useAuth = () => {
   };
 
   const logout = async () => {
+    // const { mutate } = useMutation(`/api/auth`,'DELETE');
     try {
-      // logout endpoin later implementation
+      // const response = await mutate();
+      // if (response.ok){
+        
+      // }
       setUser(null); // Reset user state
     } catch (error) {
       setAuthError(error.message);

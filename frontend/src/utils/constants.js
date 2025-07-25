@@ -1,1 +1,5 @@
-// Here we can have Constants, dummy data
+const BASE_URL=process.env.NEXT_PUBLIC_BASE_URL
+
+export {
+    BASE_URL
+}
