@@ -129,7 +129,7 @@ const ContactUs = () => {
             onClick={() => setSubmitSuccess(false)}
             className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold py-3 px-6 rounded-lg transition-colors"
           >
-            Send Another Message
+            Send Another Message.
           </button>
         </div>
       </div>
