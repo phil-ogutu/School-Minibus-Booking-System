@@ -8,7 +8,8 @@ import { useBuses } from "@/hooks/useBuses"; // Import the hook
 import axiosInstance from "@/lib/api";
 
 export default function ManageBuses() {
-  const { buses, busesLoading, busesError, createNewBus, deleteExistingBus } = useBuses(); // Using the hook
+  const { buses, busesLoading, busesError, createNewBus, deleteExistingBus } =
+    useBuses(); // Using the hook
 
   const [newBus, setNewBus] = useState({
     plate: "",
@@ -74,13 +75,57 @@ export default function ManageBuses() {
     }
   };
 
-  if (busesLoading) {
-    return <div>Loading buses...</div>; // Loading state
-  }
+  const TripsTable = () => (
+    <>
+      <h2 className="text-xl font-bold mt-8 mb-2">Upcoming Trips</h2>
+      <table className="min-w-full bg-white border rounded">
+        <thead className="bg-[#0F333F] text-white">
+          <tr>
+            <th className="px-4 py-2 border">Bus</th>
+            <th className="px-4 py-2 border">Route</th>
+            <th className="px-4 py-2 border">Date</th>
+            <th className="px-4 py-2 border">Time</th>
+            <th className="px-4 py-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {(trips.length
+            ? trips
+            : [
+                {
+                  id: 1,
+                  bus: { plate: "KDA 123A" },
+                  route: "Mombasa Rd - Kitengela → CBD",
+                  trip_date: "2025-07-25",
+                  trip_time: "08:00",
+                },
+              ]
+          ).map((trip) => (
+            <tr key={trip.id} className="hover:bg-gray-100">
+              <td className="border px-4 py-2">
+                {trip.bus?.plate || trip.bus_id}
+              </td>
+              <td className="border px-4 py-2">{trip.route}</td>
+              <td className="border px-4 py-2">{trip.trip_date}</td>
+              <td className="border px-4 py-2">{trip.trip_time}</td>
+              <td className="border px-4 py-2">
+                <button className="bg-sky-500 text-white p-1 rounded hover:bg-sky-600">
+                  <FaEdit />
+                </button>
 
-  if (busesError) {
-    return <div>Error loading buses: {busesError}</div>; // Error state
-  }
+                <button
+                  onClick={() => deleteTrip(trip.id)}
+                  className="bg-red-500 text-white p-1 rounded hover:bg-red-600"
+                >
+                  <FaTrash />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
 
   return (
     <div className="flex">
@@ -95,9 +140,7 @@ export default function ManageBuses() {
               type="text"
               placeholder="Number Plate"
               value={newBus.plate}
-              onChange={(e) =>
-                setNewBus({ ...newBus, plate: e.target.value })
-              }
+              onChange={(e) => setNewBus({ ...newBus, plate: e.target.value })}
               className="p-2 border rounded"
             />
             <input
@@ -135,7 +178,7 @@ export default function ManageBuses() {
             </tr>
           </thead>
           <tbody>
-            {buses.map((bus) => (
+            {buses?.map((bus) => (
               <tr key={bus.id} className="hover:bg-gray-100">
                 <td className="border px-4 py-2">{bus.plate}</td>
                 <td className="border px-4 py-2">{bus.capacity}</td>

@@ -162,19 +162,39 @@ const HeroSection = () => (
       <div className="max-w-6xl mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold mb-10">What Parents Say</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <motion.div
-              key={i}
-              whileHover={{ scale: 1.05 }}
-              className="bg-gray-100 rounded-xl p-6 shadow"
-            >
-              <p>
-                "SkoolaBus has made mornings stress-free and we trust the
-                drivers completely!"
-              </p>
-              <div className="mt-4 font-semibold">Parent {i}</div>
-            </motion.div>
-          ))}
+          {/* {[1, 2, 3].map((i) => ( */}
+          <motion.div
+            // key={i}
+            whileHover={{ scale: 1.05 }}
+            className="bg-gray-100 rounded-xl p-6 shadow"
+          >
+            <p>
+              "SkoolaBus has made mornings stress-free and we trust the drivers
+              completely!"
+            </p>
+            <div className="mt-4 font-semibold">— Martin K., Kitengela</div>
+            {/* <div className="mt-4 font-semibold">Parent {i}</div> */}
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-gray-100 rounded-xl p-6 shadow"
+          >
+            <p>
+              "The real-time tracking is a game-changer—I can see exactly when
+              my child boards and alights. Highly recommend!"
+            </p>
+            <div className="mt-4 font-semibold">— Sarah M., Karen</div>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-gray-100 rounded-xl p-6 shadow"
+          >
+            <p>
+              "Customer support is fantastic and the buses are always on time.
+              My kids love the friendly drivers!"
+            </p>
+            <div className="mt-4 font-semibold">— James O., Westlands</div>
+          </motion.div>
         </div>
       </div>
     </section>
@@ -184,23 +204,55 @@ const HeroSection = () => (
       <div className="max-w-6xl mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold mb-10">Meet Our Buses & Drivers</h2>
         <div className="grid md:grid-cols-3 gap-8">
-          {[1, 2, 3].map((i) => (
-            <motion.div
-              key={i}
-              whileHover={{ scale: 1.05 }}
-              className="bg-white rounded-xl shadow p-4"
-            >
-              <Image
-                src="/bus-hero.png"
-                alt={`Bus ${i}`}
-                width={400}
-                height={300}
-                className="rounded mb-4"
-              />
-              <h3 className="font-bold">Driver {i}</h3>
-              <p>Route: Kasarani - CBD</p>
-            </motion.div>
-          ))}
+          {/* {[1, 2, 3].map((i) => ( */}
+          <motion.div
+            // key={i}
+            whileHover={{ scale: 1.05 }}
+            className="bg-white rounded-xl shadow p-4"
+          >
+            <Image
+              // src="/bus-hero.png"
+              src="https://images.pexels.com/photos/6584748/pexels-photo-6584748.jpeg?auto=compress&cs=tinysrgb&w=800"
+              // alt={`Bus ${i}`}
+              alt="Driver Peter with yellow school bus"
+              width={400}
+              height={300}
+              className="rounded mb-4"
+            />
+            <h3 className="font-bold">Driver Peter Kamau</h3>
+            <p>Route: Kasarani - CBD</p>
+          </motion.div>
+          {/* ))} */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-white rounded-xl shadow p-4"
+          >
+            <Image
+              src="https://images.pexels.com/photos/718978/pexels-photo-718978.jpeg?auto=compress&cs=tinysrgb&w=800"
+              alt="Driver Mary with white minibus"
+              width={400}
+              height={300}
+              className="rounded mb-4 object-cover"
+            />
+            <h3 className="font-bold">Mary Otieno</h3>
+            <p className="text-sm text-gray-600">
+              Route: Westlands – Lavington
+            </p>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-white rounded-xl shadow p-4"
+          >
+            <Image
+              src="https://images.pexels.com/photos/10699846/pexels-photo-10699846.jpeg?auto=compress&cs=tinysrgb&w=800"
+              alt="Driver James with modern school coach"
+              width={400}
+              height={300}
+              className="rounded mb-4 object-cover"
+            />
+            <h3 className="font-bold">James Mwangi</h3>
+            <p className="text-sm text-gray-600">Route: Karen – CBD</p>
+          </motion.div>
         </div>
       </div>
     </section>
