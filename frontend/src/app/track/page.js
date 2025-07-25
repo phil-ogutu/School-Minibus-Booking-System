@@ -222,7 +222,7 @@ export default function TrackPage() {
                   <div className="flex items-center gap-x-3 bg-green-50 p-3 rounded-lg border border-green-200">
                     <FaMapMarker className="w-4 h-4 text-green-600" />
                     <div>
-                      <div className="font-medium text-green-800">📍 {trackingData.currentLocation}</div>
+                      <div className="font-medium text-green-800">{trackingData.currentLocation}</div>
                       <div className="text-xs text-green-600">Current Location</div>
                     </div>
                   </div>
