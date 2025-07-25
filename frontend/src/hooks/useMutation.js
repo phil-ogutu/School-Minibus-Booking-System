@@ -2,6 +2,8 @@
 import { useState } from 'react';
 
 export const useMutation = (url, method = 'POST') => {
+  const BASE_URL = "http://localhost:5000"
+  // const BASE_URL = "http://127.0.0.1:5000";
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -10,7 +12,7 @@ export const useMutation = (url, method = 'POST') => {
     setLoading(true);
     try {
       const finalUrl = customUrl || url;
-      const response = await fetch(finalUrl, {
+      const response = await fetch(`${BASE_URL}${finalUrl}`, {
         method,
         credentials: 'include',
         headers: {
