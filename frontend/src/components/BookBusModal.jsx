@@ -37,7 +37,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
       child_name: formData.passengerName,
       pickup: formData.pickup,
       dropoff: formData.dropoff,
-      price: 500.0,
+      price: 500.00,
     };
 
     mutate(bookingData)
