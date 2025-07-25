@@ -110,7 +110,7 @@ const ContactUs = () => {
     },
     {
       question: "What happens if the bus is late?",
-      answer: "You'll receive automatic notifications about delays. We also have backup plans for emergencies."
+      answer: "You'll immediately receive automatic notifications about delays. We also have backup plans for emergencies."
     }
   ];
 
