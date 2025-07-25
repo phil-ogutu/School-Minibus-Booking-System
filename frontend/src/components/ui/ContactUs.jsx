@@ -257,7 +257,7 @@ const ContactUs = () => {
                       <option value="parent">Parent/Guardian</option>
                       <option value="school">School Administrator</option>
                       <option value="student">Student</option>
-                      <option value="other">Other</option>
+                      
                     </select>
                     {errors.userType && (
                       <p id="userType-error" className="mt-1 text-sm text-red-600" role="alert">
