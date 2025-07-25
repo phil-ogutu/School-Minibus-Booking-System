@@ -4,10 +4,12 @@ import { createPortal } from "react-dom";
 import { useState } from "react";
 import { useBookings } from "@/hooks/useBookings";
 import { useMutation } from "@/hooks/useMutation";
+import { useAuthContext } from "@/context/AuthContext";
 
 const BookBusModal = ({ isOpen, onClose, route, bus }) => {
   if (!isOpen || !route || !bus) return null;
 
+  const { user } = useAuthContext();
   const { creatingBooking } = useBookings();
 
   const { mutate } = useMutation("http://localhost:5000/api/bookings");
@@ -31,7 +33,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
     const bookingData = {
       title: "New",
       bus_id: bus.id,
-      parent_id: 13,
+      parent_id: user?.id,
       child_name: formData.passengerName,
       pickup: formData.pickup,
       dropoff: formData.dropoff,
