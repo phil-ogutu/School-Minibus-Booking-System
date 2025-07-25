@@ -332,7 +332,7 @@ const ContactUs = () => {
                   )}
                 </button>
                 <p id="submit-button-description" className="sr-only">
-                  Click to send your message to SkoolaBus support team
+                  Click to send your message to SkoolaBus support team.
                 </p>
               </form>
             </div>
@@ -351,7 +351,7 @@ const ContactUs = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">Phone</h4>
-                    <p className="text-gray-600">+1 (555) 123-SBUS</p>
+                    <p className="text-gray-600">+254 723456789</p>
                     <p className="text-sm text-gray-500">Available 24/7 for emergencies</p>
                   </div>
                 </div>
