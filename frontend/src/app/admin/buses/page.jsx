@@ -178,7 +178,7 @@ export default function ManageBuses() {
             </tr>
           </thead>
           <tbody>
-            {buses.map((bus) => (
+            {buses?.map((bus) => (
               <tr key={bus.id} className="hover:bg-gray-100">
                 <td className="border px-4 py-2">{bus.plate}</td>
                 <td className="border px-4 py-2">{bus.capacity}</td>
