@@ -1,52 +1,55 @@
 "use client";
 
+import { useState } from 'react';
+import { useBookings } from '@/hooks/useBookings';
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
-import DataTable from "@/components/DataTable";
-import { useBookings } from "@/hooks/useBookings";
+import CreateBooking from "@/components/CreateBooking";
+import UpdateBookingForm from '@/components/UpdateBooking';
+import DataTable from "@/components/DataTable"; // Import DataTable
 
-// const bookings = [
-//   {
-//     id: 1,
-//     student: "John Doe",
-//     route: "Route A",
-//     bus: "KDA 123A",
-//     driver: "Peter Kamau",
-//     pickup: "CBD Stage",
-//     dropoff: "Westlands School Gate",
-//     dateTime: "22/07/2024 07:00 - 16:00",
-//     status: "Confirmed",
-//   },
-//   {
-//     id: 2,
-//     student: "Jane Smith",
-//     route: "Route B",
-//     bus: "KDB 456B",
-//     driver: "Mary Otieno",
-//     pickup: "Eastleigh Stop 5",
-//     dropoff: "Karen School Gate",
-//     dateTime: "22/07/2024 06:45 - 15:45",
-//     status: "Pending",
-//   },
-// ];
+const ViewBookings = () => {
+  const { bookings, deleteExistingBooking } = useBookings();
+  const [allowEditing, setAllowEditng] = useState(false)
+  const [editingBookingId, setEditingBookingId] = useState(null);
+  const [isCreating, setIsCreating] = useState(false);
 
-export default function ViewBookings() {
+  const handleCreateBooking = () => {
+    setIsCreating(true);
+  };
+
+  const handleEdit = (bookingId) => {
+    setAllowEditng(true)
+    if (bookingId) {
+      setEditingBookingId(bookingId);
+    }
+  };
+
+  const handleDelete = async (bookingId) => {
+    const confirmation = window.confirm('Are you sure you want to delete this booking?');
+    if (confirmation) {
+      await deleteExistingBooking(bookingId);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsCreating(false);
+    setEditingBookingId(null);
+  };
+
   const columns = [
     { header: "Student", accessor: "child_name" },
-    { header: "Parent Name", accessor: "parent.username" },
-    { header: "Parent Phone", accessor: "parent.phone" },
-    { header: "Parent Email", accessor: "parent.email" },
-    { header: "Route", accessor: "bus.route.start" },
-    { header: "Bus", accessor: "bus.plate" },
-    { header: "Driver", accessor: "bus.driver.driver_name" },
+    { header: "Parent", accessor: "parent_id" },
+    { header: "Bus", accessor: "bus_id" },
+    { header: "Title", accessor: "title" },
     { header: "Pickup", accessor: "pickup" },
     { header: "Drop-off", accessor: "dropoff" },
-    { header: "Date & Time", accessor: "dateTime" },
-    { header: "Status", accessor: "status" },
-    { header: "Actions", accessor: "actions" }, // Placeholder for actions like edit/delete
+    { header: "Price", accessor: "price" },
+    { header: "Status", accessor: "status", render: (status) => status ? 'Active' : 'Inactive' },
+    { header: "Created", accessor: "created_at" },
+    { header: "Updated", accessor: "updated_at" },
+    { header: "Actions", accessor: "actions" },
   ];
-  const { bookings } = useBookings();
-  console.log('admin-bookings: ', bookings)
 
   return (
     <div className="flex">
@@ -54,8 +57,36 @@ export default function ViewBookings() {
       <main className="flex-1 p-10 bg-gray-50 min-h-screen">
         <DashboardHeader title="View Bookings" />
 
-        <DataTable columns={columns} data={bookings} />
+        {/* Create New Booking Button */}
+        <button
+          onClick={handleCreateBooking}
+          className="bg-blue-500 text-white p-2 rounded mb-4"
+        >
+          Create New Booking
+        </button>
+
+        {/* Render the CreateBooking component if isCreating is true */}
+        {isCreating && <CreateBooking onClose={handleCloseModal} />}
+
+        {/* Conditionally render the UpdateBookingForm */}
+        {allowEditing && (
+          <UpdateBookingForm
+            bookingId={editingBookingId}
+            onClose={handleCloseModal}
+          />
+        )}
+
+        {/* DataTable component */}
+        <DataTable
+          columns={columns}
+          data={bookings}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </main>
     </div>
   );
-}
+};
+
+export default ViewBookings;
+

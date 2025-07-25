@@ -2,13 +2,22 @@
 
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
+import { useBuses } from "@/hooks/useBuses";
+import { useBookings } from "@/hooks/useBookings";
+import { useRoutes } from "@/hooks/useRoutes";
 
 export default function AdminDashboard() {
   // dummy stats; replace with real API data later
+    const { buses } = useBuses();
+    const { bookings } = useBookings();
+    const { routes } = useRoutes()
+
+    console.log('mm', routes)
+    
   const stats = [
-    { label: "Total Buses", value: 5 },
-    { label: "Total Routes", value: 8 },
-    { label: "Total Bookings", value: 120 },
+    { label: "Total Buses", value:  buses && buses.length },
+    { label: "Total Routes", value: routes && routes.length },
+    { label: "Total Bookings", value: bookings && bookings.length},
     { label: "Total Parents", value: 45 },
     { label: "Total Drivers", value: 12 },
   ];
