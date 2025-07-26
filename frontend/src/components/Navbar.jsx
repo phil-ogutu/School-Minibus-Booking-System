@@ -78,6 +78,14 @@ const Navbar = () => {
                 Find Bus
               </a>
             </li>
+            <li>
+              <a
+                href="/"
+                className={linkClasses("/")}
+              >
+                Contact Us
+              </a>
+            </li>
           </ul>
         </div>
       </div>
