@@ -80,8 +80,8 @@ const Navbar = () => {
             </li>
             <li>
               <a
-                href="/"
-                className={linkClasses("/")}
+                href="/contact"
+                className={linkClasses("/contact")}
               >
                 Contact Us
               </a>
