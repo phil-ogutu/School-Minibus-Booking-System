@@ -70,9 +70,19 @@ export default function Parents() {
     setuserToBeDeleted(parent)
     deleteopenModal();
   };
-  const handleDelete = (id) => {
-    alert(`Delete parent ${id}`);
-    // Implement actual delete logic here
+  const { mutate: deleteParent, error: errorDeletingParent } = useMutation(``,'DELETE');
+  const handleDelete = async(id) => {
+    if(id){
+      await deleteParent({},`/api/users/${userToBeDeleted?.id}`).then(()=>{
+        console.log(
+          `Parent deleted functionality is succcess`
+        );
+        deletecloseModal();
+        refetchParents()
+      }).catch((err)=>{
+        alert(err)
+      });
+    }
   };
 
   const columns = [
@@ -190,6 +200,7 @@ export default function Parents() {
             <button
               type="submit"
               className="bg-red-500 text-white px-4 py-2 rounded"
+              onClick={()=>{handleDelete(userToBeDeleted?.id)}}
             > Delete
             </button>
           </div>
