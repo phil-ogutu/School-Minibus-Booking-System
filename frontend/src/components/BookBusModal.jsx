@@ -8,6 +8,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { haversineDistance, calculatePrice } from "@/utils/distance";
 import { FaBus, FaCreditCard, FaMapMarkerAlt, FaUser } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
   if (!isOpen || !route || !bus) return null;
@@ -69,7 +70,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
     mutate(bookingData)
       .then((response) => {
         console.log("Booking successful:", response);
-        alert("Booking successful");
+        toast.success("Booking successful");
 
         const bookingId = response?.id || response?.data?.id;
         if (bookingId) {
@@ -82,14 +83,14 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
       })
       .catch((error) => {
         console.error("Booking failed:", error);
-        alert("Booking failed");
+        toast.error("Booking failed");
       });
   };
 
   return createPortal(
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md relative">
-        <h2 className="text-xl text-center font-semibold mb-4">
+        <h2 className="text-2xl font-medium mb-4">
           Book Your Ticket
         </h2>
 
@@ -188,7 +189,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+              className="px-4 py-2 bg-yellow-500 font-medium rounded hover:bg-yellow-700"
               disabled={creatingBooking}
             >
               {creatingBooking ? "Booking..." : "Confirm Booking"}
