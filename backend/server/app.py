@@ -16,6 +16,7 @@ from service import (
 from controllers.drivers import Drivers, DriverById, DriverTrips, DriverTripById
 from controllers.auth import Auth
 from controllers.users import Users, UserById, CurrentUser
+from controllers.analytics import Analytics
 # Local imports
 from config import app, db, api
 from middleware.auth import token_required
@@ -417,6 +418,8 @@ api.add_resource(Locations, '/api/locations')
 api.add_resource(LocationById, '/api/locations/<int:id>')
 api.add_resource(Buses, '/api/buses')
 api.add_resource(BusById, '/api/buses/<int:id>')
+#  Analytics endpoint
+api.add_resource(Analytics, '/api/analytics')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

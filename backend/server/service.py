@@ -52,6 +52,13 @@ class UserService():
                 return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).all()]
         else:
             return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+        
+    @staticmethod
+    def analytics(role=''):
+        if role:
+            return User.query.filter_by(role=role).count()
+        else:
+            return User.query.count()
     
 class DriverService():
     @staticmethod
