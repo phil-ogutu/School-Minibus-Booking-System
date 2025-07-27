@@ -13,6 +13,7 @@ import {
   FaMapMarkerAlt,
   FaUser,
 } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -39,19 +40,29 @@ export default function Bus() {
     setIsModalOpen(false);
   };
 
+  const router = useRouter();
+
+  const navigateToTrack = (id) => {
+    if (id) {
+      router.push(`/track/${id}`);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 grid grid-cols-2">
+      <div className="flex-1 md:grid grid-cols-2">
+
         {/* Left Side */}
         <div className="p-5 overflow-y-auto no-scrollbar h-[calc(100vh-150px)]">
+          
           {/* Route Name and stops */}
-          <div className="mb-5 w-[80%] shadow-sm bg-white border rounded-xl p-4 border-neutral-300 mx-auto">
+          <div className="mb-5 w-full shadow-sm bg-white border rounded-xl p-4 border-neutral-300 mx-auto">
             <div className="flex justify-start items-center gap-x-3 text-xl mb-2">
               <FaMapMarkerAlt className="w-5 h-5" />
               <h1 className="font-medium">Route Information</h1>
             </div>
-            <div className="flex justify-start gap-x-2 text-xl">
+            <div className="flex md:justify-start md:gap-x-2 md:text-xl">
               <span>{route?.start}</span>
               <span>&rarr;</span>
               <span>{route?.end}</span>
@@ -85,7 +96,7 @@ export default function Bus() {
           <div className="mb-5 text-xl font-medium">Available Buses</div>
 
           {/* Bus Cards */}
-          <div className="grid grid-cols-2 gap-2">
+          <div className="md:grid grid-cols-2 gap-2">
             {buses
               ?.filter((bus) => bus.route_id === route.id)
               .map((bus) => {
@@ -150,6 +161,7 @@ export default function Bus() {
         onClose={closeModal}
         route={route}
         bus={selectedBus}
+        onNavigate={navigateToTrack}
       />
     </div>
   );
