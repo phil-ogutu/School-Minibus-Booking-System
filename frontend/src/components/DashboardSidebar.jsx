@@ -16,11 +16,11 @@ import {
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: FaHome },
+  { href: "/admin/parents", label: "Parents", icon: FaUserFriends },
   { href: "/admin/buses", label: "Manage Buses", icon: FaBus },
   { href: "/admin/bus_owner", label: "Bus Owners", icon: FaUserCheck },
   { href: "/admin/routes", label: "Manage Routes", icon: FaRoute },
   { href: "/admin/bookings", label: "View Bookings", icon: FaClipboardList },
-  { href: "/admin/parents", label: "Parents", icon: FaUserFriends },
   { href: "/admin/drivers", label: "Drivers", icon: FaUserTie },
   { href: "/admin/profile", label: "Edit Profile", icon: FaUserFriends },
 ];

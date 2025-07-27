@@ -1,7 +1,7 @@
-import { MdNotifications, MdAccountCircle, MdDirectionsBus } from 'react-icons/md';
+import { MdNotifications, MdAccountCircle, MdDirectionsBus, MdOutlineAdd, MdEdit, MdDeleteOutline } from 'react-icons/md';
 import { TiGroup } from "react-icons/ti";
 import { RiMapPin2Fill } from "react-icons/ri";
-import { FaPlay, FaArrowRight, FaFlag, FaLocationArrow } from "react-icons/fa";
+import { FaPlay, FaArrowRight, FaArrowLeft, FaFlag, FaLocationArrow } from "react-icons/fa";
 
 /**
  * Generic icon renderer
@@ -33,6 +33,9 @@ export const mapPinIcon = (color = '', size = '', style = {}) =>
 export const playIcon = (color = '', size = '', style = {}) =>
   renderIcon(FaPlay, color, size, style);
 
+export const arrowLeftIcon = (color = '', size = '', style = {}) =>
+  renderIcon(FaArrowLeft, color, size, style);
+
 export const arrowRightIcon = (color = '', size = '', style = {}) =>
   renderIcon(FaArrowRight, color, size, style);
 
@@ -41,3 +44,12 @@ export const flagIcon = (color = '', size = '', style = {}) =>
 
 export const arrowLocationIcon = (color = '', size = '', style = {}) =>
   renderIcon(FaLocationArrow, color, size, style);
+
+export const addIcon = (color = '', size = '', style = {}) =>
+  renderIcon(MdOutlineAdd, color, size, style);
+
+export const editIcon = (color = '', size = '', style = {}) =>
+  renderIcon(MdEdit, color, size, style);
+
+export const deleteIcon = (color = '', size = '', style = {}) =>
+  renderIcon(MdDeleteOutline, color, size, style);
