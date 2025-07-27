@@ -1,34 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import DataTable from "@/components/DataTable";
-import { FaEdit, FaTrash } from "react-icons/fa";
 import Container from "@/components/ui/Container";
 import Text from "@/components/ui/Text";
-import { addIcon, deleteIcon, editIcon } from "@/components/ui/icons";
+import { addIcon, deleteIcon, editIcon, warningIcon } from "@/components/ui/icons";
 import { useFetch } from "@/hooks/useFetch";
 import debounce from "@/utils/debounce";
+import { useModal } from "@/hooks/useModal";
+import Modal from "@/components/ui/Modal";
+import { FormField, FormWrapper } from "@/components/ui/Form";
+import * as Yup from 'yup';
+import { useMutation } from "@/hooks/useMutation";
 
-const parents = [
-  {
-    id: 1,
-    name: "John Mwangi",
-    email: "john@example.com",
-    phone: "+254700000001",
-    bookings: 5,
-    trips: 12,
-  },
-  {
-    id: 2,
-    name: "Jane Tawasa",
-    email: "jane@example.com",
-    phone: "+254700000002",
-    bookings: 3,
-    trips: 8,
-  },
-];
+const parentInitialValues = {
+  username: '',
+  email: '',
+  mobile: '',
+  password: 'password',
+  role: 'parent',
+};
+
+const parentSchema = Yup.object().shape({
+  username: Yup.string().required('Username is required'),
+  email: Yup.string().required('Email is required'),
+  mobile: Yup.string().required('Mobile is required'),
+  password: Yup.string().required('Password is required'),
+  role: Yup.string().required('role').default('parent')
+})
 
 export default function Parents() {
   const [query,setQuery]=useState('');
@@ -39,12 +38,38 @@ export default function Parents() {
     setQuery(event.target.value)
     debouncedSearch()
   };
+
+  const { isOpen, openModal, closeModal } = useModal();
+  const { mutate, data: createdParent, loading: loadingCreatingParent, error: errorCreatingParent } = useMutation(`/api/users/parent`);
+  const handleCreateUserModal=()=>{
+    openModal();
+  };
+
   const [editParent, setEditParent] = useState(null);
 
   const handleEdit = (parent) => {
     setEditParent(parent);
   };
 
+  const handleCreateUserForm=async(values)=>{
+    console.log(values)    
+    await mutate(values).then(()=>{
+      console.log(
+        `Parent creation functionality is succcess`
+      );
+      closeModal();
+      refetchParents()
+    }).catch((err)=>{
+      alert(err)
+    });
+  };
+  const [userToBeDeleted,setuserToBeDeleted]=useState({});
+  const { isOpen: deleteisOpen, openModal: deleteopenModal, closeModal : deletecloseModal} = useModal();
+  const handleShowDeleteModal=(parent)=>{
+    console.log('parent',parent);
+    setuserToBeDeleted(parent)
+    deleteopenModal();
+  };
   const handleDelete = (id) => {
     alert(`Delete parent ${id}`);
     // Implement actual delete logic here
@@ -68,7 +93,7 @@ export default function Parents() {
             edit
           </button>
           <button
-            onClick={() => handleDelete(id)}
+            onClick={() => handleShowDeleteModal(id)}
             className="bg-red-400 text-white p-1 rounded hover:bg-red-600 flex flex-row gap-2 align-middle text-md"
           >
             {deleteIcon('my-0','text-xl')}
@@ -89,89 +114,87 @@ export default function Parents() {
             className="block min-w-0 grow py-1.5 pr-3 pl-1 bg-tertiary border-dark rounded-md text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
             onChange={((e)=>{handleSearch(e)})}
           />
-          <button className="bg-primary p-2 rounded-md text-white flex-row flex align-middle text-lg cursor-pointer" type="button">{addIcon('','',{marginTop:4})}new</button>
+          <button 
+            className="bg-primary p-2 rounded-md text-white flex-row flex align-middle text-lg cursor-pointer" 
+            type="button"
+            onClick={()=>handleCreateUserModal()}
+          >{addIcon('','',{marginTop:4})}new</button>
         </Container>
       </Container>
-      <DataTable columns={columns} data={parents} />
+      <DataTable columns={columns} data={parents}/>
+      <Modal
+        isOpen={isOpen}
+        onClose={closeModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl">
+              Create Parent
+            </h5>
+          </div>
+          <FormWrapper
+            initialValues={parentInitialValues}
+            validationSchema={parentSchema}
+            onSubmit={handleCreateUserForm}
+            className="w-full"
+          >
+            <FormField name="username" label="Name" type="text" placeholder="john doe" />
+            <FormField name="email" label="Email" type="email" placeholder="johndoe@gmail.com" />
+            <FormField name="mobile" label="Mobile" type="tel" placeholder="johndoe@gmail.com" />
+            <FormField name="role" label="Role" type="text" placeholder="parent" />
+            <FormField name="password" label="Password" type="password" placeholder="••••••••" />
+            <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+              <button
+                onClick={closeModal}
+                type="button"
+                className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                className="bg-primary text-white px-4 py-2 rounded"
+              > Save
+              </button>
+            </div>
+          </FormWrapper>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={deleteisOpen}
+        onClose={deletecloseModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div className="flex flex-row gap-2 align-middle">
+            <div className="rounded-full p-4 bg-red-300">
+              {warningIcon('text-white','text-2xl')}
+            </div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl text-center my-auto">
+              Delete {userToBeDeleted?.username}
+            </h5>
+          </div>
+          <div className="my-4">
+            <p>Are you sure you want to delete this parent?</p>
+            <p>This action cannot be undone.</p>
+          </div>
+          <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+            <button
+              onClick={deletecloseModal}
+              type="button"
+              className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            > Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
     </Container>
   )
-
-  // return (
-  //   <div className="flex">
-
-  //     <main className="flex-1 p-10 bg-gray-50 min-h-screen">
-
-  //       <DataTable columns={columns} data={parents} />
-
-  //       {/* Edit Parent Modal */}
-  //       {editParent && (
-  //         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  //           <div className="bg-white p-6 rounded shadow w-full max-w-md">
-  //             <h2 className="text-xl font-bold mb-4">Edit Parent</h2>
-
-  //             <form
-  //               onSubmit={(e) => {
-  //                 e.preventDefault();
-  //                 alert("Save changes logic goes here");
-  //                 setEditParent(null);
-  //               }}
-  //             >
-  //               <div className="mb-4">
-  //                 <label className="block text-gray-700 mb-2">Name</label>
-  //                 <input
-  //                   type="text"
-  //                   value={editParent.name}
-  //                   onChange={(e) =>
-  //                     setEditParent({ ...editParent, name: e.target.value })
-  //                   }
-  //                   className="p-2 border rounded w-full"
-  //                 />
-  //               </div>
-
-  //               <div className="mb-4">
-  //                 <label className="block text-gray-700 mb-2">Email</label>
-  //                 <input
-  //                   type="email"
-  //                   value={editParent.email}
-  //                   onChange={(e) =>
-  //                     setEditParent({ ...editParent, email: e.target.value })
-  //                   }
-  //                   className="p-2 border rounded w-full"
-  //                 />
-  //               </div>
-
-  //               <div className="mb-4">
-  //                 <label className="block text-gray-700 mb-2">Phone</label>
-  //                 <input
-  //                   type="text"
-  //                   value={editParent.phone}
-  //                   onChange={(e) =>
-  //                     setEditParent({ ...editParent, phone: e.target.value })
-  //                   }
-  //                   className="p-2 border rounded w-full"
-  //                 />
-  //               </div>
-
-  //               <div className="flex justify-end space-x-2">
-  //                 <button
-  //                   type="button"
-  //                   onClick={() => setEditParent(null)}
-  //                   className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
-  //                 >
-  //                   Cancel
-  //                 </button>
-  //                 <button
-  //                   type="submit"
-  //                   className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-  //                 >
-  //                   Save Changes
-  //                 </button>
-  //               </div>
-  //             </form>
-  //           </div>
-  //         </div>
-  //       )}
-  //     </main>
-  //   </div>
-  // );
 }

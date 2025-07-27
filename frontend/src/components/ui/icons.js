@@ -2,7 +2,7 @@ import { MdNotifications, MdAccountCircle, MdDirectionsBus, MdOutlineAdd, MdEdit
 import { TiGroup } from "react-icons/ti";
 import { RiMapPin2Fill } from "react-icons/ri";
 import { FaPlay, FaArrowRight, FaArrowLeft, FaFlag, FaLocationArrow } from "react-icons/fa";
-
+import { IoIosWarning } from "react-icons/io";
 /**
  * Generic icon renderer
  * @param {JSX.Element} IconComponent - The icon component from react-icons
@@ -53,3 +53,6 @@ export const editIcon = (color = '', size = '', style = {}) =>
 
 export const deleteIcon = (color = '', size = '', style = {}) =>
   renderIcon(MdDeleteOutline, color, size, style);
+
+export const warningIcon = (color = '', size = '', style = {}) =>
+  renderIcon(IoIosWarning, color, size, style);

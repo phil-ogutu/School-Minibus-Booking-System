@@ -46,10 +46,10 @@ class UserService():
                         User.email.ilike(f'%{query}%'),
                         User.mobile.ilike(f'%{query}%')
                     )
-                ).all()
+                ).limit(10).all()
                 return [user.to_dict(rules=('-password_hash','-bookings')) for user in users]
             else:
-                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).all()]
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).all()]
         else:
             return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
     

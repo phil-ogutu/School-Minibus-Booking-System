@@ -1,5 +1,5 @@
 from middleware.auth import token_required
-from service import DriverService, BusService, OwnerService, UserService
+from service import AuthService, UserService
 from flask import make_response, jsonify, request, g
 from flask_restful import Resource
 from config import db
@@ -13,6 +13,31 @@ class Users(Resource):
             jsonify(users),
             200        
         )
+    
+    def post(self,role):
+        data=request.get_json()
+
+        username = data.get('username')
+        email = data.get('email')
+        mobile = data.get('mobile')
+        role = data.get('role')
+        password = data.get('password')
+        if username == None and email == None and role == None and password == None:
+            return make_response("Required Inputs are required", 400)
+            
+        if UserService.findByEmail(email):
+            return make_response("This User already Exists", 400)
+        
+        password_hash = AuthService.hashPassword(password)
+        new_user = UserService.createUser(username, mobile, email, password_hash, role)
+        db.session.add(new_user)
+        db.session.commit()
+
+        response=make_response(
+            {"user":new_user.to_dict(rules=('-password_hash',)),"message":"User created successfully"},
+            201
+        )
+        return response
     
 class UserById(Resource):
     method_decorators = [token_required]
