@@ -2,6 +2,8 @@ import bcrypt
 from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location
 import jwt
 from flask import abort
+from sqlalchemy import or_
+
 
 class UserService():
     @staticmethod
@@ -34,8 +36,22 @@ class UserService():
         )
     
     @staticmethod
-    def findAll():
-        return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+    def findAll(role='',query=''):
+        if role:
+            if query:
+                users = User.query.filter(
+                    User.role == role,
+                    or_(
+                        User.username.ilike(f'%{query}%'),
+                        User.email.ilike(f'%{query}%'),
+                        User.mobile.ilike(f'%{query}%')
+                    )
+                ).all()
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in users]
+            else:
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).all()]
+        else:
+            return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
     
 class DriverService():
     @staticmethod

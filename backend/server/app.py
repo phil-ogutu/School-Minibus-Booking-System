@@ -15,80 +15,12 @@ from service import (
 
 from controllers.drivers import Drivers, DriverById, DriverTrips, DriverTripById
 from controllers.auth import Auth
+from controllers.users import Users, UserById, CurrentUser
 # Local imports
 from config import app, db, api
 from middleware.auth import token_required
 
 # Add your model imports
-
-class Users(Resource):
-    method_decorators = [token_required]
-    def get(self):
-        users = UserService.findAll()
-        return make_response(
-            jsonify(users),
-            200        
-        )
-class UserById(Resource):
-    method_decorators = [token_required]
-    def get(self,id):
-        print('I got hit')
-        if id is None:
-            return make_response(jsonify({'message':'missing id parameter'}),400)
-        
-        user=UserService.findById(id)
-        if user:
-            response=make_response(
-                jsonify(user.to_dict(rules=('-password_hash',))),
-                200
-            )
-  
-            return response
-        return make_response(jsonify({'message':'user not found'}),404)
-
-    def patch(self,id):
-        if id is None:
-            return make_response(jsonify({'message':'missing id parameter'}),400)
-        
-        data=request.get_json()
-        user=UserService.findById(id)
-        if user:
-            for attr in data:
-                print(data[attr])
-                setattr(user,attr,data[attr])
-            db.session.commit()
-            response=make_response(
-                jsonify(user.to_dict(rules=('-password_hash',))),
-                200
-            )
-            return response
-        return make_response(jsonify({'message':'user not found'}),404)
-    
-    def delete(self,id):  
-        if id is None:
-            return make_response(jsonify({'message':'missing id parameter'}),400)
-              
-        user=UserService.findById(id)
-        if user:
-            db.session.delete(user)
-            db.session.commit()
-            response_body=jsonify({'Message':f'user : *{user.username}* is deleted successfully'})
-            return make_response(
-                response_body,
-                200
-            )
-        return make_response(jsonify({'message':'user not found'}),404)
-
-# Get current user after log in
-class CurrentUser(Resource):
-    method_decorators = [token_required]
-
-    def get(self):
-        user = UserService.findById(g.user_id)
-        if user:
-            return make_response(jsonify(user.to_dict(rules=('-password_hash',))), 200)
-        return make_response(jsonify({'message': 'User not found'}), 404)
-    
 
 class Owners(Resource):
     method_decorators = [token_required]
@@ -465,7 +397,7 @@ def index():
     return '<h1>Project Server</h1>'
 
 api.add_resource(Auth, '/api/auth')
-api.add_resource(Users, '/api/users')
+api.add_resource(Users, '/api/users/<string:role>')
 api.add_resource(UserById, '/api/users/<int:id>')
 api.add_resource(CurrentUser, '/api/users/me')
 #  Drivers endpoint
