@@ -75,8 +75,6 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
         const bookingId = response?.id || response?.data?.id;
         if (bookingId) {
           onNavigate(bookingId);
-        } else {
-          console.warn("Booking ID not found in response");
         }
 
         onClose();
