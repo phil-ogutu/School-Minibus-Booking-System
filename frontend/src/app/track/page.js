@@ -21,7 +21,7 @@ const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function TrackPage() {
   const searchParams = useSearchParams(); // Get query parameters
-  
+  const queryId = searchParams.get('id'); // Get 'id' from query params
   const { isAuthenticated } = useAuth();
   const [trackingNumber, setTrackingNumber] = useState(id || ""); // Pre-fill with URL ID
   const [trackingError, setTrackingError] = useState("");
