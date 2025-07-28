@@ -96,18 +96,17 @@ export default function Bus() {
           {/* Bus Cards */}
           <div className="grid grid-cols-2 gap-2">
             {buses
-              ?.filter((bus) => bus.route_id === route.id)
-              .map((bus) => (
+              ?.filter((bus) => bus?.route_id === route?.id)?.map((bus) => (
                 <div
-                  key={bus.id}
+                  key={bus?.id}
                   className="w-full mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-4"
                 >
                   <div className="flex justify-start gap-x-4">
                     <FaBus className="h-12 w-10" />
                     <div className="flex flex-col">
-                      <h1 className="text-xl font-medium">{bus.plate}</h1>
+                      <h1 className="text-xl font-medium">{bus?.plate}</h1>
                       <span className="text-xs font-light">
-                        {route.start} - {route.end}
+                        {route?.start} - {route?.end}
                       </span>
                     </div>
                     {/* <p>{bus.plate}</p>
