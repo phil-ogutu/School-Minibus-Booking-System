@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useCallback} from "react";
 import { BASE_URL } from "@/utils/constants";
 import {
   FaArrowDown,
@@ -104,8 +104,9 @@ export default function TrackPage() {
       throw error;
     }
   };
-
-  const handleTrack = async (trackingId = trackingNumber) => {
+  
+  // ✅ FIXED: Memoize handleTrack to prevent infinite loop
+ const handleTrack = useCallback(async (trackingId = trackingNumber) => {
     if (!isAuthenticated) {
       setTrackingError("Please log in to track your booking");
       return;
@@ -145,7 +146,7 @@ export default function TrackPage() {
     } finally {
       setIsTracking(false);
     }
-  };
+  }, [isAuthenticated, trackingNumber]);
 
   // Show login message if not authenticated
   if (!isAuthenticated) {
