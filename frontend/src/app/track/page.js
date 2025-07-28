@@ -37,11 +37,11 @@ export default function TrackPage() {
   //   }
   // }, [isAuthenticated]);
 
-  // Auto-track when component mounts if there's an ID in URL
+  // Auto-track when component mounts if there's an ID in query params
   useEffect(() => {
-    if (isAuthenticated && id) {
-      setTrackingNumber(id);
-      handleTrack(id);
+    if (isAuthenticated && queryId) {
+      setTrackingNumber(queryId);
+      handleTrack(queryId);
     } else {
       // Load tracking number from localStorage as fallback
       const savedTrackingNumber = localStorage.getItem('trackingNumber');
@@ -50,7 +50,7 @@ export default function TrackPage() {
         handleTrack(savedTrackingNumber);
       }
     }
-  }, [id, isAuthenticated]);
+  }, [queryId, isAuthenticated, handleTrack]);
 
   const fetchTrackingData = async (bookingId) => {
     try {
