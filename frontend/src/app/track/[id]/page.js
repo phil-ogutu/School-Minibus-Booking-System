@@ -2,6 +2,7 @@
 import Navbar from "@/components/Navbar";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/useAuth";
+import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { BASE_URL } from "@/utils/constants";
 import {
@@ -19,20 +20,36 @@ import {
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function TrackPage() {
+  const { id } = useParams(); // Get the ID from URL
   const { isAuthenticated } = useAuth();
-  const [trackingNumber, setTrackingNumber] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState(id || ""); // Pre-fill with URL ID
   const [trackingError, setTrackingError] = useState("");
   const [isTracking, setIsTracking] = useState(false);
   const [trackingData, setTrackingData] = useState(null);
 
-  // Load tracking number from localStorage on component mount
+  // // Load tracking number from localStorage on component mount
+  // useEffect(() => {
+  //   const savedTrackingNumber = localStorage.getItem('trackingNumber');
+  //   if (savedTrackingNumber) {
+  //     setTrackingNumber(savedTrackingNumber);
+  //     handleTrack(savedTrackingNumber);
+  //   }
+  // }, [isAuthenticated]);
+
+  // Auto-track when component mounts if there's an ID in URL
   useEffect(() => {
-    const savedTrackingNumber = localStorage.getItem('trackingNumber');
-    if (savedTrackingNumber) {
-      setTrackingNumber(savedTrackingNumber);
-      handleTrack(savedTrackingNumber);
+    if (isAuthenticated && id) {
+      setTrackingNumber(id);
+      handleTrack(id);
+    } else {
+      // Load tracking number from localStorage as fallback
+      const savedTrackingNumber = localStorage.getItem('trackingNumber');
+      if (savedTrackingNumber && isAuthenticated) {
+        setTrackingNumber(savedTrackingNumber);
+        handleTrack(savedTrackingNumber);
+      }
     }
-  }, [isAuthenticated]);
+  }, [id, isAuthenticated]);
 
   const fetchTrackingData = async (bookingId) => {
     try {
