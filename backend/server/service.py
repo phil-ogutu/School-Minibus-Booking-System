@@ -253,7 +253,7 @@ class RouteService():
         return [route.to_dict() for route in routes]
     
     @classmethod
-    def createRoute(cls,start, end ):
+    def createRoute(cls,start, end, stops ):
         if not start or not end:
             abort(400, description="Missing required fields: 'start' and 'end'")
 
@@ -263,10 +263,25 @@ class RouteService():
         if existing_route:
             abort(400, description="Route with the same start and end already exists")
 
-        return Route(
+        new_route = Route(
             start=start,
             end=end
         )
+        db.session.add(new_route)
+        db.session.commit()
+
+        # for stop in stops
+        for stop in stops:
+            location = LocationService.createLocation(
+                latitude=stop['latitude'],
+                longitude=stop['longitude'],
+                location_name=stop['location_name'],
+                route_id=new_route.id,
+            )
+            db.session.add(location)
+            db.session.commit()
+
+        return new_route
     
 class LocationService():
     @staticmethod
@@ -289,9 +304,9 @@ class LocationService():
     
     
     @classmethod
-    def createLocation(cls,location_name, latitude, longitude ):
-        if not location_name or not latitude or not longitude:
-            abort(400, description="Missing required fields: 'location_name' and 'latitude' and 'longitude'")
+    def createLocation(cls,location_name, latitude, longitude, route_id ):
+        if not location_name or not latitude or not longitude or not route_id:
+            abort(400, description="Missing required fields: 'location_name' and 'latitude' and 'longitude' and 'route_id'")
 
         existing_location = cls.findOne(
             id=None, location_name=None,
@@ -303,5 +318,6 @@ class LocationService():
         return Location(
             latitude=latitude,
             longitude=longitude,
-            location_name=location_name
+            location_name=location_name,
+            route_id=route_id
         )
