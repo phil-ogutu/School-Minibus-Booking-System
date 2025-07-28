@@ -2,7 +2,7 @@
 import Navbar from "@/components/Navbar";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/useAuth";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { BASE_URL } from "@/utils/constants";
 import {
@@ -20,7 +20,7 @@ import {
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function TrackPage() {
-  const { id } = useParams(); // Get the ID from URL
+  
   const { isAuthenticated } = useAuth();
   const [trackingNumber, setTrackingNumber] = useState(id || ""); // Pre-fill with URL ID
   const [trackingError, setTrackingError] = useState("");
