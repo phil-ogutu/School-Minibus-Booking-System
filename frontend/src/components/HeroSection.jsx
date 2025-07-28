@@ -130,6 +130,14 @@ const HeroSection = () => (
         ))}
       </div>
     </section>
+    <section className="bg-white py-12 px-6 text-center">
+      <h2 className="text-3xl font-bold text-[#0F333F] mb-4">About Us</h2>
+      <p className="text-gray-700 max-w-3xl mx-auto">
+        SkoolaBus connects parents with safe, reliable, and affordable school
+        transport. Track your child in real‑time, book rides in seconds, and
+        rest easy knowing they’re safe.
+      </p>
+    </section>
 
     {/* USER JOURNEY */}
     <section className="bg-gray-50 py-20">
@@ -231,7 +239,7 @@ const HeroSection = () => (
               src="https://images.pexels.com/photos/718978/pexels-photo-718978.jpeg?auto=compress&cs=tinysrgb&w=800"
               alt="Driver Mary with white minibus"
               width={400}
-              height={300}
+              height={600}
               className="rounded mb-4 object-cover"
             />
             <h3 className="font-bold">Mary Otieno</h3>
