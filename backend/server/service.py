@@ -292,6 +292,10 @@ class RouteService():
 
         return new_route
     
+    @staticmethod
+    def analytics():
+        return Route.query.count()
+    
 class LocationService():
     @staticmethod
     def findAll():

@@ -20,6 +20,7 @@ export default function RootLayout({ children }) {
         </MapProvider> */}
         <AppWrapper>{children}</AppWrapper>
       </body>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"></script>
     </html>
   );
 }
