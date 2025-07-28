@@ -23,7 +23,7 @@ export default function TrackPage() {
   const searchParams = useSearchParams(); // Get query parameters
   const queryId = searchParams.get('id'); // Get 'id' from query params
   const { isAuthenticated } = useAuth();
-  const [trackingNumber, setTrackingNumber] = useState(id || ""); // Pre-fill with URL ID
+  const [trackingNumber, setTrackingNumber] = useState(queryId || ""); // Pre-fill with query ID
   const [trackingError, setTrackingError] = useState("");
   const [isTracking, setIsTracking] = useState(false);
   const [trackingData, setTrackingData] = useState(null);
