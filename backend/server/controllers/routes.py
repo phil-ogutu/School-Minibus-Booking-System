@@ -7,7 +7,8 @@ from config import db
 class Routes(Resource):
     method_decorators = [token_required]
     def get(self):
-        routes = RouteService.findAll()
+        query = request.args.get('query')
+        routes = RouteService.findAll(query)
         return make_response(
             jsonify(routes),
             200        

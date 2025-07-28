@@ -212,8 +212,17 @@ class BusService():
     
 class RouteService():
     @staticmethod
-    def findAll():
-        return [route.to_dict() for route in Route.query.all()]
+    def findAll(query=''):        
+        if query:
+            routes = Route.query.filter(
+                or_(
+                    Route.start.ilike(f'%{query}%'),
+                    Route.end.ilike(f'%{query}%'),
+                )
+            ).limit(10).all()
+            return [route.to_dict() for route in routes]
+        else:
+            return [route.to_dict() for route in Route.query.all()]
     
     @staticmethod
     def findById(id):

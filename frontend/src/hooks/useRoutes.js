@@ -9,14 +9,14 @@ export const useRoutes = (url) => {
   const { data: routes, loading: routesLoading, error: routesError, refetch } = useFetch(url ?? '/api/routes');
   const { mutate: createRoute } = useMutation('/api/routes');
   const { mutate: updateRoute } = useMutation('/api/routes', 'PATCH');
-  const { mutate: deleteRoute } = useMutation('/api/routes', 'DELETE');
+  const { mutate: deleteRoute } = useMutation('', 'DELETE');
 
   const [creating, setCreating] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const getRouteById = (id) => {
-    const { data, loading, error } = useFetch(`/api/routes/${id}`);
+    const { data, loading, error } = useFetch(`${BASE_URL}/api/routes/${id}`);
     return { route: data, loading, error };
   };
 
@@ -43,7 +43,7 @@ export const useRoutes = (url) => {
   const deleteExistingRoute = async (id) => {
     setDeleting(true);
     try {
-      await deleteRoute({}, `http://localhost:5000/api/routes/${id}`);
+      await deleteRoute({}, `/api/routes/${id}`);
       await fetchRoutes(); 
     } catch (error) {
       console.error("Error deleting route:", error);

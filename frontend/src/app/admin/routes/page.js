@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRoutes } from "@/hooks/useRoutes";
-import { addIcon, deleteIcon, editIcon } from "@/components/ui/icons";
+import { addIcon, deleteIcon, editIcon, warningIcon } from "@/components/ui/icons";
 import Container from "@/components/ui/Container";
 import Text from "@/components/ui/Text";
 import debounce from "@/utils/debounce";
 import DataTable from "@/components/DataTable";
 import { useRouter } from "next/navigation";
+import Modal from "@/components/ui/Modal";
+import { useModal } from "@/hooks/useModal";
 
 export default function ManageRoutes() {
   // const { routes, routesLoading, routesError, creating, updating, deleting, createNewRoute, deleteExistingRoute, fetchRoutes, updateExistingRoute } = useRoutes();
@@ -302,6 +304,28 @@ export default function ManageRoutes() {
     setQuery(event.target.value)
     debouncedSearch()
   };
+  /****Routes Deletion */
+  const [routeToBeDeleted,setrouteToBeDeleted]=useState({});
+  const { isOpen: deleteisOpen, openModal: deleteopenModal, closeModal : deletecloseModal} = useModal();
+  const handleShowDeleteModal=(route)=>{
+    console.log('route',route);
+    setrouteToBeDeleted(route)
+    deleteopenModal();
+  };
+  const handleDelete = async(id) => {
+    if(id){
+      await deleteExistingRoute(routeToBeDeleted?.id).then(()=>{
+        console.log(
+          `Route deleted functionality is succcess`
+        );
+        deletecloseModal();
+        fetchRoutes()
+      }).catch((err)=>{
+        alert(err)
+      });
+    }
+  };
+
   const columns = [
     { header: "Start", accessor: "start" },
     { header: "End", accessor: "end" },
@@ -320,7 +344,7 @@ export default function ManageRoutes() {
             edit
           </button>
           <button
-            // onClick={() => handleShowDeleteModal(id)}
+            onClick={() => handleShowDeleteModal(id)}
             className="bg-red-400 text-white p-1 rounded hover:bg-red-600 flex flex-row gap-2 align-middle text-md"
           >
             {deleteIcon('my-0','text-xl')}
@@ -349,6 +373,42 @@ export default function ManageRoutes() {
         </Container>
       </Container>
       <DataTable columns={columns} data={routes}/>
+      {/* Delete route Modal */}
+      <Modal
+        isOpen={deleteisOpen}
+        onClose={deletecloseModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div className="flex flex-row gap-2 align-middle">
+            <div className="rounded-full p-4 bg-red-300">
+              {warningIcon('text-white','text-2xl')}
+            </div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl text-center my-auto">
+              Delete {routeToBeDeleted?.start} - {routeToBeDeleted?.end}
+            </h5>
+          </div>
+          <div className="my-4">
+            <p>Are you sure you want to delete this route?</p>
+            <p>This action cannot be undone.</p>
+          </div>
+          <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+            <button
+              onClick={deletecloseModal}
+              type="button"
+              className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              className="bg-red-500 text-white px-4 py-2 rounded"
+              onClick={()=>{handleDelete(routeToBeDeleted?.id)}}
+            > Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
     </Container>
   )
 }
