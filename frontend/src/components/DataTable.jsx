@@ -29,26 +29,33 @@ export default function DataTable({ columns, data, onEdit, onDelete, className='
               <tr key={idx} className="hover:bg-gray-100">
                 {columns.map((col) => (
                   <td key={col.accessor} className="p-6 w-20 border-b-1 border-slate-200">
-                    {col.accessor === "status" ? (
+                    {
+                    col.accessor === "status" ? 
+                    (
                       col.render ? col.render(row) : row[col.accessor] ? "Active" : "Inactive"
-                    ) : col.accessor === "actions" ? ( col.render(row) ? col.render(row) : (
-                      <div className="flex space-x-2">
-                        <button
-                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                          onClick={() => onEdit(row.id)} // Edit booking (pass row.id)
-                        >
-                          Edit  
-                        </button>
-                        <button
-                          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                          onClick={() => onDelete(row.id)} // Delete booking
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )) : (
-                      row[col.accessor] // Render data normally for other columns
-                    )}
+                    ) : 
+                    col.accessor === "actions" ? 
+                      ( col.render(row) ? 
+                          col.render(row) : 
+                          (
+                            <div className="flex space-x-2">
+                              <button
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                onClick={() => onEdit(row.id)} // Edit booking (pass row.id)
+                              >
+                                Edit  
+                              </button>
+                              <button
+                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                onClick={() => onDelete(row.id)} // Delete booking
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )
+                      ) : 
+                    row[col.accessor] ? row[col.accessor] : col.render(row)
+                    }
                   </td>
                 ))}
               </tr>
