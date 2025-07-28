@@ -181,7 +181,7 @@ class Bookings(Resource):
             child_name=data["child_name"],
             pickup=data["pickup"],
             dropoff=data["dropoff"],
-            price=data["price"]
+            price=float(data["price"])
         )
         db.session.add(new_booking)
         db.session.commit()
