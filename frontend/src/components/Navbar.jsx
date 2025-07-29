@@ -98,6 +98,14 @@ const Navbar = () => {
               </a>
             </li>
             <li>
+              <a 
+                href="/track"
+                className={linkClasses("/track")}
+              >
+                Track
+              </a>
+             </li>
+             <li>
               <a
                 href="/contact"
                 className={linkClasses("/contact")}
