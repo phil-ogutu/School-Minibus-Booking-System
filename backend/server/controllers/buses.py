@@ -27,7 +27,8 @@ class Buses(Resource):
         return response
 
     def get(self):
-        buses = BusService.findAll()
+        query=request.args.get('query')
+        buses = BusService.findAll(query)
         return make_response(
             jsonify(buses),
             200        
