@@ -68,10 +68,17 @@ class DriverService():
             return Driver.query.filter_by(id=id).first()
         return None
     
-    @staticmethod
-    def createDriver(driver_name ):
+    @classmethod
+    def createDriver(cls,driver_name,email,mobile,id_number,rating,bio ):
+        if cls.findOne(id_number=id_number):
+            abort(400,'This driver already exists')
         return Driver(
-            driver_name=driver_name
+            driver_name=driver_name,
+            email=email,
+            mobile=mobile,
+            id_number=id_number,
+            rating=rating,
+            bio=bio
         )
     
     @staticmethod
@@ -79,9 +86,11 @@ class DriverService():
         return [driver.to_dict() for driver in Driver.query.all()]
     
     @staticmethod
-    def findOne(id,driver_name):
+    def findOne(id=None,driver_name=None,id_number=None):
         if id:
             return Driver.query.filter_by(id=id).first()
+        if id_number:
+            return Driver.query.filter_by(id_number=id_number).first()
         elif driver_name:
             return Driver.query.filter_by(driver_name=driver_name).first()
         else:
