@@ -104,6 +104,14 @@ const Navbar = () => {
               >
                 Track
               </a>
+             </li>
+             <li>
+              <a
+                href="/contact"
+                className={linkClasses("/contact")}
+              >
+                Contact Us
+              </a>
             </li>
           </ul>
         </div>
