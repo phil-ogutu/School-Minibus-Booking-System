@@ -139,7 +139,7 @@ const ContactUs = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-50">
       {/* Hero Section */}
-      <div className="bg-yellow-400 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="bg-primary py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
