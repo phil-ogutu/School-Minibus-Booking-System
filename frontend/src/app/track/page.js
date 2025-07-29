@@ -28,25 +28,17 @@ export default function TrackPage() {
   const [isTracking, setIsTracking] = useState(false);
   const [trackingData, setTrackingData] = useState(null);
 
-  // // Load tracking number from localStorage on component mount
-  // useEffect(() => {
-  //   const savedTrackingNumber = localStorage.getItem('trackingNumber');
-  //   if (savedTrackingNumber) {
-  //     setTrackingNumber(savedTrackingNumber);
-  //     handleTrack(savedTrackingNumber);
-  //   }
-  // }, [isAuthenticated]);
-
+  
   const handleTrack = useCallback(async (trackingId = trackingNumber) => {
-     if (!isAuthenticated) {
-       setTrackingError("Please log in to track your booking");
-       return;
-     }
+    if (!isAuthenticated) {
+      setTrackingError("Please log in to track your booking");
+      return;
+    }
  
      if (!trackingId.trim()) {
        setTrackingError("Please enter a tracking number");
        return;
-     }
+      }
  
      setIsTracking(true);
      setTrackingError("");
@@ -56,7 +48,7 @@ export default function TrackPage() {
        localStorage.setItem('trackingNumber', trackingId);
        
        const { booking, bus, route } = await fetchTrackingData(trackingId);
- 
+       
        // Transform data for display
        const transformedData = {
          from: booking.pickup || "N/A",
@@ -67,17 +59,25 @@ export default function TrackPage() {
          currentLocation: booking.pickup || "Starting Point",
          destination: booking.dropoff || "Destination",
          routeLocations: route?.locations || []
-       };
- 
-       setTrackingData(transformedData);
- 
-     } catch (error) {
-       setTrackingError("Tracking number not found. Please check and try again.");
-       setTrackingData(null);
-     } finally {
-       setIsTracking(false);
+        };
+        
+        setTrackingData(transformedData);
+        
+      } catch (error) {
+        setTrackingError("Tracking number not found. Please check and try again.");
+        setTrackingData(null);
+      } finally {
+        setIsTracking(false);
      }
    }, [isAuthenticated, trackingNumber]);
+   // // Load tracking number from localStorage on component mount
+   // useEffect(() => {
+   //   const savedTrackingNumber = localStorage.getItem('trackingNumber');
+   //   if (savedTrackingNumber) {
+   //     setTrackingNumber(savedTrackingNumber);
+   //     handleTrack(savedTrackingNumber);
+   //   }
+   // }, [isAuthenticated]);
   // Auto-track when component mounts if there's an ID in query params
   useEffect(() => {
     if (isAuthenticated && queryId) {
