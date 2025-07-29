@@ -17,8 +17,10 @@ export default function Booking() {
 
   const router = useRouter();
   const navigateToBuses = (routeId) => {
-    router.push( `/bookings/trips/${routeId}`)
-  }
+    router.push(`/bookings/trips/${routeId}`);
+  };
+  const navigateToPayment = (routeId) =>
+    router.push(`/payment?tripId=${routeId}`); // Added payment navigation
 
   const [stops, setStops] = useState([]);
 
@@ -44,22 +46,21 @@ export default function Booking() {
       <div className="flex-1 md:grid md:grid-cols-2">
         <div className="p-5 flex flex-col space-y-5">
           <SearchBus />
-          
+
           <div className="md:grid grid-cols-2 items-start gap-x-5 overflow-y-auto no-scrollbar">
             {displayRoutes.map((route) => (
               <SearchCard
                 key={route.id}
-                route={route}                
+                route={route}
                 onPreview={() => setStops(route.locations)}
                 onSelect={() => navigateToBuses(route.id)}
               />
-    
             ))}
           </div>
         </div>
 
         <div className="hidden md:block md:w-full md:h-full md:p-2">
-          <Map locations={stops}/>
+          <Map locations={stops} />
         </div>
       </div>
     </div>
