@@ -97,6 +97,14 @@ const Navbar = () => {
                 Find Bus
               </a>
             </li>
+            <li>
+              <a 
+                href="/track"
+                className={linkClasses("/track")}
+              >
+                Track
+              </a>
+            </li>
           </ul>
         </div>
       </div>
