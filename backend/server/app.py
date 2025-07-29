@@ -20,6 +20,7 @@ from controllers.analytics import Analytics
 from controllers.routes import Routes, RouteById, TopRoutes, LocationById, Locations
 from controllers.buses import BusById, Buses
 from controllers.bookings import Bookings, BookingById
+from controllers.payments import payments_bp # Importing the payments blueprint
 # Local imports
 from config import app, db, api
 from middleware.auth import token_required

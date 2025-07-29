@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // Added this to use the inline router.push
+import React, { useState, useEffect } from "react";
+// import { useRouter } from "next/navigation"; // Added this to use the inline router.push
 import {
   FaArrowDown,
   FaArrowRight,
@@ -107,16 +107,6 @@ const SearchCard = ({ route, onPreview, onSelect }) => {
         className="w-full px-2 py-1.5 mt-auto text-base font-medium rounded-lg bg-yellow-400 hover:bg-yellow-500"
       >
         View Buses
-      </button>
-      {/* added the pay now call to action button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          router.push(`/payment?tripId=${route.id}`);
-        }}
-        className="w-full px-2 py-1.5 mt-2 text-base font-medium rounded-lg bg-green-600 hover:bg-green-700 text-white"
-      >
-        Pay Now
       </button>
     </div>
   );

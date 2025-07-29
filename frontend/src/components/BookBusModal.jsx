@@ -74,7 +74,8 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
 
         const bookingId = response?.id || response?.data?.id;
         if (bookingId) {
-          onNavigate(bookingId);
+          // Redirect straight to the payment page
+          window.location.href = `/payment?tripId=${route.id}`;
         }
 
         onClose();
@@ -88,9 +89,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
   return createPortal(
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md relative">
-        <h2 className="text-2xl font-medium mb-4">
-          Book Your Ticket
-        </h2>
+        <h2 className="text-2xl font-medium mb-4">Book Your Ticket</h2>
 
         <form onSubmit={handleSubmit}>
           <input type="hidden" name="bus_id" value={bus.id} />
