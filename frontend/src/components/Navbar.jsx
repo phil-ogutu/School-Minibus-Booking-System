@@ -1,18 +1,29 @@
 "use client";
+import { useAuthContext } from "@/context/AuthContext";
 import Button from "./Button";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname,useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
   const pathname = usePathname();
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false);
+  const { user, setUser, loading, checkAuth } = useAuthContext();
+  const { logout } = useAuth()
 
+  console.log(user);
   const linkClasses = (path) =>
     `block py-2 px-3 rounded-sm md:p-0 ${
       pathname === path
         ? "text-white bg-yellow-500 md:bg-transparent md:text-yellow-600"
         : "text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-yellow-600"
     }`;
+  const handleLogout=()=>{
+    logout().then(()=>{
+      router.push("/");
+    })
+  }
   return (
     <nav className="bg-white w-full border-b border-gray-200">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -24,14 +35,22 @@ const Navbar = () => {
             SkoolaBus
           </span>
         </a>
-        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-          <Button
-            href="/login"
-            type="button"
-            size="base"
-          >
-            Login | Sign Up
-          </Button>
+        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse align-middle">
+          {user && (
+            <div className="flex flex-row align-middle gap-2">
+              <button className="p-2 bg-dark h-12 rounded-md text-white my-auto" onClick={(()=>{handleLogout()})}>Logout</button>
+              <ProfileCard name={user?.username} email={user?.email}/>
+            </div>
+          )}
+          {!user && (
+            <Button
+              href="/login"
+              type="button"
+              size="base"
+            >
+              Login | Sign Up
+            </Button>
+          )}
           <button
             onClick={() => setIsOpen(!isOpen)}
             type="button"
@@ -86,3 +105,28 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+const ProfileCard = ({ name = 'User', email = 'user@example.com' }) => {
+  const initial = name.charAt(0).toUpperCase();
+
+  const getRandomBgColor = () => {
+    const colors = [
+      'bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
+      'bg-indigo-500', 'bg-pink-500', 'bg-purple-500', 'bg-teal-500',
+      'bg-orange-500', 'bg-cyan-500'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+  const bgColor = useMemo(() => getRandomBgColor(), []);
+  return (
+    <div className="flex items-center space-x-4 p-4 bg-white align-middle">
+      <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${bgColor}`}>
+        {initial}
+      </div>
+      {/* <div>
+        <div className="font-semibold text-gray-800">{name}</div>
+        <div className="text-sm text-gray-500">{email}</div>
+      </div> */}
+    </div>
+  );
+};
