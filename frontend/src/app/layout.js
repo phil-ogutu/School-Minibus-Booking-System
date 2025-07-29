@@ -15,6 +15,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google Maps script loaded correctly */}
+        <script
+          async
+          defer
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
+        ></script>
+      </head>
       <body>
         {/* <MapProvider>
           <Providers>{children}</Providers>
@@ -28,7 +36,7 @@ export default function RootLayout({ children }) {
           />
         </AppWrapper>
       </body>
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"></script>
+      {/* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"></script> */}
     </html>
   );
 }

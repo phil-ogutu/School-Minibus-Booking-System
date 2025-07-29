@@ -2,7 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import MpesaPayment from "./MpesaPayment";
+import MpesaPayment from "@/components/MpesaButton";
 
 export default function PaymentForm({ tripId }) {
   const [name, setName] = useState("");
