@@ -44,44 +44,49 @@
 //   );
 // }
 
-import { useState } from "react";
+"use client";
+import { useState, useCallback } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
-export default function MpesaPayment({ amount, name, bookingId, phone }) {
+export default function MpesaPayment({
+  amount,
+  name,
+  bookingId,
+  phone,
+  onSuccess,
+}) {
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
 
-  const handlePay = async () => {
+  const handlePay = useCallback(async () => {
+    if (!phone || !amount) {
+      toast.error("Phone & amount are required.");
+      return;
+    }
     setLoading(true);
-    setMessage(null);
-
     try {
-      const res = await axios.post("/api/payments/initiate", {
+      await axios.post("/api/payments/initiate", {
         phone,
         amount,
         name,
         bookingId,
       });
-
-      setMessage("STK Push sent to your phone. Please enter M-Pesa PIN.");
-    } catch (error) {
-      console.error(error);
-      setMessage("Failed to initiate payment.");
+      toast.success("STK Push sent to your phone.");
+      onSuccess?.();
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Payment failed.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [amount, bookingId, name, onSuccess, phone]);
 
   return (
-    <div className="my-4">
-      <button
-        onClick={handlePay}
-        disabled={loading}
-        className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
-      >
-        {loading ? "Processing..." : "Pay with M-Pesa"}
-      </button>
-      {message && <p className="mt-2 text-sm">{message}</p>}
-    </div>
+    <button
+      onClick={handlePay}
+      disabled={loading}
+      className="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50"
+    >
+      {loading ? "Processing..." : "Pay with M-Pesa"}
+    </button>
   );
 }
