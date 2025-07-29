@@ -5,6 +5,7 @@ import "../styles/globals.css";
 // import { Providers } from "./providers"; // NextAuth wrapper
 // import { MapProvider } from "@/context/MapContext";
 import { AppWrapper } from "./AppWrapper";
+import { ToastContainer } from "react-toastify";
 
 export const metadata = {
   title: "SkoolaBus",
@@ -18,8 +19,16 @@ export default function RootLayout({ children }) {
         {/* <MapProvider>
           <Providers>{children}</Providers>
         </MapProvider> */}
-        <AppWrapper>{children}</AppWrapper>
+        <AppWrapper>
+          {children}
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            hideProgressBar={true}
+          />
+        </AppWrapper>
       </body>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"></script>
     </html>
   );
 }

@@ -1,5 +1,6 @@
 // src/context/AuthContext.js
 import React from 'react';
+import { BASE_URL } from '@/utils/constants';
 import { createContext, useContext, useState, useEffect } from 'react';
 
  export const AuthContext = createContext();
@@ -12,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const checkAuth = async () => {
     console.log('CKECKAUTH: called' )
     try {
-      const response = await fetch('http://localhost:5000/api/users/me', {
+      const response = await fetch(`${BASE_URL}/api/users/me`, {
         credentials: 'include',
       });
       if (response.ok) {

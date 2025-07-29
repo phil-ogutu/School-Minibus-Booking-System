@@ -7,21 +7,13 @@ import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import BookBusModal from "@/components/BookBusModal";
 import {
-  FaArrowDown,
-  FaArrowRight,
   FaBus,
-  FaChevronDown,
-  FaChevronUp,
   FaCircle,
   FaClock,
-  FaLocationArrow,
-  FaMapMarkedAlt,
-  FaMapMarker,
   FaMapMarkerAlt,
-  FaMapPin,
-  FaPersonBooth,
   FaUser,
 } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -35,7 +27,7 @@ export default function Bus() {
   const [selectedBus, setSelectedBus] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
-  const stops = route?.locations.slice(1, -1); // exclude first and last
+  const stops = route?.locations;
   const visibleStops = expanded ? stops : stops?.slice(0, 4);
 
   const openModal = (bus) => {
@@ -48,19 +40,29 @@ export default function Bus() {
     setIsModalOpen(false);
   };
 
+  const router = useRouter();
+
+  const navigateToTrack = (id) => {
+    if (id) {
+      router.push(`/track/${id}`);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex-1 grid grid-cols-2">
+      <div className="flex-1 md:grid grid-cols-2">
+
         {/* Left Side */}
         <div className="p-5 overflow-y-auto no-scrollbar h-[calc(100vh-150px)]">
+
           {/* Route Name and stops */}
-          <div className="mb-5 w-[80%] shadow-sm bg-white border rounded-xl p-4 border-neutral-300 mx-auto">
+          <div className="mb-5 w-full shadow-sm bg-white border rounded-xl p-4 border-neutral-300 mx-auto">
             <div className="flex justify-start items-center gap-x-3 text-xl mb-2">
               <FaMapMarkerAlt className="w-5 h-5" />
-              <h1>Route Information</h1>
+              <h1 className="font-medium">Route Information</h1>
             </div>
-            <div className="flex justify-start gap-x-2 text-xl">
+            <div className="flex md:justify-start md:gap-x-2 md:text-xl">
               <span>{route?.start}</span>
               <span>&rarr;</span>
               <span>{route?.end}</span>
@@ -73,19 +75,19 @@ export default function Bus() {
                     key={loc.id}
                     className="w-full flex items-center gap-2 bg-neutral-100/80 p-2 mb-2 rounded-sm"
                   >
-                    <FaCircle className="w-2 h-2 text-neutral-600" />                 
+                    <FaCircle className="w-2 h-2 text-neutral-600" />
                     {loc.location_name}
                   </li>
                 ))}
               </ul>
               {stops?.length > 4 && (
                 <div className="flex justify-end">
-                <button
-                  onClick={() => setExpanded(!expanded)}
-                  className="text-yellow-600 text-sm mt-2"
-                >
-                  {expanded ? "View Less" : "View More"}
-                </button>
+                  <button
+                    onClick={() => setExpanded(!expanded)}
+                    className="text-yellow-600 text-sm mt-2"
+                  >
+                    {expanded ? "View Less" : "View More"}
+                  </button>
                 </div>
               )}
             </div>
@@ -94,52 +96,57 @@ export default function Bus() {
           <div className="mb-5 text-xl font-medium">Available Buses</div>
 
           {/* Bus Cards */}
-          <div className="grid grid-cols-2 gap-2">
-            {buses
-              ?.filter((bus) => bus.route_id === route.id)
-              .map((bus) => (
-                <div
-                  key={bus.id}
-                  className="w-full mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-4"
-                >
-                  <div className="flex justify-start gap-x-4">
-                    <FaBus className="h-12 w-10" />
-                    <div className="flex flex-col">
-                      <h1 className="text-xl font-medium">{bus.plate}</h1>
-                      <span className="text-xs font-light">
-                        {route.start} - {route.end}
-                      </span>
-                    </div>
-                    {/* <p>{bus.plate}</p>
-                    <p>7:00pm</p>
-                    <p>Seats: {bus.capacity}</p> */}
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-2">
-                    <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
-                      <FaClock />
+          <div className="md:grid grid-cols-2 gap-2">
+            {buses?.filter((bus) => bus?.route_id === route?.id)
+              .map((bus) => {
+                const departureTime = new Date(
+                  bus?.departure
+                ).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                return (
+                  <div
+                    key={bus?.id}
+                    className="w-full mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-4"
+                  >
+                    <div className="flex justify-start gap-x-4">
+                      <FaBus className="h-12 w-10" />
                       <div className="flex flex-col">
-                        <span className="text-xs">Departure</span>
-                        <span>10:30pm</span>
+                        <h1 className="text-xl font-medium">{bus?.plate}</h1>
+                        <span className="text-xs font-light">
+                          {route?.start} - {route?.end}
+                        </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
-                      <FaUser />
-                      <div className="flex flex-col">
-                        <span className="text-xs">Capacity</span>
-                        <span>10/50</span>
+                    <div className="grid grid-cols-2 gap-x-2">
+                      <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
+                        <FaClock />
+                        <div className="flex flex-col">
+                          <span className="text-xs">Departure</span>
+                          <span>{departureTime}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
+                        <FaUser />
+                        <div className="flex flex-col">
+                          <span className="text-xs">Available seats</span>
+                          <span>{(bus?.capacity - bus?.bookings?.length) ?? 0}</span>
+                        </div>
                       </div>
                     </div>
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => openModal(bus)}
+                        className="w-full px-2 py-1.5 h-full text-base font-medium rounded-lg bg-yellow-400 hover:bg-yellow-500"
+                      >
+                        Book Now
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex justify-center">
-                    <button
-                      onClick={() => openModal(bus)}
-                      className="w-full px-2 py-1.5 h-full text-base font-medium rounded-lg bg-yellow-400 hover:bg-yellow-500"
-                    >
-                      Book Now
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
           </div>
         </div>
 
@@ -153,6 +160,7 @@ export default function Bus() {
         onClose={closeModal}
         route={route}
         bus={selectedBus}
+        onNavigate={navigateToTrack}
       />
     </div>
   );
