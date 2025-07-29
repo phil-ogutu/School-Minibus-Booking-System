@@ -45,7 +45,7 @@ export default function Booking() {
         <div className="p-5 flex flex-col space-y-5">
           <SearchBus />
           
-          <div className="grid grid-cols-2 items-start gap-x-5 overflow-y-auto no-scrollbar">
+          <div className="md:grid grid-cols-2 items-start gap-x-5 overflow-y-auto no-scrollbar">
             {displayRoutes.map((route) => (
               <SearchCard
                 key={route.id}

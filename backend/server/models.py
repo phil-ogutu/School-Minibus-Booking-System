@@ -66,7 +66,7 @@ class Booking(db.Model,SerializerMixin):
 # Buses Table
 class Bus(db.Model,SerializerMixin):
     __tablename__ = 'buses'
-    serialize_rules = ('-bookings.bus','-routes.bus')
+    serialize_rules = ('-bookings.bus','-routes.bus','-driver.bus')
     
     id = db.Column(db.Integer, primary_key=True)
     route_id = db.Column(db.Integer, db.ForeignKey('routes.id'))  # FK for route
@@ -76,11 +76,12 @@ class Bus(db.Model,SerializerMixin):
     capacity = db.Column(db.Integer)
     status = db.Column(Enum(TripStatus), default=TripStatus.pending)
     created_at = db.Column(db.DateTime(), server_default= func.now())
-    arrived = db.Column(db.DateTime())
-    departure = db.Column(db.DateTime())
+    arrived = db.Column(db.DateTime(),nullable=True)
+    departure = db.Column(db.DateTime(),nullable=True)
 
     bookings = db.relationship("Booking", back_populates="bus")
     routes = db.relationship("Route", back_populates="buses")
+    driver=db.relationship('Driver', back_populates="bus")
 
 #Driver Table
 class Driver(db.Model,SerializerMixin):
@@ -90,7 +91,7 @@ class Driver(db.Model,SerializerMixin):
     driver_name = db.Column(db.String, nullable=False)
     bio = db.Column(db.String)
 
-    # buses = db.relationship("Bus", backref="driver", lazy=True)
+    bus = db.relationship("Bus", back_populates="driver")
 
 #Owner Table
 class Owner(db.Model,SerializerMixin):
