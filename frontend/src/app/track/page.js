@@ -37,6 +37,47 @@ export default function TrackPage() {
   //   }
   // }, [isAuthenticated]);
 
+  const handleTrack = useCallback(async (trackingId = trackingNumber) => {
+     if (!isAuthenticated) {
+       setTrackingError("Please log in to track your booking");
+       return;
+     }
+ 
+     if (!trackingId.trim()) {
+       setTrackingError("Please enter a tracking number");
+       return;
+     }
+ 
+     setIsTracking(true);
+     setTrackingError("");
+     
+     try {
+       // Save tracking number to localStorage
+       localStorage.setItem('trackingNumber', trackingId);
+       
+       const { booking, bus, route } = await fetchTrackingData(trackingId);
+ 
+       // Transform data for display
+       const transformedData = {
+         from: booking.pickup || "N/A",
+         to: booking.dropoff || "N/A", 
+         tripStartTime: bus?.departure ? new Date(bus.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "4:00 am",
+         studentName: booking.child_name || "N/A",
+         studentNumber: booking.id.toString(),
+         currentLocation: booking.pickup || "Starting Point",
+         destination: booking.dropoff || "Destination",
+         routeLocations: route?.locations || []
+       };
+ 
+       setTrackingData(transformedData);
+ 
+     } catch (error) {
+       setTrackingError("Tracking number not found. Please check and try again.");
+       setTrackingData(null);
+     } finally {
+       setIsTracking(false);
+     }
+   }, [isAuthenticated, trackingNumber]);
   // Auto-track when component mounts if there's an ID in query params
   useEffect(() => {
     if (isAuthenticated && queryId) {
@@ -106,47 +147,6 @@ export default function TrackPage() {
   };
   
   // ✅ FIXED: Memoize handleTrack to prevent infinite loop
- const handleTrack = useCallback(async (trackingId = trackingNumber) => {
-    if (!isAuthenticated) {
-      setTrackingError("Please log in to track your booking");
-      return;
-    }
-
-    if (!trackingId.trim()) {
-      setTrackingError("Please enter a tracking number");
-      return;
-    }
-
-    setIsTracking(true);
-    setTrackingError("");
-    
-    try {
-      // Save tracking number to localStorage
-      localStorage.setItem('trackingNumber', trackingId);
-      
-      const { booking, bus, route } = await fetchTrackingData(trackingId);
-
-      // Transform data for display
-      const transformedData = {
-        from: booking.pickup || "N/A",
-        to: booking.dropoff || "N/A", 
-        tripStartTime: bus?.departure ? new Date(bus.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "4:00 am",
-        studentName: booking.child_name || "N/A",
-        studentNumber: booking.id.toString(),
-        currentLocation: booking.pickup || "Starting Point",
-        destination: booking.dropoff || "Destination",
-        routeLocations: route?.locations || []
-      };
-
-      setTrackingData(transformedData);
-
-    } catch (error) {
-      setTrackingError("Tracking number not found. Please check and try again.");
-      setTrackingData(null);
-    } finally {
-      setIsTracking(false);
-    }
-  }, [isAuthenticated, trackingNumber]);
 
   // Show login message if not authenticated
   if (!isAuthenticated) {
