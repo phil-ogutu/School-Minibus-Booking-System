@@ -27,7 +27,7 @@ export default function Bus() {
   const [selectedBus, setSelectedBus] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
-  const stops = route?.locations.slice(1, -1);
+  const stops = route?.locations;
   const visibleStops = expanded ? stops : stops?.slice(0, 4);
 
   const openModal = (bus) => {
@@ -55,7 +55,7 @@ export default function Bus() {
 
         {/* Left Side */}
         <div className="p-5 overflow-y-auto no-scrollbar h-[calc(100vh-150px)]">
-          
+
           {/* Route Name and stops */}
           <div className="mb-5 w-full shadow-sm bg-white border rounded-xl p-4 border-neutral-300 mx-auto">
             <div className="flex justify-start items-center gap-x-3 text-xl mb-2">
