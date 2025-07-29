@@ -126,8 +126,17 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll():
-        return [booking.to_dict() for booking in Booking.query.all()]
+    def findAll(query=''):
+        if query:
+            bookings = Booking.query.filter(
+                or_(
+                    Booking.child_name.ilike(f'%{query}%'),
+                    Booking.pickup.ilike(f'%{query}%'),
+                    Booking.dropoff.ilike(f'%{query}%')
+                )
+            ).limit(10).all()
+            return [booking.to_dict() for booking in bookings]
+        return [booking.to_dict() for booking in Booking.query.limit(10).all()]
     
     @staticmethod
     def findOne(id):
