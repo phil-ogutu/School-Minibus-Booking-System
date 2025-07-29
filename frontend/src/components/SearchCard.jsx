@@ -33,9 +33,16 @@ const SearchCard = ({ route, onPreview, onSelect }) => {
     }
   };
 
+  const truncateWords = (text, limit = 2) => {
+  const words = text.split(" ");
+  return words.length > limit ? words.slice(0, limit).join(" ") + "..." : text;
+  };
+
+
   return (
     <div
-      className={`flex flex-col mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-2 ${showStops ? "h-auto" : "h-[200px]"}`}
+      // className={`flex flex-col mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-2 h-auto`}
+      className={`flex flex-col mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4 border-neutral-300 ${showStops ? "h-auto" : "h-[200px]"}`}
       onClick={onPreview}
     >
       <div className="w-full mb-3">
@@ -47,8 +54,8 @@ const SearchCard = ({ route, onPreview, onSelect }) => {
           </div>
 
           <div className="flex items-center justify-between gap-x-5">
-            <h1 className="text-lg md:text-xl font-semibold w-1/3">
-              {route.start}
+            <h1 className="text-base md:text-lg font-semibold w-1/3">
+              {truncateWords(route.start)}
             </h1>
 
             <div className="flex-1  border-dashed border border-neutral-400 relative">
@@ -57,8 +64,8 @@ const SearchCard = ({ route, onPreview, onSelect }) => {
               </div>
             </div>
 
-            <h1 className="text-lg md:text-xl font-semibold w-1/3 text-right">
-              {route.end}
+            <h1 className="text-base md:text-lg font-semibold w-1/3 text-right">
+              {truncateWords(route.end)}
             </h1>
           </div>
         </div>
