@@ -1,6 +1,7 @@
 // This is the payment form
 "use client";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import MpesaPayment from "./MpesaPayment";
 
 export default function PaymentForm({ tripId }) {
@@ -8,10 +9,14 @@ export default function PaymentForm({ tripId }) {
   const [phone, setPhone] = useState("");
   const amount = 100; // fixed for demo
 
+  /* Pull name once */
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user")) || {};
     setName(user.name || "");
   }, []);
+
+  /* Optional callback when payment succeeds */
+  const handleSuccess = () => toast.success("Payment initiated!");
 
   return (
     <div className="space-y-4 max-w-md">
@@ -33,6 +38,7 @@ export default function PaymentForm({ tripId }) {
         name={name}
         phone={phone}
         bookingId={tripId}
+        onSuccess={handleSuccess}
       />
     </div>
   );
