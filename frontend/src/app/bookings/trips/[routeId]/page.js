@@ -109,23 +109,20 @@ export default function Bus() {
                         {route?.start} - {route?.end}
                       </span>
                     </div>
-                    {/* <p>{bus.plate}</p>
-                    <p>7:00pm</p>
-                    <p>Seats: {bus.capacity}</p> */}
                   </div>
                   <div className="grid grid-cols-2 gap-x-2">
                     <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
                       <FaClock />
                       <div className="flex flex-col">
                         <span className="text-xs">Departure</span>
-                        <span>10:30pm</span>
+                        <span>{bus?.departure ??'10:30pm'}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
                       <FaUser />
                       <div className="flex flex-col">
-                        <span className="text-xs">Capacity</span>
-                        <span>10/50</span>
+                        <span className="text-xs">Available seats</span>
+                        <span>{(bus?.capacity - bus?.bookings?.length) ?? 0}</span>
                       </div>
                     </div>
                   </div>

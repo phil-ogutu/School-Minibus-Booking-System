@@ -30,13 +30,6 @@ const parentSchema = Yup.object().shape({
 })
 
 export default function Parents() {
-  
-  
-  const [editParent, setEditParent] = useState(null);
-  
-  const handleEdit = (parent) => {
-    setEditParent(parent);
-  };
   /****User Fetch */
   const [query,setQuery]=useState('');
   const { data: parents, loading: loadingParents, error: errorParents, refetch: refetchParents} = useFetch(`/api/users/parent?query=${query}`);

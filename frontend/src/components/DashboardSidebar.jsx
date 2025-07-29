@@ -18,7 +18,7 @@ const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: FaHome },
   { href: "/admin/parents", label: "Parents", icon: FaUserFriends },
   { href: "/admin/routes", label: "Routes", icon: FaRoute },
-  { href: "/admin/buses", label: "Manage Buses", icon: FaBus },
+  { href: "/admin/buses", label: "Buses", icon: FaBus },
   { href: "/admin/bus_owner", label: "Bus Owners", icon: FaUserCheck },
   { href: "/admin/bookings", label: "View Bookings", icon: FaClipboardList },
   { href: "/admin/drivers", label: "Drivers", icon: FaUserTie },
