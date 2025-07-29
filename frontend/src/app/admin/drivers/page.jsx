@@ -30,67 +30,7 @@ const driverSchema = Yup.object().shape({
   email: Yup.string().required('Email is required'),
 });
 
-export default function Drivers() {
-  // const [drivers, setDrivers] = useState([
-  //   {
-  //     id: 1,
-  //     name: "Peter Kamau",
-  //     phone: "+254700000001",
-  //     idNumber: "12345678",
-  //     email: "peter@example.com",
-  //     residence: "Nairobi",
-  //     atWork: true,
-  //     startTime: "08:00",
-  //     endTime: "17:00",
-  //     trips: 5,
-  //     route: "Thika Road",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Mary Otieno",
-  //     phone: "+254700000002",
-  //     idNumber: "87654321",
-  //     email: "mary@example.com",
-  //     residence: "Kitengela",
-  //     atWork: false,
-  //     startTime: "09:00",
-  //     endTime: "16:00",
-  //     trips: 3,
-  //     route: "Mombasa Road",
-  //   },
-  // ]);
-
-  // const [newDriver, setNewDriver] = useState({
-  //   name: "",
-  //   phone: "",
-  //   idNumber: "",
-  //   email: "",
-  //   residence: "",
-  // });
-
-  // const handleAddDriver = () => {
-  //   const driver = {
-  //     ...newDriver,
-  //     id: Date.now(),
-  //     atWork: false,
-  //     startTime: "",
-  //     endTime: "",
-  //     trips: 0,
-  //     route: "-",
-  //   };
-  //   setDrivers((prev) => [...prev, driver]);
-  //   setNewDriver({
-  //     name: "",
-  //     phone: "",
-  //     idNumber: "",
-  //     email: "",
-  //     residence: "",
-  //   });
-  // };
-
-  const handleEdit = (id) => alert(`Edit driver ${id}`);
-
-  
+export default function Drivers() {  
   /****Drivers Fetch */
   const [query,setQuery]=useState('');
   const { data: drivers, loading: loadingDrivers, error: errorDrivers, refetch: refetchDrivers} = useFetch(`/api/drivers?query=${query}`);
@@ -110,6 +50,30 @@ export default function Drivers() {
         `Driver creation functionality is succcess`
       );
       closeModal();
+      refetchDrivers()
+    }).catch((err)=>{
+      alert(err)
+    });
+  };
+  /****Driver Update */
+  const [driverToBeUpdated,setdriverToBeUpdated]=useState({});
+  const { isOpen: isEditModalOpen, openModal: openEditModal, closeModal: closeEditModal } = useModal();
+  const { mutate: editMutate, data: updatedDriver, loading: loadingUpdatingDriver, error: errorUpdatingDriver } = useMutation(``,'PATCH');
+  const handleShowUpdateModal=(driver)=>{
+    driverInitialValues.driver_name = driver.driver_name;
+    driverInitialValues.email = driver.email;
+    driverInitialValues.id_number = driver.id_number;
+    driverInitialValues.mobile = driver.mobile;
+    setdriverToBeUpdated(driver)
+    openEditModal();
+  };
+  const handleUpdateDriverForm=async(values)=>{
+    console.log(values);
+    await editMutate(driverInitialValues,`/api/drivers/${driverToBeUpdated?.id}`).then(()=>{
+      console.log(
+        `Driver update functionality is succcess`
+      );
+      closeEditModal();
       refetchDrivers()
     }).catch((err)=>{
       alert(err)
@@ -149,7 +113,7 @@ export default function Drivers() {
       render: (id, row) => (
         <div className="flex space-x-2">
           <button
-            // onClick={() => handleShowUpdateModal(id)}
+            onClick={() => handleShowUpdateModal(id)}
             className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
           >
             {editIcon('my-0','text-xl')}
@@ -225,6 +189,45 @@ export default function Drivers() {
           </FormWrapper>
         </div>
       </Modal>
+      {/* Update driver Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={closeEditModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl">
+              Update Driver
+            </h5>
+          </div>
+          <FormWrapper
+            initialValues={driverInitialValues}
+            validationSchema={driverSchema}
+            onSubmit={handleUpdateDriverForm}
+            className="w-full"
+          >
+            <FormField name="driver_name" label="Name" type="text" placeholder="John Doe" />
+            <FormField name="mobile" label="Mobile" type="tel" placeholder="0700000000" />
+            <FormField name="id_number" label="Id Number" type="text" placeholder="1234567" />
+            <FormField name="email" label="Email" type="email" placeholder="johndoe@gmail.com" />
+            <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+              <button
+                onClick={closeModal}
+                type="button"
+                className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                className="bg-primary text-white px-4 py-2 rounded"
+              > Save
+              </button>
+            </div>
+          </FormWrapper>
+        </div>
+      </Modal>
       {/* Delete driver Modal */}
       <Modal
         isOpen={deleteisOpen}
@@ -262,70 +265,5 @@ export default function Drivers() {
         </div>
       </Modal>
     </Container>
-    // <div className="flex">
-    //   <main className="flex-1 p-10 bg-gray-50 min-h-screen">
-
-    //     {/* Add New Driver Form */}
-    //     <div className="mb-6">
-    //       <h2 className="text-xl font-bold mb-2">Add New Driver</h2>
-    //       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-    //         <input
-    //           type="text"
-    //           placeholder="Name"
-    //           value={newDriver.name}
-    //           onChange={(e) =>
-    //             setNewDriver({ ...newDriver, name: e.target.value })
-    //           }
-    //           className="p-2 border rounded"
-    //         />
-    //         <input
-    //           type="text"
-    //           placeholder="Phone"
-    //           value={newDriver.phone}
-    //           onChange={(e) =>
-    //             setNewDriver({ ...newDriver, phone: e.target.value })
-    //           }
-    //           className="p-2 border rounded"
-    //         />
-    //         <input
-    //           type="text"
-    //           placeholder="ID Number"
-    //           value={newDriver.idNumber}
-    //           onChange={(e) =>
-    //             setNewDriver({ ...newDriver, idNumber: e.target.value })
-    //           }
-    //           className="p-2 border rounded"
-    //         />
-    //         <input
-    //           type="email"
-    //           placeholder="Email"
-    //           value={newDriver.email}
-    //           onChange={(e) =>
-    //             setNewDriver({ ...newDriver, email: e.target.value })
-    //           }
-    //           className="p-2 border rounded"
-    //         />
-    //         <input
-    //           type="text"
-    //           placeholder="Residence"
-    //           value={newDriver.residence}
-    //           onChange={(e) =>
-    //             setNewDriver({ ...newDriver, residence: e.target.value })
-    //           }
-    //           className="p-2 border rounded"
-    //         />
-    //         <button
-    //           onClick={handleAddDriver}
-    //           className="bg-green-600 text-white p-2 rounded hover:bg-green-700 flex items-center justify-center"
-    //         >
-    //           <FaPlus className="mr-2" /> Add Driver
-    //         </button>
-    //       </div>
-    //     </div>
-
-    //     {/* Drivers Table */}
-    //     <DataTable columns={columns} data={drivers} />
-    //   </main>
-    // </div>
   );
 }
