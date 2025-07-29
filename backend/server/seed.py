@@ -11,6 +11,9 @@ from config import bcrypt
 from config import app
 from models import db, User, UserRole, Booking, Bus, Location, Driver, Owner, Route, RouteStatus, TripStatus
 
+# Importing the Payment model and PaymentStatus Enum
+from models import Payment, PaymentStatus  
+
 dummy_data = [
     [
         { "lat": -1.105225, "lng": 37.016789, "name": "JKUAT Entry road" },
@@ -59,6 +62,18 @@ dummy_routes = [
 
 if __name__ == '__main__':
     fake = Faker()
+
+# # Function to seed payments
+#     # This function creates payment records based on bookings
+#     # It randomly assigns a status to each payment and generates a stub record
+#     # for the payment with a booking ID, amount, and status.
+
+
+    # Initialize the database
+# with app.app_context():
+#     print("Dropping and recreating all tables...")
+#     db.drop_all()
+#     db.create_all()
 
     # Helper function to generate random users
     def create_user():
@@ -121,7 +136,8 @@ if __name__ == '__main__':
         return Owner(
             owner_name=fake.company()
         )
-
+    
+    
     # Helper function to generate random routes
     def create_route(start, end):
         return Route(
@@ -130,7 +146,34 @@ if __name__ == '__main__':
             status=rc([RouteStatus.pending, RouteStatus.started, RouteStatus.ended]),
             created_at=fake.date_this_year()
         )
+    
+    # Function to seed payments
+    # This function creates payment records based on bookings
+    # It randomly assigns a status to each payment and generates a stub record
+    # for the payment with a booking ID, amount, and status.
+    def seed_payments(bookings):
+        payments = []
+        for booking in bookings:
+            status = rc(
+                [PaymentStatus.PAID, PaymentStatus.PENDING, PaymentStatus.FAILED],
+                weights=[60, 30, 10]
+            )[0]
+            mpesa_code = f"STK-{fake.uuid4()[:8].upper()}" if status == PaymentStatus.PAID else None
+            paid_at = fake.date_time_this_year() if status == PaymentStatus.PAID else None
+            payments.append(
+                Payment(
+                    booking_id=booking.id,
+                    amount=booking.price,
+                    status=status,
+                    mpesa_code=mpesa_code,
+                    paid_at=paid_at
+                )
+            )
+        db.session.bulk_save_objects(payments)
+        db.session.commit()
 
+    # Initialize the database and seed data
+    # This will drop all existing tables and create new ones, then seed the database with dummy data
     with app.app_context():
         print("Dropping and recreating all tables...")
         db.drop_all()
@@ -201,4 +244,7 @@ if __name__ == '__main__':
         db.session.bulk_save_objects(bookings)
         db.session.commit()
 
-        print("Seeding complete!")
+        # Payments
+    seed_payments(bookings)
+
+    print("Seeding complete!")
