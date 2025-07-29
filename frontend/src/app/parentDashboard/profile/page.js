@@ -1,20 +1,20 @@
+// src/app/parentDashboard/profile/page.jsx
 "use client";
 import { useAuthContext } from "@/context/AuthContext";
-import DashboardSidebar from "@/components/DashboardSidebar";
+import ParentDashboardSidebar from "@/components/ParentDashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import ProfileForm from "@/components/ProfileForm";
 import axiosInstance from "@/lib/api"; // Axios for the components' API requests
 
 export default function EditProfilePage() {
-  const { user, setUser, loading, checkAuth } = useAuthContext() // error?
-  console.log('PROFILE USER', user)
+  const { user, setUser, loading, error, checkAuth } = useAuthContext();
 
   if (loading) return <div>Loading...</div>; 
-  // if (error) return <div>Error: {error}</div>; 
+  if (error) return <div>Error: {error}</div>; 
 
   const fallback = {
-    name: user?.username || "Admin User",
-    email: user?.email || "admin@gmail.com",
+    name: user?.username || "Parent User",
+    email: user?.email || "parent@gmail.com",
     mobile: user?.mobile || "+254700000000",
     photo_url: user?.photo_url || "/fallback-avatar.png",
   };
@@ -23,17 +23,11 @@ export default function EditProfilePage() {
   const handleSave = async (formData) => {
     const updatedData = Object.fromEntries(formData);
     console.log("Updating profile with:", updatedData);
-    if (!user || !user.id) {
-      alert("You're not logged in! Pleade log in to update profile.");
-      return
-    }
-    // console.log('profile user id: ', user.id)
 
     try {
       // Send the updated data to the backend (PATCH request)
       const response = await axiosInstance.patch(`/users/${user.id}`, updatedData);
-      // console.log('RESPONSE :', response)
-      // console.log('USER ID :', user.id)
+      console.log('USER ID :', user.id)
       
       // On success, update the context with the new data
       setUser((prevUser) => ({
@@ -54,7 +48,7 @@ export default function EditProfilePage() {
 
   return (
     <div className="flex">
-      <DashboardSidebar />
+      <ParentDashboardSidebar />
       <main className="flex-1 p-10">
         <DashboardHeader title="Edit Profile" />
         <ProfileForm initial={fallback} onSave={handleSave} />
