@@ -3,6 +3,7 @@ from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Loc
 import jwt
 from flask import abort
 from sqlalchemy import or_
+from datetime import datetime
 
 
 class UserService():
@@ -160,10 +161,19 @@ class BookingService():
     
 class BusService():
     @staticmethod
-    def findAll(driver_id=None):
+    def findAll(driver_id=None, query='',date=None):
+        dbQuery = Bus.query
+
         if driver_id:
-            return [bus.to_dict(rules=('-routes.buses','-bookings',)) for bus in Bus.query.filter_by(driver_id=driver_id).all()]
-        return [bus.to_dict() for bus in Bus.query.all()]
+            dbQuery = dbQuery.filter_by(driver_id=driver_id)
+
+        if query:
+            dbQuery = dbQuery.filter(Bus.plate.ilike(f"%{query}%"))
+        
+        if date:
+            dbQuery = dbQuery.filter(Bus.departure == date)
+
+        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.all()]
     
     @staticmethod
     def findOne(id=None, plate=None):
@@ -180,7 +190,7 @@ class BusService():
         return None
     
     @classmethod
-    def createBus(cls,route_id, driver_id, owner_id, plate, capacity):
+    def createBus(cls,route_id, driver_id, owner_id, plate, capacity, departure):
         existing_bus = cls.findOne(plate=plate)
         if existing_bus:
             abort(400, description="This bus already exists")
@@ -202,11 +212,12 @@ class BusService():
             abort(400, description="A bus with this plate number already exists")
 
         return Bus(
-            route_id=route_id,
-            driver_id=driver_id,
-            owner_id=owner_id,
+            route_id=int(route_id),
+            driver_id=int(driver_id),
+            owner_id=int(owner_id),
             plate=plate,
-            capacity=capacity,
+            capacity=int(capacity),
+            departure=datetime.fromisoformat(departure),
             status=TripStatus.pending
         )
     

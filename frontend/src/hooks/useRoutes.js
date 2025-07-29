@@ -16,7 +16,7 @@ export const useRoutes = (url) => {
   const [deleting, setDeleting] = useState(false);
 
   const getRouteById = (id) => {
-    const { data, loading, error } = useFetch(`${BASE_URL}/api/routes/${id}`);
+    const { data, loading, error } = useFetch(`/api/routes/${id}`);
     return { route: data, loading, error };
   };
 
