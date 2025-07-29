@@ -78,20 +78,24 @@ export default function TrackPage() {
    //     handleTrack(savedTrackingNumber);
    //   }
    // }, [isAuthenticated]);
+
   // Auto-track when component mounts if there's an ID in query params
   useEffect(() => {
-    if (isAuthenticated && queryId) {
-      setTrackingNumber(queryId);
-      handleTrack(queryId);
-    } else {
-      // Load tracking number from localStorage as fallback
-      const savedTrackingNumber = localStorage.getItem('trackingNumber');
-      if (savedTrackingNumber && isAuthenticated) {
-        setTrackingNumber(savedTrackingNumber);
-        handleTrack(savedTrackingNumber);
-      }
-    }
-  }, [queryId, isAuthenticated, handleTrack]);
+  if (!isAuthenticated) return;
+
+  const savedTrackingNumber = localStorage.getItem('trackingNumber');
+
+  if (queryId) {
+    // If query param is present, override localStorage
+    setTrackingNumber(queryId);
+    handleTrack(queryId);
+    localStorage.setItem('trackingNumber', queryId); // update localStorage too
+  } else if (savedTrackingNumber) {
+    // Fallback to localStorage only if no query param
+    setTrackingNumber(savedTrackingNumber);
+    handleTrack(savedTrackingNumber);
+  }
+}, [queryId, isAuthenticated, handleTrack]);
 
   const fetchTrackingData = async (bookingId) => {
     try {
