@@ -1,13 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { FaArrowDown, FaArrowRight, FaChevronDown, FaChevronUp, FaCircle, FaLocationArrow } from "react-icons/fa";
+import {
+  FaArrowDown,
+  FaArrowRight,
+  FaChevronDown,
+  FaChevronUp,
+  FaCircle,
+  FaLocationArrow,
+} from "react-icons/fa";
 import BookBusModal from "./BookBusModal";
 import { routesData } from "@/data/RoutesData";
 import { format } from "date-fns";
 import { fetchLatLng } from "@/utils/geocode";
 
-const SearchCard = ({ route }) => {
+const SearchCard = ({ route, onPreview, onSelect }) => {
   console.log("Search Card", route);
   const [isModalOpen, setModalOpen] = useState(false);
   const today = new Date();
@@ -27,8 +34,11 @@ const SearchCard = ({ route }) => {
   };
 
   return (
-    <div className="w-[98%] mx-auto mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-4">
-      <div className="space-y-2 w-full">
+    <div
+      className={`flex flex-col mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-2 ${showStops ? "h-auto" : "h-[200px]"}`}
+      onClick={onPreview}
+    >
+      <div className="w-full mb-3">
         {/* Route */}
         <div className="space-y-0">
           <div className="w-full flex items-center justify-between">
@@ -37,7 +47,7 @@ const SearchCard = ({ route }) => {
           </div>
 
           <div className="flex items-center justify-between gap-x-5">
-            <h1 className="text-lg md:text-xl text-neutral-600 font-semibold w-1/3">
+            <h1 className="text-lg md:text-xl font-semibold w-1/3">
               {route.start}
             </h1>
 
@@ -47,30 +57,27 @@ const SearchCard = ({ route }) => {
               </div>
             </div>
 
-            <h1 className="text-lg md:text-xl text-neutral-600 font-semibold w-1/3 text-right">
+            <h1 className="text-lg md:text-xl font-semibold w-1/3 text-right">
               {route.end}
             </h1>
           </div>
         </div>
       </div>
-      
-      <div
-        onClick={() => setShowStops(!showStops)}
-        className=""
-      >
+
+      <div onClick={() => setShowStops(!showStops)} className="mb-2">
         {showStops ? (
-          <FaChevronUp className="text-neutral-500 text-sm" />
+          <FaChevronUp className="text-neutral-500" />
         ) : (
           <div className="flex items-center space-x-2">
-          <FaLocationArrow className="text-neutral-500 text-sm" />
-          <p className="text-xs">stops</p>
+            <FaLocationArrow className="text-sm" />
+            <p className="text-sm">stops</p>
           </div>
         )}
       </div>
 
-      {showStops && route.locations.length > 0 && (
-        <div className="w-[95%] mt-2 bg-neutral-300/20 space-y-2 pl-10 mx-auto rounded-md">
-          {route.locations.map((location) => (
+      {showStops && route.locations.length > 2 && (
+        <div className="w-[95%] mt-2 bg-neutral-300/20 space-y-2 mx-auto rounded-md p-2">
+          {route.locations.slice(1, -1).map((location) => (
             <div key={location.id} className="flex items-center gap-x-2">
               <FaCircle className="w-2 h-2 text-neutral-500" />
               <p className="text-sm text-neutral-600">
@@ -81,25 +88,17 @@ const SearchCard = ({ route }) => {
         </div>
       )}
 
-      <div className="w-full flex items-center justify-between">
-        {/* <h1 className="text-lg text-neutral-700 font-semibold">{() =>handleGetPrice}</h1> */}
-        <h1 className="text-lg text-neutral-700 font-semibold">Ksh 100</h1>
-
-        <button
-          onClick={() => setModalOpen(true)}
-          className="w-fit px-2 py-1.5 h-full text-base text-yellow-600 font-medium hover:text-neutral-400"
-        >
-          Book Now
-        </button>
-
-        <BookBusModal
-          isOpen={isModalOpen}
-          onClose={() => setModalOpen(false)}
-        />
-      </div>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect();
+        }}
+        className="w-full px-2 py-1.5 mt-auto text-base font-medium rounded-lg bg-yellow-400 hover:bg-yellow-500"
+      >
+        View Buses
+      </button>
     </div>
   );
 };
 
 export default SearchCard;
-

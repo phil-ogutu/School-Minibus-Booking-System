@@ -22,7 +22,7 @@ export default function DashboardHeader({ title }) {
   }, [user?.photo_url]);
 
   return (
-    <header className="flex justify-between items-center mb-6">
+    <header className="flex justify-between items-center p-4 border-b border-slate-200">
       <h1 className="text-3xl font-bold text-[#0F333F]">{title}</h1>
 
       <div className="flex items-center space-x-3">
@@ -46,3 +46,6 @@ export default function DashboardHeader({ title }) {
     </header>
   );
 }
+
+// Only users whose user.role === 'admin' can access this page
+// the DashboardHeader is reusable but independent of any other file

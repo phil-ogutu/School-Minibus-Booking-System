@@ -63,12 +63,12 @@ const EditBusModal = ({ bus, onClose, onSave }) => {
             <input
               type="text"
               id="driver"
+
               name="driver"
               value={formData.driver || ""}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
-          </div>
           <div className="flex justify-between items-center mt-4">
             <button
               type="button"

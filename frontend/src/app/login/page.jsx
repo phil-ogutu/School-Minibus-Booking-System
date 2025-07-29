@@ -45,7 +45,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(loginData); // Call login function, it will handle fetching user details
-      router.push("/"); // Redirect after successful login
+      router.push("/bookings"); // Redirect after successful login
     } catch (error) {
       console.error("Login failed:", error);
     }
