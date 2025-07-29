@@ -97,8 +97,7 @@ export default function Bus() {
 
           {/* Bus Cards */}
           <div className="md:grid grid-cols-2 gap-2">
-            {buses
-              ?.filter((bus) => bus.route_id === route.id)
+            {buses?.filter((bus) => bus.route_id === route.id)
               .map((bus) => {
                 const departureTime = new Date(
                   bus.departure
@@ -132,8 +131,8 @@ export default function Bus() {
                       <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
                         <FaUser />
                         <div className="flex flex-col">
-                          <span className="text-xs">Capacity</span>
-                          <span>10/50</span>
+                          <span className="text-xs">Available seats</span>
+                          <span>{(bus?.capacity - bus?.bookings?.length) ?? 0}</span>
                         </div>
                       </div>
                     </div>

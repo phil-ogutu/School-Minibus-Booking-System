@@ -114,7 +114,7 @@ export default function DashboardHeader({ title }) {
   };
 
   return (
-    <header className="flex justify-between items-center mb-6">
+    <header className="flex justify-between items-center p-4 border-b border-slate-200">
       <h1 className="text-3xl font-bold text-[#0F333F]">{title}</h1>
 
       <div className="flex items-center space-x-3">
