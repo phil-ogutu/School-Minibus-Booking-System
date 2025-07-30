@@ -1,5 +1,5 @@
 import bcrypt
-from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location
+from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location, Contact
 import jwt
 from flask import abort
 from sqlalchemy import or_
@@ -354,3 +354,26 @@ class LocationService():
             location_name=location_name,
             route_id=route_id
         )
+
+class ContactService:
+    @staticmethod
+    def create_contact(name, email, mobile, role, subject, message):
+        contact = Contact(name=name, email=email, mobile=mobile, role=role, subject=subject, message=message)
+        db.session.add(contact)
+        db.session.commit()
+        return contact
+
+    @staticmethod
+    def get_all_contacts(query=None):
+        if query:
+            return Contact.query.filter(Contact.name.ilike(f"%{query}%")).all()
+        return Contact.query.all()
+
+    @staticmethod
+    def find_by_id(contact_id):
+        return Contact.query.get(contact_id)
+
+    @staticmethod
+    def delete_contact(contact):
+        db.session.delete(contact)
+        db.session.commit()

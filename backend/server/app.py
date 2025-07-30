@@ -20,6 +20,8 @@ from controllers.analytics import Analytics
 from controllers.routes import Routes, RouteById, TopRoutes, LocationById, Locations
 from controllers.buses import BusById, Buses
 from controllers.bookings import Bookings, BookingById
+from controllers.contacts import Contacts, ContactById
+
 # Local imports
 from config import app, db, api
 from middleware.auth import token_required
@@ -128,6 +130,9 @@ api.add_resource(Buses, '/api/buses')
 api.add_resource(BusById, '/api/buses/<int:id>')
 #  Analytics endpoint
 api.add_resource(Analytics, '/api/analytics')
+# Contact endpoints
+api.add_resource(Contacts, '/api/contacts')
+api.add_resource(ContactById, '/api/contacts/<int:id>') 
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
