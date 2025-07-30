@@ -128,3 +128,69 @@ const createBookingConfirmationEmail = (bookingData) => {
   };
 };
 
+export async function POST(request) {
+  try {
+    const { bookingData, type = 'booking_confirmation' } = await request.json();
+    
+    if (!bookingData) {
+      return NextResponse.json(
+        { error: 'Booking data is required' },
+        { status: 400 }
+      );
+    }
+
+    const { parent, bus, route, booking } = bookingData;
+    
+    // Validate required data
+    if (!parent?.email || !booking || !bus || !route) {
+      return NextResponse.json(
+        { error: 'Missing required booking information' },
+        { status: 400 }
+      );
+    }
+
+    const transporter = createTransporter();
+    
+    let emailContent;
+    switch (type) {
+      case 'booking_confirmation':
+        emailContent = createBookingConfirmationEmail(bookingData);
+        break;
+      default:
+        return NextResponse.json(
+          { error: 'Invalid email type' },
+          { status: 400 }
+        );
+    }
+
+    const mailOptions = {
+      from: `"SkoolaBus" <${process.env.EMAIL_USER}>`,
+      to: parent.email,
+      subject: emailContent.subject,
+      html: emailContent.html,
+      text: emailContent.text,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return NextResponse.json(
+      { 
+        message: 'Email sent successfully',
+        recipient: parent.email,
+        type: type
+      },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error('Email sending failed:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to send email',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}
+
