@@ -12,3 +12,17 @@ const createTransporter = () => {
     },
   });
 };
+// Email templates
+const createBookingConfirmationEmail = (bookingData) => {
+  const { parent, bus, route, booking } = bookingData;
+
+  return {
+    subject: `Booking Confirmation - ${booking.child_name}'s School Transport`,
+    html: `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+
