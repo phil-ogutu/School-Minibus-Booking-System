@@ -39,5 +39,25 @@ const createBookingConfirmationEmail = (bookingData) => {
           <h1 style="color: white; margin: 0;">🚌 SkoolaBus</h1>
           <p style="color: white; margin: 5px 0;">Booking Confirmation</p>
         </div>
+                <div class="content">
+          <h2>Dear ${parent.username},</h2>
+          <p>Your booking has been confirmed! Here are the details:</p>
+          
+          <div class="booking-details">
+            <h3>Booking Information</h3>
+            <div class="detail-row">
+              <span class="label">Booking ID:</span>
+              <span>#${booking.id}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Child Name:</span>
+              <span>${booking.child_name}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Route:</span>
+              <span>${route.start} → ${route.end}</span>
+            </div>
+
+
 
 
