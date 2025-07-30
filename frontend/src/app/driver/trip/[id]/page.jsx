@@ -181,6 +181,7 @@ const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id
   const router = useRouter()
   const { mutate } = useMutation(`/api/drivers/1/trip/${trip_id}`,'PATCH');
   const handleStartRide=async()=>{
+    window.open(`/driver/trip/${trip_id}/tracking`, '_blank') // Relative push to /driver/trip/[id]/tracking
     try {
       const data = await mutate({status: 'started'});
       setTripStatus('started')

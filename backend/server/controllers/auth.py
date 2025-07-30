@@ -6,6 +6,7 @@ from config import db
 class Auth(Resource):
     def post(self):
         data=request.get_json()
+        print('SIGNUP==========================================: ', data)
         action = data.get('action')
 
 

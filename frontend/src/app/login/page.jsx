@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./login.css";
 import Image from "next/image";
 import {useAuth} from '@/hooks/useAuth'
 import { useRouter } from "next/navigation";
+import { AuthContext } from "@/context/AuthContext";
 
 
 const Login = () => {
@@ -22,6 +23,8 @@ const Login = () => {
     mobile: "",
     password: "",
   });
+  
+  const { user } = useContext(AuthContext)
 
   const switchTab = (tab) => {
     setActiveTab(tab);
@@ -39,6 +42,7 @@ const Login = () => {
       ...signupData,
       [e.target.name]: e.target.value,
     });
+    console.log("SIGN UP DATA ", signupData)
   };
 
   const handleLogin = async (e) => {
@@ -52,7 +56,13 @@ const Login = () => {
   // });
     try {
       await login(loginData); // Call login function, it will handle fetching user details
-      router.push("/bookings"); // Redirect after successful login
+      if (user.role === 'admin') {
+        router.push("/bookings"); // Redirect after successful login
+      } else if (user.role === 'parent') {
+        router.push("/bookings"); // Redirect after successful login
+      } else if (user.role === 'driver') {
+        router.push("/driver/home"); // Redirect after successful login
+      }
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -168,7 +178,7 @@ const Login = () => {
                 >
                   <option value="">Select your role</option>
                   <option value="parent">Parent/Guardian</option>
-                  <option value="school">School Administrator</option>
+                  <option value="admin">School Administrator</option>
                   <option value="driver">Bus Driver</option>
                 </select>
               </div>

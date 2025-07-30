@@ -137,9 +137,11 @@ class BookingService():
     
 class BusService():
     @staticmethod
-    def findAll(driver_id=None):
+    def findAll(driver_id=None, status=None):
         if driver_id:
             return [bus.to_dict(rules=('-routes.buses','-bookings',)) for bus in Bus.query.filter_by(driver_id=driver_id).all()]
+        if status:
+            return [bus.to_dict(rules=('-routes.buses','-bookings',)) for bus in Bus.query.filter_by(status=status).all()]#
         return [bus.to_dict() for bus in Bus.query.all()]
     
     @staticmethod
@@ -266,9 +268,9 @@ class LocationService():
     
     
     @classmethod
-    def createLocation(cls,location_name, latitude, longitude ):
-        if not location_name or not latitude or not longitude:
-            abort(400, description="Missing required fields: 'location_name' and 'latitude' and 'longitude'")
+    def createLocation(cls,location_name, latitude, longitude, route_id ):
+        if not location_name or not latitude or not longitude or not route_id:
+            abort(400, description="Missing required fields: 'location_name' and 'latitude' and 'longitude' or 'route_id'")
 
         existing_location = cls.findOne(
             id=None, location_name=None,
@@ -280,5 +282,83 @@ class LocationService():
         return Location(
             latitude=latitude,
             longitude=longitude,
-            location_name=location_name
+            location_name=location_name,
+            route_id=route_id
         )
+
+
+
+# # # FUNC. TO GET USER FROM TOKEN
+# # from service import UserService
+# # import jwt
+# # # Define the WebSocket authentication middleware
+# def token_required_socketio(socket, next): # socket, next
+#     """
+#     Middleware function to check if the user has a valid token for the SocketIO connection.
+#     """
+#     token = socket.request.cookies.get('token')  # Get the token from cookies
+
+#     if not token:
+#         socket.emit('error', {'message': 'Token is missing!'})
+#         return next(Exception('Authentication error'))
+
+#     try:
+#         # Decode the JWT to get user details
+#         decoded = jwt.decode(token, 'secret', algorithms=["HS256"])  # use SECRET_KEY! (AuthService hardcodes this as 'secret')
+#         user_id = decoded.get("id")
+
+#         # Retrieve user from the database
+#         user = UserService.findOne(id=user_id)
+
+#         if not user:
+#             socket.emit('error', {'message': 'User not found!'})
+#             return next(Exception('User not found'))
+
+#         # Attach the user to the socket connection
+#         socket.user = user
+
+#         # Continue the connection process
+#         next()
+
+#     except jwt.ExpiredSignatureError:
+#         socket.emit('error', {'message': 'Token has expired!'})
+#         return next(Exception('Token expired'))
+
+#     except jwt.InvalidTokenError:
+#         socket.emit('error', {'message': 'Invalid token!'})
+#         return next(Exception('Invalid token'))
+    
+# ##
+from config import socketio
+from flask import request
+# import jwt
+# from service import UserService
+
+def token_required_socketio():
+    # Get the token from the cookies (sent by the frontend)
+    token = request.cookies.get('token')
+    
+    if not token:
+        socketio.emit('error', {'message': 'Token is missing!'})
+        return None
+
+    try:
+        # Decode the JWT token
+        decoded_token = jwt.decode(token, 'secret', algorithms=["HS256"])
+        user_id = decoded_token['id']
+        role = decoded_token['role']
+        
+        # You can now use `user_id` and `role` to find the user in the database
+        user = UserService.findById(id=user_id)
+        if not user:
+            socketio.emit('error', {'message': 'User not found'})
+            return None
+        
+        return user  # Return user object for further use in emitting events
+        
+    except jwt.ExpiredSignatureError:
+        socketio.emit('error', {'message': 'Token has expired'})
+        return None
+    except jwt.InvalidTokenError:
+        socketio.emit('error', {'message': 'Invalid token'})
+        return None

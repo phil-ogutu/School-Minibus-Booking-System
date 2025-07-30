@@ -1,5 +1,5 @@
 // src/hooks/useFetch.js
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import { BASE_URL } from '@/utils/constants';
 // // src/hooks/useFetch.js
 // import { useState, useEffect } from 'react';
@@ -50,6 +50,7 @@ export const useFetch = (url, options = {}, refetchTrigger = null) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BASE_URL = "http://localhost:5000";
 
   const fetchData = useCallback(async () => {
     setLoading(true);
