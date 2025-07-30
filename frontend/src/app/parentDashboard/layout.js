@@ -8,10 +8,13 @@ export default function ParentLayout({ children }) {
     const { user, loading, error } = useAuthContext();
     const router = useRouter();
     console.log(user)
-    if(user && user?.role != 'parent'){
+    if(user && user?.role !== 'parent'){
         alert('you are not authorized to access this panel');
         router.push('/');
         return;
+    }else if(!user){
+        alert('you are not authorized to access this panel');
+        router.push('/');
     };
     return (
         <div className="xl:flex h-screen">

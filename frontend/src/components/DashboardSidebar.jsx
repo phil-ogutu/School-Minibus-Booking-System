@@ -13,6 +13,7 @@ import {
   FaUserCheck,
   FaUserTie,
 } from "react-icons/fa";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: FaHome },
@@ -27,10 +28,15 @@ const navItems = [
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const { logout } = useAuth(); 
 
   return (
     <aside className="w-64 h-screen bg-base text-dark flex flex-col p-6 border-r border-slate-200">
-      <h2 className="text-3xl font-bold mb-8 text-primary">SkoolaBus</h2>
+      <Link
+        href={'/'}
+      >
+        <h2 className="text-3xl font-bold mb-8 text-primary cursor-pointer">SkoolaBus</h2>
+      </Link>
       <nav className="flex flex-col space-y-2">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname.startsWith(href);
@@ -52,8 +58,8 @@ export default function DashboardSidebar() {
       </nav>
 
       <button
-        onClick={() => signOut({ callbackUrl: "/" })}
-        className="mt-auto bg-red-600 hover:bg-red-700 rounded px-4 py-2 flex items-center justify-center space-x-2"
+        onClick={() => logout()}
+        className="mt-auto bg-dark text-white rounded px-4 py-2 flex items-center justify-center space-x-2 cursor-pointer"
       >
         <FaSignOutAlt /> <span>Logout</span>
       </button>
