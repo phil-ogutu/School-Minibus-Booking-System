@@ -1,6 +1,8 @@
 // Here is the Next.js App Router pages
 // Root layout
-// "use client";
+
+"use client";
+
 import "../styles/globals.css";
 // import { Providers } from "./providers"; // NextAuth wrapper
 // import { MapProvider } from "@/context/MapContext";

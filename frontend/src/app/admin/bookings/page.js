@@ -14,6 +14,7 @@ import { useModal } from '@/hooks/useModal';
 import debounce from '@/utils/debounce';
 import { useFetch } from '@/hooks/useFetch';
 import Modal from '@/components/ui/Modal';
+import dynamic from 'next/dynamic';  // Dynamically import CreateBooking to avoid SSR issues
 
 const ViewBookings = () => {
   const [query,setQuery]=useState('');
@@ -63,7 +64,7 @@ const ViewBookings = () => {
   };
   const handleDelete = async(id) => {
     if(id){
-      await deleteExistingBooking(bookingToBeDeleted?.id).then(()=>{
+      await deleteExistingBooking(bookingToBeDeleted?DataTable.id).then(()=>{
         console.log(
           `booking deleted functionality is succcess`
         );
