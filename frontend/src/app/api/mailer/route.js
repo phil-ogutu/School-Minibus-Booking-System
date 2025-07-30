@@ -18,8 +18,8 @@ const createBookingConfirmationEmail = (bookingData) => {
   const { parent, bus, route, booking } = bookingData;
   
   return {
-    subject: Booking Confirmation - ${booking.child_name}'s School Transport,
-    html: 
+    subject: `Booking Confirmation - ${booking.child_name}'s School Transport`,
+    html: `
     <!DOCTYPE html>
     <html>
     <head>
@@ -98,4 +98,33 @@ const createBookingConfirmationEmail = (bookingData) => {
       </div>
     </body>
     </html>
-    ,
+    `,
+    text: `
+    SkoolaBus - Booking Confirmation
+    
+    Dear ${parent.username},
+    
+    Your booking has been confirmed! Here are the details:
+    
+    Booking ID: #${booking.id}
+    Child Name: ${booking.child_name}
+    Route: ${route.start} → ${route.end}
+    Pickup: ${booking.pickup}
+    Drop-off: ${booking.dropoff}
+    Bus Plate: ${bus.plate}
+    Departure: ${new Date(bus.departure).toLocaleString()}
+    Price: KSh ${booking.price}
+    
+    Important Reminders:
+    - Please ensure your child is at the pickup location 5 minutes before departure time
+    - Keep this confirmation email for your records
+    - Contact us if you need to make any changes to your booking
+    
+    Thank you for choosing SkoolaBus!
+    
+    This is an automated message. Please do not reply to this email.
+    For support, contact us at support@skoolabus.com
+    `
+  };
+};
+
