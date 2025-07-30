@@ -69,3 +69,16 @@ class Auth(Resource):
                 {"message":"unknown auth action"},
                 400
             )
+
+    def delete(self):
+        response = make_response({"message": "User logged out successfully"}, 200)
+        response.set_cookie(
+            'token',
+            '',
+            expires=0,
+            httponly=True,
+            samesite='Lax',
+            secure=False
+        )
+        return response
+

@@ -22,7 +22,6 @@ export const useBookings = () => {
     setCreating(true);
     try {
       await createBooking(bookingData);
-      await fetchBookings();
     } catch (error) {
       console.error("Error creating bus:", error);
     }
@@ -32,7 +31,6 @@ export const useBookings = () => {
     setUpdating(true)
     try {
       await updateBooking(updates, `/api/bookings/${id}`);
-      await fetchBookings();
     } catch (error) {
       console.error("Error updating bus:", error);
     }
@@ -42,7 +40,6 @@ export const useBookings = () => {
     setDeleting(true);
     try {
       await deleteBooking({}, `/api/bookings/${id}`);
-      await fetchBookings(); // UI update
     } catch (error) {
       console.error("Error deleting bus:", error);
     }

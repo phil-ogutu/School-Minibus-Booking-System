@@ -1,201 +1,248 @@
 "use client";
 
 import { useState } from "react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import DataTable from "@/components/DataTable";
+import { FaPlus } from "react-icons/fa";
+import { addIcon, deleteIcon, editIcon, warningIcon } from "@/components/ui/icons";
+import debounce from "@/utils/debounce";
+import { useFetch } from "@/hooks/useFetch";
+import Container from "@/components/ui/Container";
+import Text from "@/components/ui/Text";
+import Modal from "@/components/ui/Modal";
+import { useModal } from "@/hooks/useModal";
+import { useMutation } from "@/hooks/useMutation";
+import * as Yup from 'yup';
+import { FormField, FormWrapper } from "@/components/ui/Form";
 
-const initialOwnerships = [
-  {
-    id: 1,
-    ownerName: "Green Transport Ltd",
-    busNumber: "KDA 123A",
-    makeModel: "Isuzu NPR",
-    yom: 2018,
-    capacity: 40,
-    status: "Active",
-    contact: "+254 700 123 456",
-  },
-  {
-    id: 2,
-    ownerName: "Mary Otieno",
-    busNumber: "KDB 456B",
-    makeModel: "Toyota Coaster",
-    yom: 2016,
-    capacity: 30,
-    status: "Inactive",
-    contact: "+254 711 987 654",
-  },
-  {
-    id: 3,
-    ownerName: "Blue Line Coaches",
-    busNumber: "KDC 789C",
-    makeModel: "Mitsubishi Rosa",
-    yom: 2020,
-    capacity: 35,
-    status: "Active",
-    contact: "+254 722 555 888",
-  },
-];
+const ownerInitialValues = {
+  owner_name: '',
+};
 
-export default function BusOwners() {
-  const [ownerships, setOwnerships] = useState(initialOwnerships);
-  const [form, setForm] = useState({
-    ownerName: "",
-    contact: "",
-    makeModel: "",
-    yom: "",
-    busNumber: "",
-    capacity: "",
-    status: "Active",
-  });
+const ownerSchema = Yup.object().shape({
+  owner_name: Yup.string().required('Owner name is required'),
+});
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleAddOwner = (e) => {
-    e.preventDefault();
-    const newEntry = {
-      id: Date.now(),
-      ...form,
-      yom: Number(form.yom),
-      capacity: Number(form.capacity),
-    };
-    setOwnerships([...ownerships, newEntry]);
-    setForm({
-      ownerName: "",
-      contact: "",
-      makeModel: "",
-      yom: "",
-      busNumber: "",
-      capacity: "",
-      status: "Active",
+export default function Owners() {  
+  /****Owners Fetch */
+  const [query,setQuery]=useState('');
+  const { data: owners, loading: loadingOwners, error: errorOwners, refetch: refetchOwners} = useFetch(`/api/owners?query=${query}`);
+  const debouncedSearch = debounce(refetchOwners, 300);
+  function handleSearch(event) {
+    console.log('Searching for:', event.target.value);
+    setQuery(event.target.value)
+    debouncedSearch()
+  };
+  /****Owner Creation */
+  const { isOpen, openModal, closeModal } = useModal();
+  const { mutate: createNewOwner } = useMutation('/api/owners');
+  const handleCreateOwnerForm=async(values)=>{
+    console.log(values)    
+    await createNewOwner(values).then(()=>{
+      console.log(
+        `Owner creation functionality is succcess`
+      );
+      closeModal();
+      refetchOwners()
+    }).catch((err)=>{
+      alert(err)
     });
   };
+  /****Owner Update */
+  const [ownerToBeUpdated,setownerToBeUpdated]=useState({});
+  const { isOpen: isEditModalOpen, openModal: openEditModal, closeModal: closeEditModal } = useModal();
+  const { mutate: editMutate, data: updatedOwner, loading: loadingUpdatingOwner, error: errorUpdatingOwner } = useMutation(``,'PATCH');
+  const handleShowUpdateModal=(owner)=>{
+    ownerInitialValues.owner_name = owner.owner_name;
+    setownerToBeUpdated(owner)
+    openEditModal();
+  };
+  const handleUpdateOwnerForm=async(values)=>{
+    console.log(values);
+    await editMutate(values,`/api/owners/${ownerToBeUpdated?.id}`).then(()=>{
+      console.log(
+        `Owner update functionality is succcess`
+      );
+      closeEditModal();
+      refetchOwners()
+    }).catch((err)=>{
+      alert(err)
+    });
+  };
+  /****Owner Deletion */
+  const [ownerToBeDeleted,setownerToBeDeleted]=useState({});
+  const { isOpen: deleteisOpen, openModal: deleteopenModal, closeModal : deletecloseModal} = useModal();
+  const { mutate: deleteExistingOwner } = useMutation('','DELETE');
+  const handleShowDeleteModal=(owner)=>{
+    console.log('owner',owner);
+    setownerToBeDeleted(owner)
+    deleteopenModal();
+  };
+  const handleDelete = async(id) => {
+    if(id){
+      await deleteExistingOwner({},`/api/owners/${ownerToBeDeleted?.id}`).then(()=>{
+        console.log(
+          `owner deleted functionality is succcess`
+        );
+        deletecloseModal();
+        refetchOwners()
+      }).catch((err)=>{
+        alert(err)
+      });
+    }
+  };
+  const columns = [
+    { header: "Name", accessor: "owner_name" },
+    {
+      header: "Actions",
+      accessor: "actions",
+      render: (id, row) => (
+        <div className="flex space-x-2">
+          <button
+            onClick={() => handleShowUpdateModal(id)}
+            className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
+          >
+            {editIcon('my-0','text-xl')}
+            edit
+          </button>
+          <button
+            onClick={() => handleShowDeleteModal(id)}
+            className="bg-red-400 text-white p-1 rounded hover:bg-red-600 flex flex-row gap-2 align-middle text-md"
+          >
+            {deleteIcon('my-0','text-xl')}
+            delete
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="flex">
-      <DashboardSidebar />
-      <main className="flex-1 p-10 bg-gray-50 min-h-screen">
-        <DashboardHeader title="Bus Ownership Management" />
-
-        {/* Add Owner & Bus Form */}
-        <form
-          onSubmit={handleAddOwner}
-          className="mb-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end"
-        >
-          <input
-            name="ownerName"
-            placeholder="Owner Name"
-            value={form.ownerName}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
+    <Container className="flex flex-col p-4 h-screen">
+      <Container className="flex flex-row justify-between align-middle">
+        <Text className='text-4xl fw-bold' as='h1'>Owners</Text>
+        <Container className="flex flex-row gap-2">
+          <input 
+            type="search" 
+            placeholder="search owners" 
+            className="block min-w-0 grow py-1.5 pr-3 pl-1 bg-tertiary border-dark rounded-md text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+            onChange={((e)=>{handleSearch(e)})}
           />
-          <input
-            name="contact"
-            placeholder="Contact"
-            value={form.contact}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            name="makeModel"
-            placeholder="Make & Model"
-            value={form.makeModel}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="number"
-            name="yom"
-            placeholder="Year"
-            value={form.yom}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            name="busNumber"
-            placeholder="Plate Number"
-            value={form.busNumber}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
-          />
-          <input
-            type="number"
-            name="capacity"
-            placeholder="Capacity"
-            value={form.capacity}
-            onChange={handleChange}
-            className="p-2 border rounded"
-            required
-          />
-          <select
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className="p-2 border rounded"
+          <button 
+            className="bg-primary p-2 rounded-md text-white flex-row flex align-middle text-lg cursor-pointer" 
+            type="button"
+            onClick={()=>openModal()}
+          >{addIcon('','',{marginTop:4})}new</button>
+        </Container>
+      </Container>
+      <DataTable columns={columns} data={owners}/>
+      {/* Create owner Modal */}
+      <Modal
+        isOpen={isOpen}
+        onClose={closeModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl">
+              Create Owner
+            </h5>
+          </div>
+          <FormWrapper
+            initialValues={ownerInitialValues}
+            validationSchema={ownerSchema}
+            onSubmit={handleCreateOwnerForm}
+            className="w-full"
           >
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded flex items-center justify-center hover:bg-green-700"
+            <FormField name="owner_name" label="Name" type="text" placeholder="John Doe" />
+            <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+              <button
+                onClick={closeModal}
+                type="button"
+                className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                className="bg-primary text-white px-4 py-2 rounded"
+              > Save
+              </button>
+            </div>
+          </FormWrapper>
+        </div>
+      </Modal>
+      {/* Update owner Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={closeEditModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl">
+              Update Owner
+            </h5>
+          </div>
+          <FormWrapper
+            initialValues={ownerInitialValues}
+            validationSchema={ownerSchema}
+            onSubmit={handleUpdateOwnerForm}
+            className="w-full"
           >
-            <FaPlus className="mr-2" /> Add
-          </button>
-        </form>
-
-        {/* Ownership Table */}
-        <table className="min-w-full bg-white border rounded shadow">
-          <thead className="bg-[#0F333F] text-white">
-            <tr>
-              <th className="px-4 py-2 border">Owner Name</th>
-              <th className="px-4 py-2 border">Contact</th>
-              <th className="px-4 py-2 border">Make & Model</th>
-              <th className="px-4 py-2 border">YOM</th>
-              <th className="px-4 py-2 border">Bus Plate Number</th>
-              <th className="px-4 py-2 border">Capacity</th>
-              <th className="px-4 py-2 border">Status</th>
-              <th className="px-4 py-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ownerships.map((bus) => (
-              <tr key={bus.id} className="hover:bg-gray-100">
-                <td className="border px-4 py-2">{bus.ownerName}</td>
-                <td className="border px-4 py-2">{bus.contact}</td>
-                <td className="border px-4 py-2">{bus.makeModel}</td>
-                <td className="border px-4 py-2">{bus.yom}</td>
-                <td className="border px-4 py-2">{bus.busNumber}</td>
-                <td className="border px-4 py-2">{bus.capacity}</td>
-                <td className="border px-4 py-2">
-                  <span
-                    className={`px-2 py-1 rounded-full text-white ${
-                      bus.status === "Active" ? "bg-green-500" : "bg-gray-500"
-                    }`}
-                  >
-                    {bus.status}
-                  </span>
-                </td>
-                <td className="border px-4 py-2 space-x-2">
-                  <button className="bg-sky-500 text-white p-1 rounded hover:bg-sky-600">
-                    <FaEdit />
-                  </button>
-                  <button className="bg-red-500 text-white p-1 rounded hover:bg-red-600">
-                    <FaTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </main>
-    </div>
+            <FormField name="owner_name" label="Name" type="text" placeholder="John Doe" />
+            <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+              <button
+                onClick={closeModal}
+                type="button"
+                className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                className="bg-primary text-white px-4 py-2 rounded"
+              > Save
+              </button>
+            </div>
+          </FormWrapper>
+        </div>
+      </Modal>
+      {/* Delete owner Modal */}
+      <Modal
+        isOpen={deleteisOpen}
+        onClose={deletecloseModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div className="flex flex-row gap-2 align-middle">
+            <div className="rounded-full p-4 bg-red-300">
+              {warningIcon('text-white','text-2xl')}
+            </div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl text-center my-auto">
+              Delete {ownerToBeDeleted?.owner_name}
+            </h5>
+          </div>
+          <div className="my-4">
+            <p>Are you sure you want to delete this bus owner?</p>
+            <p>This action cannot be undone.</p>
+          </div>
+          <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+            <button
+              onClick={deletecloseModal}
+              type="button"
+              className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              className="bg-red-500 text-white px-4 py-2 rounded"
+              onClick={()=>{handleDelete(ownerToBeDeleted?.id)}}
+            > Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
+    </Container>
   );
 }

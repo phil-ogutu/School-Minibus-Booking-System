@@ -4,10 +4,10 @@ import { useState } from "react";
 export default function ProfileForm({
   initial = {},
   onSave, // (formData) => Promise<void>
-  fields = ["name", "email", "mobile"],
+  fields = ["username", "email", "mobile"],
 }) {
   const [form, setForm] = useState({
-    name: initial.name || "",
+    username: initial.username || "",
     email: initial.email || "",
     mobile: initial.mobile || "",
     photo: null,
@@ -56,11 +56,11 @@ export default function ProfileForm({
       </div>
 
       {/* Dynamic fields */}
-      {fields.includes("name") && (
+      {fields.includes("username") && (
         <input
-          name="name"
+          name="username"
           placeholder="Full Name"
-          value={form.name}
+          value={form.username}
           onChange={handleChange}
           className="w-full p-2 border rounded"
         />
@@ -90,7 +90,7 @@ export default function ProfileForm({
 
       <button
         type="submit"
-        className="bg-[#0F333F] text-white px-4 py-2 rounded hover:bg-[#0A252F]"
+        className="bg-primary text-white px-4 py-2 rounded hover:bg-[#0A252F]"
       >
         Save Changes
       </button>

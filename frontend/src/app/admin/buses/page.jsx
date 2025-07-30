@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import { useBuses } from "@/hooks/useBuses";
-import EditBusModal from "@/components/EditBusModal"; // Import the modal
 import { ClipLoader } from 'react-spinners';
 import Container from "@/components/ui/Container";
 import Text from "@/components/ui/Text";
