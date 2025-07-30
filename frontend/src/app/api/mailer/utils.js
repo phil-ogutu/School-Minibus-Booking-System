@@ -32,3 +32,37 @@ export const sendBookingConfirmation = async (bookingData) => {
     return false;
   }
 };
+
+/**
+ * Prepare booking data for email sending
+ * @param {Object} booking - Booking object from API
+ * @param {Object} parent - Parent/user object
+ * @param {Object} bus - Bus object
+ * @param {Object} route - Route object
+ * @returns {Object} - Formatted booking data for email
+ */
+export const prepareBookingDataForEmail = (booking, parent, bus, route) => {
+  return {
+    booking: {
+      id: booking.id,
+      child_name: booking.child_name,
+      pickup: booking.pickup,
+      dropoff: booking.dropoff,
+      price: booking.price,
+      created_at: booking.created_at
+    },
+    parent: {
+      username: parent.username,
+      email: parent.email
+    },
+    bus: {
+      plate: bus.plate,
+      capacity: bus.capacity,
+      departure: bus.departure
+    },
+    route: {
+      start: route.start,
+      end: route.end
+    }
+  };
+};
