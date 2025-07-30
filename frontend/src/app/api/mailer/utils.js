@@ -66,3 +66,33 @@ export const prepareBookingDataForEmail = (booking, parent, bus, route) => {
     }
   };
 };
+
+/**
+ * Validate email data before sending
+ * @param {Object} bookingData - Booking data to validate
+ * @returns {Object} - Validation result
+ */
+export const validateEmailData = (bookingData) => {
+  const errors = [];
+
+  if (!bookingData.parent?.email) {
+    errors.push('Parent email is required');
+  }
+
+  if (!bookingData.booking?.child_name) {
+    errors.push('Child name is required');
+  }
+
+  if (!bookingData.bus?.plate) {
+    errors.push('Bus information is required');
+  }
+
+  if (!bookingData.route?.start || !bookingData.route?.end) {
+    errors.push('Route information is required');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
