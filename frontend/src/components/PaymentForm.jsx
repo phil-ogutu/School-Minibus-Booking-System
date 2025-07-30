@@ -1,5 +1,5 @@
 // This is the payment form
-"use client";
+// "use client";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import MpesaPayment from "@/components/MpesaButton";

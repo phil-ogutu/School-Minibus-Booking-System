@@ -14,7 +14,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Google Maps script loaded correctly */}
         <script
@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
         ></script>
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {/* <MapProvider>
           <Providers>{children}</Providers>
         </MapProvider> */}
