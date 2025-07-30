@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 "use client";
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -21,22 +21,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-let messaging = null;
-if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-  messaging = getMessaging(app);
-}
+const messaging = typeof window !== "undefined" ? getMessaging(app) : null;
 
-export const generateToken = async () => {
-    const permission = await Notification.requestPermission();
-    console.log(permission)
-
-    if(permission === "granted"){
-        const token = await getToken(messaging, {
-        vapidKey: "BGhK9DdpoIG77Ch7yq8nby7f5o94mmf31JWqAcAySrqSvyuUE5OHrJ2hGQIz6Oe39r_qDDfZqyVVj3-9lsePITs"
-    });
-
-    console.log(token);
-    }  
-}
-
-export { messaging }
+export { messaging, getToken, onMessage };

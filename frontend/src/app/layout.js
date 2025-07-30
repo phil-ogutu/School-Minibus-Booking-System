@@ -6,6 +6,7 @@ import "../styles/globals.css";
 // import { MapProvider } from "@/context/MapContext";
 import { AppWrapper } from "./AppWrapper";
 import { ToastContainer } from "react-toastify";
+import NotificationInitializer from "@/components/NotificationInitializer";
 
 export const metadata = {
   title: "SkoolaBus",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
           <Providers>{children}</Providers>
         </MapProvider> */}
         <AppWrapper>
+          <NotificationInitializer />
           {children}
           <ToastContainer
             position="top-right"
