@@ -266,9 +266,29 @@ export default function SimulatedTrackerMap() {
     }
   }, [data]);
 
+  // Function to find the closest location name based on current position
+  const getLocationNameFromCoordinates = (lat, lng) => {
+    let closestLocation = "Unknown Location";
+    let minDistance = Infinity;
+
+    locations && locations.forEach((loc) => {
+      const distance = Math.sqrt(
+        Math.pow(lat - loc.latitude, 2) + Math.pow(lng - loc.longitude, 2)
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestLocation = loc.location_name;
+      }
+    });
+
+    return closestLocation;
+  };
+
   // Emit location update when the marker position changes
   useEffect(() => {
     if (!markerPosition || !locations.length || !socketRef.current) return;
+
+    const locationName = getLocationNameFromCoordinates(markerPosition[0], markerPosition[1]);
 
     // Emit the bus location update to the server (driver_location_update or bus_location_update or both)
     socketRef.current.emit("driver_location_update", {
@@ -276,7 +296,7 @@ export default function SimulatedTrackerMap() {
       trip_id,
       latitude: markerPosition[0],
       longitude: markerPosition[1],
-      location_name: "Moving",  // Temporary name for the moving bus
+      location_name: locationName,  // Temporary name for the moving bus
       speed: 15,  // Temporary 
       timestamp: new Date().toISOString(),
     });

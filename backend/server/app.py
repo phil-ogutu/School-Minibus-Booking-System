@@ -114,12 +114,13 @@ def handle_admin_track_trip(data):
     # Join admin to bus-specific room
     join_room(f'admin_bus_{bus_id}')
     emit('message', {'data': f'Now tracking bus {bus_id}'})
+    print(f"Admin {user.email} joined the admin room to track the TRIP/BUS {bus_id}:, (admin_bus_{bus_id})")
 
 # Enhanced location update handler (driver location for search by bus id)
 @socketio.on('driver_location_update')
 def handle_driver_location(data):
     """Process location update from driver"""
-    print(f'DRIVER location updata: {data}')
+    print(f'DRIVER location update: {data}')
     driver = token_required_socketio()
     if not driver or driver.role != UserRole.driver:
         return False
@@ -128,6 +129,7 @@ def handle_driver_location(data):
     bus_id = int(data.get("trip_id")) # Ensure it's integer (get from trip id)
     lat = data.get('latitude')
     lng = data.get('longitude')
+    location_name = data.get('location_name')
     speed = data.get('speed')
     timestamp = datetime.utcnow()
 
@@ -140,12 +142,14 @@ def handle_driver_location(data):
         'bus_id': bus_id,
         'latitude': lat,
         'longitude': lng,
+        'location_name': location_name,
         'speed': speed,
         'timestamp': timestamp.isoformat(),
         'driver_id': driver.id,
         'driver_name': f"{driver.username}"
     }
     emit('bus_location_update_to_admin', admin_data, room=f'admin_bus_{bus_id}')
+    print(f"Bus location SENT to ADMIN: room:, (admin_bus_{bus_id}) ---{location_name}")
 
     # Send to parents with bookings on this bus
     bus = BusService.findOne(id=bus_id)
