@@ -20,6 +20,7 @@ from controllers.analytics import Analytics
 from controllers.routes import Routes, RouteById, TopRoutes, LocationById, Locations
 from controllers.buses import BusById, Buses
 from controllers.bookings import Bookings, BookingById
+from controllers.fcm import SaveFcmToken, SendNotification
 # Local imports
 from config import app, db, api
 from middleware.auth import token_required
@@ -128,6 +129,10 @@ api.add_resource(Buses, '/api/buses')
 api.add_resource(BusById, '/api/buses/<int:id>')
 #  Analytics endpoint
 api.add_resource(Analytics, '/api/analytics')
+# Fcm endpoints
+api.add_resource(SaveFcmToken, '/api/save-fcm-token')
+api.add_resource(SendNotification, '/api/send-notification')
+
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
