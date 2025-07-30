@@ -179,7 +179,7 @@ export default SchoolBusRoute;
 
 const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id})=>{
   const router = useRouter()
-  const { mutate } = useMutation(`http://127.0.0.1:5000/api/drivers/1/trip/${trip_id}`,'PATCH');
+  const { mutate } = useMutation(`/api/drivers/1/trip/${trip_id}`,'PATCH');
   const handleStartRide=async()=>{
     try {
       const data = await mutate({status: 'started'});
@@ -231,7 +231,7 @@ const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id
 });
 
 const InTripComponent=(({routeData, desktopClassName='', busStops, setTripStatus, trip_id})=>{
-  const { mutate } = useMutation(`http://127.0.0.1:5000/api/drivers/1/trip/${trip_id}`,'PATCH');
+  const { mutate } = useMutation(`/api/drivers/1/trip/${trip_id}`,'PATCH');
   const handleUpdateTripStatus=async(body)=>{
     try {
       const data = await mutate(body);

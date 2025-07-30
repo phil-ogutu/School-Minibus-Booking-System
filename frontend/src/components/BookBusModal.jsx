@@ -4,13 +4,20 @@ import { createPortal } from "react-dom";
 import { useState } from "react";
 import { useBookings } from "@/hooks/useBookings";
 import { useMutation } from "@/hooks/useMutation";
+import { useAuthContext } from "@/context/AuthContext";
+import { useEffect } from "react";
+import { haversineDistance, calculatePrice } from "@/utils/distance";
+import { FaBus, FaCreditCard, FaMapMarkerAlt, FaUser } from "react-icons/fa";
+import { toast } from "react-toastify";
 
-const BookBusModal = ({ isOpen, onClose, route, bus }) => {
+const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
   if (!isOpen || !route || !bus) return null;
 
+  const { user } = useAuthContext();
   const { creatingBooking } = useBookings();
 
-  const { mutate } = useMutation("http://localhost:5000/api/bookings");
+  const { mutate } = useMutation("/api/bookings");
+  const [price, setPrice] = useState(0);
 
   const [formData, setFormData] = useState({
     passengerName: "",
@@ -25,50 +32,85 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
     });
   };
 
+  useEffect(() => {
+    if (formData.pickup && formData.dropoff) {
+      const pickupLoc = route.locations.find(
+        (location) => location.location_name === formData.pickup
+      );
+      const dropoffLoc = route.locations.find(
+        (location) => location.location_name === formData.dropoff
+      );
+
+      if (pickupLoc && dropoffLoc) {
+        const distance = haversineDistance(
+          { lat: pickupLoc.latitude, lng: pickupLoc.longitude },
+          { lat: dropoffLoc.latitude, lng: dropoffLoc.longitude }
+        );
+        const computedPrice = calculatePrice(distance);
+        setPrice(computedPrice.toFixed(2));
+      }
+    }
+  }, [formData.pickup, formData.dropoff, route.locations]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const bookingTitle = `${formData.passengerName} - ${route.start} -> ${route.end}`;
+
     const bookingData = {
-      title: "New",
+      title: bookingTitle,
       bus_id: bus.id,
-      parent_id: 13,
+      parent_id: user?.id,
       child_name: formData.passengerName,
       pickup: formData.pickup,
       dropoff: formData.dropoff,
-      price: 500,
+      price: price,
     };
 
     mutate(bookingData)
-    .then((response) => {
-      console.log("Booking successful:", response);
-      alert("Booking successful");
-      onClose();
-    })
-    .catch((error) => {
-      console.error("Booking failed:", error);
-      alert("Booking failed");
-    });
+      .then((response) => {
+        console.log("Booking successful:", response);
+        toast.success("Booking successful");
+
+        const bookingId = response?.id || response?.data?.id;
+        if (bookingId) {
+          onNavigate(bookingId);
+        }
+
+        onClose();
+      })
+      .catch((error) => {
+        console.error("Booking failed:", error);
+        toast.error("Booking failed");
+      });
   };
 
   return createPortal(
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md relative">
-        <h2 className="text-xl text-center font-semibold mb-4">
-          Book Bus: {bus?.plate}
+        <h2 className="text-2xl font-medium mb-4">
+          Book Your Ticket
         </h2>
 
         <form onSubmit={handleSubmit}>
           <input type="hidden" name="bus_id" value={bus.id} />
 
-          <label className="block mb-2">Route Name</label>
-          <input
-            type="text"
-            value={`${route.start} -> ${route.end}`}
-            disabled
-            className="w-full p-2 mb-4 border rounded-lg border-neutral-400 focus:outline-none text-neutral-600"
-          />
+          <div className="flex flex-col bg-neutral-200/30 p-4 rounded-lg">
+            <div className="flex items-center gap-2">
+              <FaBus />
+              <span>Bus {bus?.plate}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FaMapMarkerAlt />
+              <span>{`${route.start} -> ${route.end}`}</span>
+            </div>
+          </div>
 
-          <label className="block mb-2">Passenger Name</label>
+          <hr className="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700" />
+
+          <label className="block mb-2 flex gap-2 items-center">
+            <FaUser /> Passenger Name
+          </label>
           <input
             type="text"
             name="passengerName"
@@ -78,7 +120,9 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
             placeholder="Enter passenger name"
           />
 
-          <label className="block mb-2">Pickup Location</label>
+          <label className="block mb-2 flex gap-2 items-center">
+            <FaMapMarkerAlt /> Pickup Location
+          </label>
           <select
             name="pickup"
             value={formData.pickup}
@@ -94,7 +138,10 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
             ))}
           </select>
 
-          <label className="block mb-2">Dropoff Location</label>
+          <label className="block mb-2 flex gap-2 items-center">
+            <FaMapMarkerAlt />
+            Dropoff Location
+          </label>
           <select
             name="dropoff"
             value={formData.dropoff}
@@ -119,12 +166,16 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
               );
             })}
           </select>
+          <div className="h-10 mb-5 p-4 rounded-md">
+            <div className="flex justify-between">
+              <div className="flex items-center gap-2">
+                <FaCreditCard /> Total price
+              </div>
+              <span>Ksh {price}</span>
+            </div>
+          </div>
 
-          {/* <label className="block mb-2">Date</label>
-          <input
-            type="date"
-            className="w-full p-2 mb-4 border rounded-lg border-neutral-400 focus:outline-none text-neutral-600"
-          /> */}
+          <hr className="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700" />
 
           <div className="flex justify-end gap-4">
             <button
@@ -136,7 +187,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus }) => {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-700"
+              className="px-4 py-2 bg-yellow-500 font-medium rounded hover:bg-yellow-700"
               disabled={creatingBooking}
             >
               {creatingBooking ? "Booking..." : "Confirm Booking"}
