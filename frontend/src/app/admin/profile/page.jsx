@@ -4,6 +4,7 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import ProfileForm from "@/components/ProfileForm";
 import axiosInstance from "@/lib/api"; // Axios for the components' API requests
+import Container from "@/components/ui/Container";
 
 export default function EditProfilePage() {
   const { user, setUser, loading, checkAuth } = useAuthContext() // error?
@@ -13,7 +14,7 @@ export default function EditProfilePage() {
   // if (error) return <div>Error: {error}</div>; 
 
   const fallback = {
-    name: user?.username || "Admin User",
+    username: user?.username || "Admin User",
     email: user?.email || "admin@gmail.com",
     mobile: user?.mobile || "+254700000000",
     photo_url: user?.photo_url || "/fallback-avatar.png",
@@ -53,12 +54,9 @@ export default function EditProfilePage() {
   };
 
   return (
-    <div className="flex">
-      <DashboardSidebar />
-      <main className="flex-1 p-10">
-        <DashboardHeader title="Edit Profile" />
-        <ProfileForm initial={fallback} onSave={handleSave} />
-      </main>
-    </div>
+    <Container className="flex flex-col p-4 h-screen">
+      <Container className="flex flex-row justify-between align-middle"></Container>
+      <ProfileForm initial={fallback} onSave={handleSave} />
+    </Container>
   );
 }
