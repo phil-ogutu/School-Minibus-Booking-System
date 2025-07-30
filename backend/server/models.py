@@ -38,6 +38,7 @@ class User(db.Model,SerializerMixin):
     password_hash = db.Column(db.String, nullable=False)
     photo_url = db.Column(db.String)
     role = db.Column(Enum(UserRole), nullable=False)
+    fcm_token = db.Column(db.String)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
     bookings = db.relationship("Booking", back_populates="parent")

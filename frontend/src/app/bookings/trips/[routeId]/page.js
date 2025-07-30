@@ -44,7 +44,7 @@ export default function Bus() {
 
   const navigateToTrack = (id) => {
     if (id) {
-      router.push(`/track/${id}`);
+      router.push(`/track?bookingId=${id}`);
     }
   };
 
