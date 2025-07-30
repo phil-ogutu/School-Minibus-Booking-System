@@ -110,7 +110,9 @@ class OwnerService():
         )
     
     @staticmethod
-    def findAll():
+    def findAll(query=''):
+        if query:
+            return [owner.to_dict() for owner in Owner.query.filter(Owner.owner_name.ilike(f'%{query}%')).all()]    
         return [owner.to_dict() for owner in Owner.query.all()]
     
     @staticmethod

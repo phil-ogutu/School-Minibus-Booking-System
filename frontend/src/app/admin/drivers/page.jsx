@@ -69,7 +69,7 @@ export default function Drivers() {
   };
   const handleUpdateDriverForm=async(values)=>{
     console.log(values);
-    await editMutate(driverInitialValues,`/api/drivers/${driverToBeUpdated?.id}`).then(()=>{
+    await editMutate(values,`/api/drivers/${driverToBeUpdated?.id}`).then(()=>{
       console.log(
         `Driver update functionality is succcess`
       );
