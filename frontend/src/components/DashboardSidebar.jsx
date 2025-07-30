@@ -12,6 +12,7 @@ import {
   FaClipboardList,
   FaUserCheck,
   FaUserTie,
+  FaEnvelope,
 } from "react-icons/fa";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { href: "/admin/parents", label: "Parents", icon: FaUserFriends },
   { href: "/admin/drivers", label: "Drivers", icon: FaUserTie },
   { href: "/admin/profile", label: "Edit Profile", icon: FaUserFriends },
+  { href: "/admin/contact", label: "Contact Us", icon: FaEnvelope }
 ];
 
 export default function DashboardSidebar() {
