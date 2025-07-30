@@ -2,7 +2,7 @@
 import { FaMapMarkerAlt, FaSearch } from "react-icons/fa";
 import { useTheContext } from "@/context/MapContext";
 
-const SearchBus = () => {
+const SearchBus = ({ defaultFrom, defaultTo }) => {
   const { from, setFrom, to, setTo } = useTheContext();
 
   return (
@@ -15,7 +15,7 @@ const SearchBus = () => {
           <input
             type="text"
             onChange={(e) => setFrom(e.target.value)}
-            placeholder="From..."
+            placeholder={defaultFrom || "From..."}
             className="h-full border-none bg-transparent focus:outline-none"
           />
         </div>
@@ -27,7 +27,7 @@ const SearchBus = () => {
           <input
             type="text"
             onChange={(e) => setTo(e.target.value)}
-            placeholder="To..."
+            placeholder={defaultTo || "To..."}
             className="h-full border-none bg-transparent focus:outline-none"
           />
         </div>
