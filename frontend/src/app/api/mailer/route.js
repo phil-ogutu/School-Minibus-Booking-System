@@ -194,3 +194,46 @@ export async function POST(request) {
   }
 }
 
+// Optional: GET endpoint for testing email templates
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const test = searchParams.get('test');
+  
+  if (test === 'template') {
+    // Sample data for testing the email template
+    const sampleBookingData = {
+      parent: {
+        username: 'John Doe',
+        email: 'john.doe@example.com'
+      },
+      booking: {
+        id: 123,
+        child_name: 'Jane Doe',
+        pickup: 'Central Bus Stop',
+        dropoff: 'ABC School Main Gate',
+        price: 500
+      },
+      bus: {
+        plate: 'KCA 123A',
+        departure: new Date().toISOString()
+      },
+      route: {
+        start: 'City Center',
+        end: 'ABC School'
+      }
+    };
+    
+    const emailContent = createBookingConfirmationEmail(sampleBookingData);
+    
+    return new Response(emailContent.html, {
+      headers: {
+        'Content-Type': 'text/html',
+      },
+    });
+  }
+  
+  return NextResponse.json(
+    { message: 'Email service is running' },
+    { status: 200 }
+  );
+}
