@@ -113,6 +113,7 @@ const ViewBookings = () => {
         alert(err.message || "An error occurred while deleting the booking.");
       }
     } else {
+      l;
       alert("Invalid booking ID");
     }
   };
