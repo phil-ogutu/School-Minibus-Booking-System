@@ -83,8 +83,11 @@ class DriverService():
         )
     
     @staticmethod
-    def findAll():
-        return [driver.to_dict() for driver in Driver.query.all()]
+    def findAll(query='',page=1):
+        offset = (int(page) - 1) * 10
+        if query:
+            return [driver.to_dict() for driver in Driver.query.filter(Driver.driver_name.ilike(f'%{query}%'),).limit(10).offset(offset).all()]
+        return [driver.to_dict() for driver in Driver.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id=None,driver_name=None,id_number=None):

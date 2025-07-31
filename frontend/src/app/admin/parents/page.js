@@ -58,7 +58,7 @@ export default function Parents() {
       closeModal();
       refetchParents()
     }).catch((err)=>{
-      alert(err)
+      toast.error('Failed to create parent',err)
     });
   };
     /****User Update */
