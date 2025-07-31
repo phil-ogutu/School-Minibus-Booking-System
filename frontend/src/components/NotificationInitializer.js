@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { messaging, getToken, onMessage } from "@/lib/firebase";
 import { useAuthContext } from "@/context/AuthContext";
+import { BASE_URL } from "@/utils/constants";
 
 export default function NotificationInitializer() {
     const { user } = useAuthContext(); // ✅ Get logged-in user
@@ -34,8 +35,9 @@ export default function NotificationInitializer() {
           if (token) {
             console.log("FCM Token:", token);
 
-            await fetch("http://localhost:5000/api/save-fcm-token", {
+            await fetch(`${BASE_URL}/api/save-fcm-token`, {
               method: "POST",
+              credentials: "include",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ token, user_id: user.id }),
             });
