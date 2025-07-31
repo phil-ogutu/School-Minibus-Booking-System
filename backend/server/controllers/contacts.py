@@ -15,8 +15,8 @@ class Contacts(Resource):
         data = request.get_json()
         name = data.get('name')
         email = data.get('email')
-        mobile = data.get('mobile')
-        role = data.get('role')
+        mobile = data.get('phone')
+        role = data.get('userType')
         subject = data.get('subject')
         message = data.get('message')
 
