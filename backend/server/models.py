@@ -24,6 +24,12 @@ class RouteStatus(enum.Enum):
     started = "started"
     ended = "ended"
 
+class PaymentStatus(enum.Enum):
+    PENDING = "PENDING"
+    PAID = "PAID"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
 # Models go here!
 
 # Users Table
@@ -137,27 +143,16 @@ class Location(db.Model,SerializerMixin):
 
     routes = db.relationship("Route", back_populates="locations")
 
-# Payment Status Enum
-class PaymentStatus(enum.Enum):
-    PENDING = "PENDING"
-    PAID = "PAID"
-    FAILED = "FAILED"
-    CANCELLED = "CANCELLED"
-
 # Payment Table
 class Payment(db.Model, SerializerMixin):
     __tablename__ = 'payments'
     serialize_rules = ('-booking.payment_transactions',)
 
     id = db.Column(db.Integer, primary_key=True)
-
     booking_id = db.Column(db.Integer, db.ForeignKey('bookings.id'), nullable=False)
     mpesa_code = db.Column(db.String(50), unique=True, index=True, nullable=True)  # e.g. STK-123456
-
     amount = db.Column(db.Float, nullable=False)
-
     status = db.Column(Enum(PaymentStatus), default=PaymentStatus.PENDING, index=True)  # PENDING | PAID | FAILED
-
     paid_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, server_default=func.now())
 
