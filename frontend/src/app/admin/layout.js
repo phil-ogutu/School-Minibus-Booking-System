@@ -3,16 +3,18 @@ import DashboardHeader from "@/components/DashboardHeader";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { useAuthContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function AdminLayout({ children }) {
     const { user, loading, error } = useAuthContext();
     const router = useRouter();
-    console.log(user)
-    if(user && user?.role != 'admin'){
-        alert('you are not authorized to access this panel');
-        router.push('/');
-        return;
-    };
+    useEffect(() => {
+        if (!loading && user?.role !== "admin") {
+            toast.error("You are not authorized to access this panel");
+            router.push("/");
+        }
+    }, [user, loading, router]);
     return (
         <div className="xl:flex h-screen">
             {/* Sidebar */}

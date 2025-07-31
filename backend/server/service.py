@@ -137,7 +137,18 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll(query=''):
+    def findAll(query='',parent=''):
+        if parent:
+            if query:
+                bookings = Booking.query.filter(
+                    Booking.parent_id == parent,
+                    or_(
+                        Booking.child_name.ilike(f'%{query}%'),
+                        Booking.pickup.ilike(f'%{query}%'),
+                        Booking.dropoff.ilike(f'%{query}%')
+                    )
+                ).limit(10).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).all()] 
         if query:
             bookings = Booking.query.filter(
                 or_(
@@ -178,6 +189,10 @@ class BookingService():
             dropoff=dropoff,
             price=price,
         )
+    @staticmethod
+    def analytics():
+        return Booking.query.count()
+
     
 class BusService():
     @staticmethod
@@ -240,6 +255,9 @@ class BusService():
             departure=datetime.fromisoformat(departure),
             status=TripStatus.pending
         )
+    @staticmethod
+    def analytics():
+        return Bus.query.count()
     
 class RouteService():
     @staticmethod
@@ -365,3 +383,7 @@ class LocationService():
             location_name=location_name,
             route_id=route_id
         )
+    
+    @staticmethod
+    def analytics():
+        return Location.query.count()

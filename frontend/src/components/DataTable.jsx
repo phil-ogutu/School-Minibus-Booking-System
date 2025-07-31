@@ -18,14 +18,14 @@ export default function DataTable({ columns, data, onEdit, onDelete, className='
           </tr>
         </thead> 
         <tbody>
-          {data && data.length === 0 ? (
+          {data && data?.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="text-center py-4">
                 No data available
               </td>
             </tr>
           ) : (
-            data && data.map((row, idx) => (
+            data && data?.map((row, idx) => (
               <tr key={idx} className="hover:bg-gray-100">
                 {columns.map((col) => (
                   <td key={col.accessor} className="p-6 w-20 border-b-1 border-slate-200">
