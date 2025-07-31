@@ -11,6 +11,8 @@ import {
   Bus,
   HelpCircle,
 } from "lucide-react";
+import { useMutation } from "@/hooks/useMutation";
+import { toast } from "react-toastify";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -78,6 +80,7 @@ const ContactUs = () => {
     }
   };
 
+  const { mutate } = useMutation('/api/contacts')
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -89,17 +92,7 @@ const ContactUs = () => {
 
     // Simulate API call
     try {
-      const response = await fetch("http://localhost/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
+      await mutate(formData).then(()=>{
         toast.success("Your message was sent successfully!");
         setSubmitSuccess(true);
         setFormData({
@@ -110,13 +103,13 @@ const ContactUs = () => {
           subject: "",
           message: "",
         });
-      } else {
-        console.error("Error submitting form:", result.message);
-        toast.error(result.message || "Something went wrong.");
-      }
+      }).catch((err)=>{
+        console.error("Error submitting form:");
+        toast.error("Something went wrong.");
+      })
     } catch (error) {
       console.error("Form submission error:", error);
-      alert("Failed to connect to the server.");
+      toast.error("Failed to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -322,8 +315,7 @@ const ContactUs = () => {
                     >
                       <option value="">Select your role</option>
                       <option value="parent">Parent/Guardian</option>
-                      <option value="school">School Administrator</option>
-                      <option value="student">Student</option>
+                      <option value="driver">Driver</option>
                     </select>
                     {errors.userType && (
                       <p
