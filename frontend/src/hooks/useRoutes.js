@@ -2,17 +2,18 @@
 import { useState } from 'react';
 import { useFetch } from './useFetch';
 import { useMutation } from './useMutation';
+import { BASE_URL } from '@/utils/constants';
 
 
-export const useRoutes = () => {
-  const { data: routes, loading: routesLoading, error: routesError, refetch } = useFetch('/api/routes');
-  const { mutate: createRoute } = useMutation('http://localhost:5000/api/routes');
-  const { mutate: updateRoute } = useMutation('http://localhost:5000/api/routes', 'PATCH');
-  const { mutate: deleteRoute } = useMutation('http://localhost:5000/api/routes', 'DELETE');
+export const useRoutes = (url) => {
+  const { data: routes, loading: routesLoading, error: routesError, refetch } = useFetch(url ?? '/api/routes');
+  const { mutate: createRoute } = useMutation('/api/routes');
+  const { mutate: updateRoute } = useMutation('/api/routes', 'PATCH');
+  const { mutate: deleteRoute } = useMutation('', 'DELETE');
 
-    const [creating, setCreating] = useState(false);
-    const [updating, setUpdating] = useState(false);
-    const [deleting, setDeleting] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const getRouteById = (id) => {
     const { data, loading, error } = useFetch(`/api/routes/${id}`);
@@ -32,7 +33,7 @@ export const useRoutes = () => {
   const updateExistingRoute = async (id, updates) => {
     setUpdating(true)
     try {
-      await updateRoute(updates, `http://localhost:5000/api/routes/${id}`);
+      await updateRoute(updates, `/api/routes/${id}`);
       await fetchRoutes();
     } catch (error) {
       console.error("Error updating bus:", error);
@@ -42,7 +43,7 @@ export const useRoutes = () => {
   const deleteExistingRoute = async (id) => {
     setDeleting(true);
     try {
-      await deleteRoute({}, `http://localhost:5000/api/routes/${id}`);
+      await deleteRoute({}, `/api/routes/${id}`);
       await fetchRoutes(); 
     } catch (error) {
       console.error("Error deleting route:", error);

@@ -1,7 +1,10 @@
 import bcrypt
-from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location
+from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location, Contact
 import jwt
 from flask import abort
+from sqlalchemy import or_
+from datetime import datetime
+
 
 class UserService():
     @staticmethod
@@ -34,8 +37,29 @@ class UserService():
         )
     
     @staticmethod
-    def findAll():
-        return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+    def findAll(role='',query=''):
+        if role:
+            if query:
+                users = User.query.filter(
+                    User.role == role,
+                    or_(
+                        User.username.ilike(f'%{query}%'),
+                        User.email.ilike(f'%{query}%'),
+                        User.mobile.ilike(f'%{query}%')
+                    )
+                ).limit(10).all()
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in users]
+            else:
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).all()]
+        else:
+            return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+        
+    @staticmethod
+    def analytics(role=''):
+        if role:
+            return User.query.filter_by(role=role).count()
+        else:
+            return User.query.count()
     
 class DriverService():
     @staticmethod
@@ -44,10 +68,17 @@ class DriverService():
             return Driver.query.filter_by(id=id).first()
         return None
     
-    @staticmethod
-    def createDriver(driver_name ):
+    @classmethod
+    def createDriver(cls,driver_name,email,mobile,id_number,rating,bio ):
+        if cls.findOne(id_number=id_number):
+            abort(400,'This driver already exists')
         return Driver(
-            driver_name=driver_name
+            driver_name=driver_name,
+            email=email,
+            mobile=mobile,
+            id_number=id_number,
+            rating=rating,
+            bio=bio
         )
     
     @staticmethod
@@ -55,9 +86,11 @@ class DriverService():
         return [driver.to_dict() for driver in Driver.query.all()]
     
     @staticmethod
-    def findOne(id,driver_name):
+    def findOne(id=None,driver_name=None,id_number=None):
         if id:
             return Driver.query.filter_by(id=id).first()
+        if id_number:
+            return Driver.query.filter_by(id_number=id_number).first()
         elif driver_name:
             return Driver.query.filter_by(driver_name=driver_name).first()
         else:
@@ -77,7 +110,9 @@ class OwnerService():
         )
     
     @staticmethod
-    def findAll():
+    def findAll(query=''):
+        if query:
+            return [owner.to_dict() for owner in Owner.query.filter(Owner.owner_name.ilike(f'%{query}%')).all()]    
         return [owner.to_dict() for owner in Owner.query.all()]
     
     @staticmethod
@@ -102,8 +137,28 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll():
-        return [booking.to_dict() for booking in Booking.query.all()]
+    def findAll(query='',parent=''):
+        if parent:
+            if query:
+                bookings = Booking.query.filter(
+                    Booking.parent_id == parent,
+                    or_(
+                        Booking.child_name.ilike(f'%{query}%'),
+                        Booking.pickup.ilike(f'%{query}%'),
+                        Booking.dropoff.ilike(f'%{query}%')
+                    )
+                ).limit(10).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).all()] 
+        if query:
+            bookings = Booking.query.filter(
+                or_(
+                    Booking.child_name.ilike(f'%{query}%'),
+                    Booking.pickup.ilike(f'%{query}%'),
+                    Booking.dropoff.ilike(f'%{query}%')
+                )
+            ).limit(10).all()
+            return [booking.to_dict() for booking in bookings]
+        return [booking.to_dict() for booking in Booking.query.limit(10).all()]
     
     @staticmethod
     def findOne(id):
@@ -134,14 +189,24 @@ class BookingService():
             dropoff=dropoff,
             price=price,
         )
+    @staticmethod
+    def analytics():
+        return Booking.query.count()
+
     
 class BusService():
     @staticmethod
-    def findAll(driver_id=None, status=None):
+    def findAll(driver_id=None, status=None, query='',date=None):
         if driver_id:
             return [bus.to_dict(rules=('-routes.buses','-bookings',)) for bus in Bus.query.filter_by(driver_id=driver_id).all()]
         if status:
-            return [bus.to_dict(rules=('-routes.buses','-bookings',)) for bus in Bus.query.filter_by(status=status).all()]#
+            return [bus.to_dict(rules=('-routes.buses','-bookings',)) for bus in Bus.query.filter_by(status=status).all()]
+        if query:
+            return [bus.to_dict(rules=('-routes.buses',)) for bus in Bus.query.filter(Bus.plate.ilike(f"%{query}%")).all()]
+        if date:
+            return [bus.to_dict(rules=('-routes.buses',)) for bus in Bus.query.filter(Bus.departure == date).all()]
+            dbQuery = dbQuery
+         
         return [bus.to_dict() for bus in Bus.query.all()]
     
     @staticmethod
@@ -159,7 +224,7 @@ class BusService():
         return None
     
     @classmethod
-    def createBus(cls,route_id, driver_id, owner_id, plate, capacity):
+    def createBus(cls,route_id, driver_id, owner_id, plate, capacity, departure):
         existing_bus = cls.findOne(plate=plate)
         if existing_bus:
             abort(400, description="This bus already exists")
@@ -181,18 +246,31 @@ class BusService():
             abort(400, description="A bus with this plate number already exists")
 
         return Bus(
-            route_id=route_id,
-            driver_id=driver_id,
-            owner_id=owner_id,
+            route_id=int(route_id),
+            driver_id=int(driver_id),
+            owner_id=int(owner_id),
             plate=plate,
-            capacity=capacity,
+            capacity=int(capacity),
+            departure=datetime.fromisoformat(departure),
             status=TripStatus.pending
         )
+    @staticmethod
+    def analytics():
+        return Bus.query.count()
     
 class RouteService():
     @staticmethod
-    def findAll():
-        return [route.to_dict() for route in Route.query.all()]
+    def findAll(query=''):        
+        if query:
+            routes = Route.query.filter(
+                or_(
+                    Route.start.ilike(f'%{query}%'),
+                    Route.end.ilike(f'%{query}%'),
+                )
+            ).limit(10).all()
+            return [route.to_dict() for route in routes]
+        else:
+            return [route.to_dict() for route in Route.query.all()]
     
     @staticmethod
     def findById(id):
@@ -232,7 +310,7 @@ class RouteService():
         return [route.to_dict() for route in routes]
     
     @classmethod
-    def createRoute(cls,start, end ):
+    def createRoute(cls,start, end, stops ):
         if not start or not end:
             abort(400, description="Missing required fields: 'start' and 'end'")
 
@@ -242,10 +320,29 @@ class RouteService():
         if existing_route:
             abort(400, description="Route with the same start and end already exists")
 
-        return Route(
+        new_route = Route(
             start=start,
             end=end
         )
+        db.session.add(new_route)
+        db.session.commit()
+
+        # for stop in stops
+        for stop in stops:
+            location = LocationService.createLocation(
+                latitude=stop['latitude'],
+                longitude=stop['longitude'],
+                location_name=stop['location_name'],
+                route_id=new_route.id,
+            )
+            db.session.add(location)
+            db.session.commit()
+
+        return new_route
+    
+    @staticmethod
+    def analytics():
+        return Route.query.count()
     
 class LocationService():
     @staticmethod
@@ -285,8 +382,10 @@ class LocationService():
             location_name=location_name,
             route_id=route_id
         )
-
-
+    
+    @staticmethod
+    def analytics():
+        return Location.query.count()
 
 # # # FUNC. TO GET USER FROM TOKEN
 # # from service import UserService
@@ -331,8 +430,6 @@ class LocationService():
 # ##
 from config import socketio
 from flask import request
-# import jwt
-# from service import UserService
 
 def token_required_socketio():
     # Get the token from the cookies (sent by the frontend)
@@ -362,3 +459,28 @@ def token_required_socketio():
     except jwt.InvalidTokenError:
         socketio.emit('error', {'message': 'Invalid token'})
         return None
+    
+
+      
+class ContactService:
+    @staticmethod
+    def create_contact(name, email, mobile, role, subject, message):
+        contact = Contact(name=name, email=email, mobile=mobile, role=role, subject=subject, message=message)
+        db.session.add(contact)
+        db.session.commit()
+        return contact
+
+    @staticmethod
+    def get_all_contacts(query=None):
+        if query:
+            return Contact.query.filter(Contact.name.ilike(f"%{query}%")).all()
+        return Contact.query.all()
+
+    @staticmethod
+    def find_by_id(contact_id):
+        return Contact.query.get(contact_id)
+
+    @staticmethod
+    def delete_contact(contact):
+        db.session.delete(contact)
+        db.session.commit()

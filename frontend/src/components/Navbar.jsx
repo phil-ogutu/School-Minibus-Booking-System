@@ -39,7 +39,7 @@ const Navbar = () => {
           {user && (
             <div className="flex flex-row align-middle gap-2">
               <button className="p-2 bg-dark h-12 rounded-md text-white my-auto" onClick={(()=>{handleLogout()})}>Logout</button>
-              <ProfileCard name={user?.username} email={user?.email}/>
+              <ProfileCard name={user?.username} email={user?.email} role={user?.role}/>
             </div>
           )}
           {!user && (
@@ -97,6 +97,22 @@ const Navbar = () => {
                 Find Bus
               </a>
             </li>
+            <li>
+              <a 
+                href="/track"
+                className={linkClasses("/track")}
+              >
+                Track my Bus
+              </a>
+             </li>
+             <li>
+              <a
+                href="/contact"
+                className={linkClasses("/contact")}
+              >
+                Contact Us
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -106,7 +122,7 @@ const Navbar = () => {
 
 export default Navbar;
 
-const ProfileCard = ({ name = 'User', email = 'user@example.com' }) => {
+const ProfileCard = ({ name = 'User', email = 'user@example.com',role='' }) => {
   const initial = name.charAt(0).toUpperCase();
 
   const getRandomBgColor = () => {
@@ -118,15 +134,25 @@ const ProfileCard = ({ name = 'User', email = 'user@example.com' }) => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
   const bgColor = useMemo(() => getRandomBgColor(), []);
+  const router = useRouter()
+  const navigateToDashboard =()=>{
+    if(role=='admin'){
+      router.push('/admin/dashboard')
+    }else if(role=='parent'){
+      router.push('/parentDashboard/home')
+    }else if(role=='driver'){
+      router.push('/driver')
+    }
+  }
   return (
-    <div className="flex items-center space-x-4 p-4 bg-white align-middle">
+    <div className="flex items-center space-x-4 p-4 bg-white align-middle cursor-pointer" onClick={(()=>{navigateToDashboard()})}>
       <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${bgColor}`}>
         {initial}
       </div>
-      {/* <div>
+      <div>
         <div className="font-semibold text-gray-800">{name}</div>
         <div className="text-sm text-gray-500">{email}</div>
-      </div> */}
+      </div>
     </div>
   );
 };
