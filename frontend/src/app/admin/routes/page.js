@@ -10,12 +10,14 @@ import DataTable from "@/components/DataTable";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/ui/Modal";
 import { useModal } from "@/hooks/useModal";
+import { toast } from "react-toastify";
 
 export default function ManageRoutes() {
   const router = useRouter();
   /****Routes Fetch */
   const [query,setQuery]=useState('');
-  const { routes, routesLoading, routesError, creating, updating, deleting, createNewRoute, deleteExistingRoute, fetchRoutes, updateExistingRoute } = useRoutes(`/api/routes?query=${query}`);
+  const [page,setPage]=useState(1);
+  const { routes, routesLoading, routesError, creating, updating, deleting, createNewRoute, deleteExistingRoute, fetchRoutes, updateExistingRoute } = useRoutes(`/api/routes?query=${query}&page=${page}`);
   const debouncedSearch = debounce(fetchRoutes, 300);
   function handleSearch(event) {
     console.log('Searching for:', event.target.value);
@@ -37,7 +39,8 @@ export default function ManageRoutes() {
           `Route deleted functionality is succcess`
         );
         deletecloseModal();
-        fetchRoutes()
+        fetchRoutes();
+        toast.success(`${routeToBeDeleted.start} deleted successfully`)
       }).catch((err)=>{
         alert(err)
       });
@@ -55,7 +58,7 @@ export default function ManageRoutes() {
       render: (id, row) => (
         <div className="flex space-x-2">
           <button
-            // onClick={() => handleShowUpdateModal(id)}
+            onClick={()=>router.push(`/admin/routes/manage?id=${id.id}`)}
             className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
           >
             {editIcon('my-0','text-xl')}
@@ -86,11 +89,11 @@ export default function ManageRoutes() {
           <button 
             className="bg-primary p-2 rounded-md text-white flex-row flex align-middle text-lg cursor-pointer" 
             type="button"
-            onClick={()=>router.push('/admin/routes/new')}
+            onClick={()=>router.push('/admin/routes/manage')}
           >{addIcon('','',{marginTop:4})}new</button>
         </Container>
       </Container>
-      <DataTable columns={columns} data={routes}/>
+      <DataTable columns={columns} data={routes} setPage={setPage} Page={page}/>
       {/* Delete route Modal */}
       <Modal
         isOpen={deleteisOpen}

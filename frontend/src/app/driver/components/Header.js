@@ -4,11 +4,14 @@ import Container from '@/components/ui/Container';
 import Text from '@/components/ui/Text';
 import { accountIcon, notificationIcon } from '@/components/ui/icons';
 import { theme } from '@/components/ui/theme';
+import Link from 'next/link';
 
 export function Header() {
   return (
     <Container className='flex flex-row align-middle justify-between w-full p-4'>
-      <Logo />
+      <Link href={'/'}>
+        <Logo />
+      </Link>
       <Container className='flex flex-row align-middle gap-4'>
         <Text className='m-auto text-xl'>Bus</Text>
         <Text className='m-auto text-xl'>Routes</Text>

@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
-import { Phone, Mail, MapPin, Clock, AlertCircle, Send, CheckCircle, Users, Bus, HelpCircle } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Clock,
+  AlertCircle,
+  Send,
+  CheckCircle,
+  Users,
+  Bus,
+  HelpCircle,
+} from "lucide-react";
+import { useMutation } from "@/hooks/useMutation";
+import { toast } from "react-toastify";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    userType: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    phone: "",
+    userType: "",
+    subject: "",
+    message: "",
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,80 +29,87 @@ const ContactUs = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
+      newErrors.name = "Full name is required";
     }
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = "Please enter a valid email address";
     }
-    
+
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
+      newErrors.phone = "Phone number is required";
     } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = "Please enter a valid phone number";
     }
-    
+
     if (!formData.userType) {
-      newErrors.userType = 'Please select your role';
+      newErrors.userType = "Please select your role";
     }
-    
+
     if (!formData.subject.trim()) {
-      newErrors.subject = 'Subject is required';
+      newErrors.subject = "Subject is required";
     }
-    
+
     if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
+      newErrors.message = "Message is required";
     } else if (formData.message.length < 15) {
-      newErrors.message = 'Message must be at least 15 characters long';
+      newErrors.message = "Message must be at least 15 characters long";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     // Clear error for this field when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
 
+  const { mutate } = useMutation('/api/contacts')
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setSubmitSuccess(true);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        userType: '',
-        subject: '',
-        message: ''
-      });
+      await mutate(formData).then(()=>{
+        toast.success("Your message was sent successfully!");
+        setSubmitSuccess(true);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          userType: "",
+          subject: "",
+          message: "",
+        });
+      }).catch((err)=>{
+        console.error("Error submitting form:");
+        toast.error("Something went wrong.");
+      })
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error("Form submission error:", error);
+      toast.error("Failed to connect to the server.");
     } finally {
       setIsSubmitting(false);
     }
@@ -98,20 +118,24 @@ const ContactUs = () => {
   const faqItems = [
     {
       question: "How do I book a bus for my child?",
-      answer: "You can book through our online platform or contact us directly. We'll help you find the best route and schedule."
+      answer:
+        "You can book through our online platform or contact us directly. We'll help you find the best route and schedule.",
     },
     {
       question: "What safety measures are in place?",
-      answer: "All our buses are equipped with GPS tracking, seat belts, and experienced drivers with background checks."
+      answer:
+        "All our buses are equipped with GPS tracking, seat belts, and experienced drivers with background checks.",
     },
     {
       question: "Can I track my child's bus in real-time?",
-      answer: "Yes! Parents can track bus locations and receive notifications through our mobile app."
+      answer:
+        "Yes! Parents can track bus locations and receive notifications through our mobile app.",
     },
     {
       question: "What happens if the bus is late?",
-      answer: "You'll immediately receive automatic notifications about delays. We also have backup plans for emergencies."
-    }
+      answer:
+        "You'll immediately receive automatic notifications about delays. We also have backup plans for emergencies.",
+    },
   ];
 
   if (submitSuccess) {
@@ -121,9 +145,12 @@ const ContactUs = () => {
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Message Sent Successfully!</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Message Sent Successfully!
+          </h2>
           <p className="text-gray-600 mb-6">
-            Thank you for contacting SkoolaBus. We'll get back to you within 24 hours.
+            Thank you for contacting SkoolaBus. We'll get back to you within 24
+            hours.
           </p>
           <button
             onClick={() => setSubmitSuccess(false)}
@@ -150,7 +177,7 @@ const ContactUs = () => {
             Get in Touch with SkoolaBus
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            Make your child's journey to school safe, reliable, and worry-free. 
+            Make your child's journey to school safe, reliable, and worry-free.
             Contact us anytime for any support, bookings, or questions.
           </p>
         </div>
@@ -161,15 +188,21 @@ const ContactUs = () => {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Send us a Message!</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Send us a Message!
+              </h2>
               <p className="text-gray-600 mb-8">
-                Fill out the form below and we'll respond as quickly as possible.
+                Fill out the form below and we'll respond as quickly as
+                possible.
               </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6"> 
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Full Name *
                     </label>
                     <input
@@ -179,20 +212,27 @@ const ContactUs = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all ${
-                        errors.name ? 'border-red-500' : 'border-gray-300'
+                        errors.name ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="Enter your full name"
                       aria-describedby={errors.name ? "name-error" : undefined}
                     />
                     {errors.name && (
-                      <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">
+                      <p
+                        id="name-error"
+                        className="mt-1 text-sm text-red-600"
+                        role="alert"
+                      >
                         {errors.name}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Email Address *
                     </label>
                     <input
@@ -202,13 +242,19 @@ const ContactUs = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
+                        errors.email ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="your.email@example.com"
-                      aria-describedby={errors.email ? "email-error" : undefined}
+                      aria-describedby={
+                        errors.email ? "email-error" : undefined
+                      }
                     />
                     {errors.email && (
-                      <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                      <p
+                        id="email-error"
+                        className="mt-1 text-sm text-red-600"
+                        role="alert"
+                      >
                         {errors.email}
                       </p>
                     )}
@@ -217,7 +263,10 @@ const ContactUs = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="phone"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Phone Number *
                     </label>
                     <input
@@ -227,20 +276,29 @@ const ContactUs = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all ${
-                        errors.phone ? 'border-red-500' : 'border-gray-300'
+                        errors.phone ? "border-red-500" : "border-gray-300"
                       }`}
                       placeholder="+1 (555) 123-4567"
-                      aria-describedby={errors.phone ? "phone-error" : undefined}
+                      aria-describedby={
+                        errors.phone ? "phone-error" : undefined
+                      }
                     />
                     {errors.phone && (
-                      <p id="phone-error" className="mt-1 text-sm text-red-600" role="alert">
+                      <p
+                        id="phone-error"
+                        className="mt-1 text-sm text-red-600"
+                        role="alert"
+                      >
                         {errors.phone}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="userType"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       I am a *
                     </label>
                     <select
@@ -249,18 +307,22 @@ const ContactUs = () => {
                       value={formData.userType}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all ${
-                        errors.userType ? 'border-red-500' : 'border-gray-300'
+                        errors.userType ? "border-red-500" : "border-gray-300"
                       }`}
-                      aria-describedby={errors.userType ? "userType-error" : undefined}
+                      aria-describedby={
+                        errors.userType ? "userType-error" : undefined
+                      }
                     >
                       <option value="">Select your role</option>
                       <option value="parent">Parent/Guardian</option>
-                      <option value="school">School Administrator</option>
-                      <option value="student">Student</option>
-                      
+                      <option value="driver">Driver</option>
                     </select>
                     {errors.userType && (
-                      <p id="userType-error" className="mt-1 text-sm text-red-600" role="alert">
+                      <p
+                        id="userType-error"
+                        className="mt-1 text-sm text-red-600"
+                        role="alert"
+                      >
                         {errors.userType}
                       </p>
                     )}
@@ -268,7 +330,10 @@ const ContactUs = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Subject *
                   </label>
                   <input
@@ -278,20 +343,29 @@ const ContactUs = () => {
                     value={formData.subject}
                     onChange={handleInputChange}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all ${
-                      errors.subject ? 'border-red-500' : 'border-gray-300'
+                      errors.subject ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="What is your message about?"
-                    aria-describedby={errors.subject ? "subject-error" : undefined}
+                    aria-describedby={
+                      errors.subject ? "subject-error" : undefined
+                    }
                   />
                   {errors.subject && (
-                    <p id="subject-error" className="mt-1 text-sm text-red-600" role="alert">
+                    <p
+                      id="subject-error"
+                      className="mt-1 text-sm text-red-600"
+                      role="alert"
+                    >
                       {errors.subject}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Message *
                   </label>
                   <textarea
@@ -301,13 +375,19 @@ const ContactUs = () => {
                     onChange={handleInputChange}
                     rows={6}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all resize-none ${
-                      errors.message ? 'border-red-500' : 'border-gray-300'
+                      errors.message ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="Please provide details about your inquiry..."
-                    aria-describedby={errors.message ? "message-error" : undefined}
+                    aria-describedby={
+                      errors.message ? "message-error" : undefined
+                    }
                   />
                   {errors.message && (
-                    <p id="message-error" className="mt-1 text-sm text-red-600" role="alert">
+                    <p
+                      id="message-error"
+                      className="mt-1 text-sm text-red-600"
+                      role="alert"
+                    >
                       {errors.message}
                     </p>
                   )}
@@ -342,8 +422,10 @@ const ContactUs = () => {
           <div className="space-y-8">
             {/* Contact Methods */}
             <div className="bg-white rounded-2xl shadow-xl p-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h3>
-              
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Contact Information
+              </h3>
+
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -352,7 +434,9 @@ const ContactUs = () => {
                   <div>
                     <h4 className="font-semibold text-gray-900">Phone</h4>
                     <p className="text-gray-600">+254 723456789</p>
-                    <p className="text-sm text-gray-500">Available 24/7 for emergencies</p>
+                    <p className="text-sm text-gray-500">
+                      Available 24/7 for emergencies
+                    </p>
                   </div>
                 </div>
 
@@ -363,7 +447,9 @@ const ContactUs = () => {
                   <div>
                     <h4 className="font-semibold text-gray-900">Email</h4>
                     <p className="text-gray-600">support@skoolabus.com</p>
-                    <p className="text-sm text-gray-500">We respond within 24 hours</p>
+                    <p className="text-sm text-gray-500">
+                      We respond within 24 hours
+                    </p>
                   </div>
                 </div>
 
@@ -373,7 +459,11 @@ const ContactUs = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">Address</h4>
-                    <p className="text-gray-600">123 Education Drive<br />School District, ST 12345</p>
+                    <p className="text-gray-600">
+                      123 Education Drive
+                      <br />
+                      School District, ST 12345
+                    </p>
                   </div>
                 </div>
               </div>
@@ -383,9 +473,11 @@ const ContactUs = () => {
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <Clock className="w-6 h-6 text-yellow-600" />
-                <h3 className="text-xl font-bold text-gray-900">Business Hours</h3>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Business Hours
+                </h3>
               </div>
-              
+
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Monday - Friday</span>
@@ -406,10 +498,16 @@ const ContactUs = () => {
             <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
               <div className="flex items-center space-x-2 mb-4">
                 <AlertCircle className="w-6 h-6 text-red-600" />
-                <h3 className="text-xl font-bold text-red-900">Emergency Contact</h3>
+                <h3 className="text-xl font-bold text-red-900">
+                  Emergency Contact
+                </h3>
               </div>
-              <p className="text-red-800 font-semibold mb-2">24/7 Emergency Line:</p>
-              <p className="text-2xl font-bold text-red-900">+254 723456789-HELP</p>
+              <p className="text-red-800 font-semibold mb-2">
+                24/7 Emergency Line:
+              </p>
+              <p className="text-2xl font-bold text-red-900">
+                +254 723456789-HELP
+              </p>
               <p className="text-sm text-red-700 mt-2">
                 For immediate safety concerns or bus emergencies only!
               </p>
@@ -426,7 +524,9 @@ const ContactUs = () => {
                   <HelpCircle className="w-6 h-6 text-yellow-600" />
                 </div>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Frequently Asked Questions
+              </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 Quick answers to common questions about SkoolaBus services.
               </p>
@@ -434,8 +534,13 @@ const ContactUs = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {faqItems.map((faq, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-6 hover:border-yellow-300 transition-colors">
-                  <h3 className="font-semibold text-gray-900 mb-3">{faq.question}</h3>
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg p-6 hover:border-yellow-300 transition-colors"
+                >
+                  <h3 className="font-semibold text-gray-900 mb-3">
+                    {faq.question}
+                  </h3>
                   <p className="text-gray-600">{faq.answer}</p>
                 </div>
               ))}
@@ -443,7 +548,11 @@ const ContactUs = () => {
 
             <div className="text-center mt-8">
               <p className="text-gray-600">
-                Don't see your question? <span className="text-yellow-600 font-medium">Contact us directly</span> and we'll be happy to help!
+                Don't see your question?{" "}
+                <span className="text-yellow-600 font-medium">
+                  Contact us directly
+                </span>{" "}
+                and we'll be happy to help!
               </p>
             </div>
           </div>

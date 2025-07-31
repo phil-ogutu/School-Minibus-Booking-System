@@ -3,7 +3,7 @@ import React from 'react';
 import { BASE_URL } from '@/utils/constants';
 import { createContext, useContext, useState, useEffect } from 'react';
 
- export const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -32,8 +32,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     checkAuth();
-  }, []); // Empty dependency array ensures it runs only once on mount (when loggin in, checkAuth is called from login function in hooks/useAuth.js)
-
+  }, []); 
   return (
     <AuthContext.Provider value={{ user, setUser, loading, checkAuth }}>
       {children}
