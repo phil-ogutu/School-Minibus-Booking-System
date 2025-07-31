@@ -3,3 +3,5 @@
 
 /backend/server/instance
 /backend/server/migrations
+
+/backend/server/serviceAccountKey.json
