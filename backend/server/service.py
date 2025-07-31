@@ -85,7 +85,8 @@ class DriverService():
     
     @staticmethod
     def findAll(query='',page=1):
-        offset = (int(page) - 1) * 10
+        page = int(page) if str(page).isdigit() else 1
+        offset = (page - 1) * 10
         if query:
             return [driver.to_dict() for driver in Driver.query.filter(Driver.driver_name.ilike(f'%{query}%'),).limit(10).offset(offset).all()]
         return [driver.to_dict() for driver in Driver.query.limit(10).offset(offset).all()]

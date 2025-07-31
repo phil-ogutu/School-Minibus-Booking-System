@@ -29,7 +29,7 @@ export default function NotificationInitializer() {
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
           const token = await getToken(messaging, {
-            vapidKey: "BGhK9DdpoIG77Ch7yq8nby7f5o94mmf31JWqAcAySrqSvyuUE5OHrJ2hGQIz6Oe39r_qDDfZqyVVj3-9lsePITs",
+            vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
           });
 
           if (token) {
