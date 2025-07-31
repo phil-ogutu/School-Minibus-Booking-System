@@ -53,7 +53,7 @@ class UserService():
             else:
                 return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).offset(offset).all()]
         else:
-            return [user.to_dict(rules=('-password_hash',)) for user in User.query.offset(offset).all()]
+            return [user.to_dict(rules=('-password_hash',)) for user in User.query.limit(10).offset(offset).all()]
         
     @staticmethod
     def analytics(role=''):
@@ -197,7 +197,8 @@ class BookingService():
     
 class BusService():
     @staticmethod
-    def findAll(driver_id=None, query='',date=None):
+    def findAll(driver_id=None, query='',date=None,page=1):
+        offset = (int(page) - 1) * 10
         dbQuery = Bus.query
 
         if driver_id:
@@ -209,7 +210,7 @@ class BusService():
         if date:
             dbQuery = dbQuery.filter(Bus.departure == date)
 
-        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.all()]
+        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id=None, plate=None):
