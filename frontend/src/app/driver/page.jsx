@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import Container from "@/components/ui/Container.js";
 import Text from "@/components/ui/Text.js";
 import { useRouter } from "next/navigation";
+import { BASE_URL } from "@/utils/constants";
 
 export default function DriverLogin() {
   const router = useRouter();
@@ -15,8 +16,23 @@ export default function DriverLogin() {
     name: Yup.string().required("Name is required"),
     password: Yup.string().required("Password is required"),
   });
-  const handleSubmit = (values) => {
+  const handleSubmit = async(values) => {
     console.log(values);
+    const response = await fetch(`${BASE_URL}/api/drivers/${values?.name}`, {
+      // ...options,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        // ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const jsonData = await response.json();
+    localStorage.setItem('driverData', JSON.stringify(jsonData));
     router.push("/driver/home");
   };
   return (

@@ -1,11 +1,13 @@
 // Here is the Next.js App Router pages
 // Root layout
 // "use client";
+import Head from "next/head";
 import "../styles/globals.css";
 // import { Providers } from "./providers"; // NextAuth wrapper
 // import { MapProvider } from "@/context/MapContext";
 import { AppWrapper } from "./AppWrapper";
 import { ToastContainer } from "react-toastify";
+import NotificationInitializer from "@/components/NotificationInitializer";
 
 export const metadata = {
   title: "SkoolaBus",
@@ -15,11 +17,19 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <Head>
+       {/* Load Google Maps script properly */}
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
+          async
+        ></script>
+      </Head>
       <body>
         {/* <MapProvider>
           <Providers>{children}</Providers>
         </MapProvider> */}
         <AppWrapper>
+          <NotificationInitializer />
           {children}
           <ToastContainer
             position="top-right"
@@ -27,8 +37,11 @@ export default function RootLayout({ children }) {
             hideProgressBar={true}
           />
         </AppWrapper>
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
+          async
+        ></script>
       </body>
-      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"></script>
     </html>
   );
 }

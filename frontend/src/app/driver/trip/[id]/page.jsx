@@ -8,6 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useFetch } from '@/hooks/useFetch';
 import { loadLeaflet, L_Instance } from '@/utils/leaflet';
 import { useMutation } from '@/hooks/useMutation';
+import Link from 'next/link';
 
 const SchoolBusRoute = () => {
   const mapRef = useRef(null);
@@ -156,6 +157,7 @@ const SchoolBusRoute = () => {
         
         {/* Mobile Route Info Overlay (Bottom) - Hidden on desktop */}
         <div className="md:hidden absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl border-t border-gray-200 z-1000">
+          <Link href={'/driver/home'}>Go back to home</Link>
           {routeData?.status === 'pending' ? 
             <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id}/> :
             <InTripComponent routeData={routeData} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id}/>
@@ -165,6 +167,7 @@ const SchoolBusRoute = () => {
 
       {/* Desktop Sidebar - Hidden on mobile */}
       <div className="hidden md:block w-80 bg-white shadow-xl">
+        <Link href={'/driver/home'}>Go back to home</Link>
         {routeData?.status === 'pending' ? 
           <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id}/> :
           <InTripComponent routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id}/>

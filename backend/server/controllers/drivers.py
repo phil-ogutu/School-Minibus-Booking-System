@@ -7,7 +7,9 @@ from config import db
 class Drivers(Resource):
     method_decorators = [token_required]
     def get(self):
-        drivers = DriverService.findAll()
+        query = request.args.get('query')
+        page = request.args.get('page')
+        drivers = DriverService.findAll(query,page)
         return make_response(
             jsonify(drivers),
             200        
@@ -177,3 +179,18 @@ class DriverTripById(Resource):
             return make_response(jsonify({'message':'bus not found'}),404)
         return make_response(jsonify({'message':'driver not found'}),404)
         
+class DriverAuth(Resource):
+    method_decorators = [token_required]
+    def get(self,name):
+        if name is None:
+            return make_response(jsonify({'message':'missing name parameter'}),400)
+        
+        driver=DriverService.findOne(driver_name=name)
+        if driver:
+            response=make_response(
+                jsonify(driver.to_dict()),
+                200
+            )
+  
+            return response
+        return make_response(jsonify({'message':'driver not found'}),404)

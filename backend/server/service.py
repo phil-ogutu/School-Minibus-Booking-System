@@ -1,9 +1,10 @@
 import bcrypt
-from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location
+from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location, Contact
 import jwt
 from flask import abort
 from sqlalchemy import or_
 from datetime import datetime
+from firebase_admin import messaging
 
 
 class UserService():
@@ -37,7 +38,8 @@ class UserService():
         )
     
     @staticmethod
-    def findAll(role='',query=''):
+    def findAll(role='',query='',page=1):
+        offset = (int(page) - 1) * 10
         if role:
             if query:
                 users = User.query.filter(
@@ -47,12 +49,12 @@ class UserService():
                         User.email.ilike(f'%{query}%'),
                         User.mobile.ilike(f'%{query}%')
                     )
-                ).limit(10).all()
+                ).limit(10).offset(offset).all()
                 return [user.to_dict(rules=('-password_hash','-bookings')) for user in users]
             else:
-                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).all()]
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).offset(offset).all()]
         else:
-            return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+            return [user.to_dict(rules=('-password_hash',)) for user in User.query.limit(10).offset(offset).all()]
         
     @staticmethod
     def analytics(role=''):
@@ -82,8 +84,12 @@ class DriverService():
         )
     
     @staticmethod
-    def findAll():
-        return [driver.to_dict() for driver in Driver.query.all()]
+    def findAll(query='',page=1):
+        page = int(page) if str(page).isdigit() else 1
+        offset = (page - 1) * 10
+        if query:
+            return [driver.to_dict() for driver in Driver.query.filter(Driver.driver_name.ilike(f'%{query}%'),).limit(10).offset(offset).all()]
+        return [driver.to_dict() for driver in Driver.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id=None,driver_name=None,id_number=None):
@@ -137,7 +143,19 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll(query=''):
+    def findAll(query='',parent='',page=1):
+        offset = (int(page) - 1) * 10
+        if parent:
+            if query:
+                bookings = Booking.query.filter(
+                    Booking.parent_id == parent,
+                    or_(
+                        Booking.child_name.ilike(f'%{query}%'),
+                        Booking.pickup.ilike(f'%{query}%'),
+                        Booking.dropoff.ilike(f'%{query}%')
+                    )
+                ).limit(10).offset(offset).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).limit(10).offset(offset).all()] 
         if query:
             bookings = Booking.query.filter(
                 or_(
@@ -145,9 +163,9 @@ class BookingService():
                     Booking.pickup.ilike(f'%{query}%'),
                     Booking.dropoff.ilike(f'%{query}%')
                 )
-            ).limit(10).all()
+            ).limit(10).offset(offset).all()
             return [booking.to_dict() for booking in bookings]
-        return [booking.to_dict() for booking in Booking.query.limit(10).all()]
+        return [booking.to_dict() for booking in Booking.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id):
@@ -178,10 +196,15 @@ class BookingService():
             dropoff=dropoff,
             price=price,
         )
+    @staticmethod
+    def analytics():
+        return Booking.query.count()
+
     
 class BusService():
     @staticmethod
-    def findAll(driver_id=None, query='',date=None):
+    def findAll(driver_id=None, query='',date=None,page=1):
+        offset = (int(page) - 1) * 10
         dbQuery = Bus.query
 
         if driver_id:
@@ -193,7 +216,7 @@ class BusService():
         if date:
             dbQuery = dbQuery.filter(Bus.departure == date)
 
-        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.all()]
+        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id=None, plate=None):
@@ -240,20 +263,24 @@ class BusService():
             departure=datetime.fromisoformat(departure),
             status=TripStatus.pending
         )
+    @staticmethod
+    def analytics():
+        return Bus.query.count()
     
 class RouteService():
     @staticmethod
-    def findAll(query=''):        
+    def findAll(query='',page=1):  
+        offset = (int(page or 1) - 1) * 10 
         if query:
             routes = Route.query.filter(
                 or_(
                     Route.start.ilike(f'%{query}%'),
                     Route.end.ilike(f'%{query}%'),
                 )
-            ).limit(10).all()
+            ).limit(10).offset(offset).all()
             return [route.to_dict() for route in routes]
         else:
-            return [route.to_dict() for route in Route.query.all()]
+            return [route.to_dict() for route in Route.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findById(id):
@@ -365,3 +392,64 @@ class LocationService():
             location_name=location_name,
             route_id=route_id
         )
+    
+
+    @staticmethod
+    def analytics():
+        return Location.query.count()
+
+      
+class ContactService:
+    @staticmethod
+    def create_contact(name, email, mobile, role, subject, message):
+        contact = Contact(name=name, email=email, mobile=mobile, role=role, subject=subject, message=message)
+        db.session.add(contact)
+        db.session.commit()
+        return contact
+
+    @staticmethod
+    def get_all_contacts(query=None):
+        if query:
+            return Contact.query.filter(Contact.name.ilike(f"%{query}%")).all()
+        return Contact.query.all()
+
+    @staticmethod
+    def find_by_id(contact_id):
+        return Contact.query.get(contact_id)
+
+    @staticmethod
+    def delete_contact(contact):
+        db.session.delete(contact)
+        db.session.commit()
+
+class NotificationService():
+    def __init__(self, title, user_ids, body):
+        self.title = title
+        self.user_ids = user_ids
+        self.body = body
+
+    def saveFcmToken(self, fcm_token):
+        user = UserService.findById(self.user_ids[0])
+
+        if not user:
+            abort(400, description="User not found")
+
+        user.fcm_token = fcm_token
+        db.session.commit()
+
+        return 
+
+    def sendFcmNotification(self):
+        user = UserService.findById(self.user_ids[0])
+
+        if not user:
+           abort(400, description="User not found")
+
+        message = messaging.Message(
+            notification=messaging.Notification(title=self.title, body=self.body),
+            token=user.fcm_token
+        )
+
+        response = messaging.send(message)
+
+        return response

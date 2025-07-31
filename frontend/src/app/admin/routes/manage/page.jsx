@@ -7,6 +7,8 @@ import { BASE_URL } from "@/utils/constants";
 import Text from "@/components/ui/Text";
 import Container from "@/components/ui/Container";
 import { useRoutes } from "@/hooks/useRoutes";
+import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation";
 
 const DragIcon = () => (
   <svg className="w-5 h-5 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
@@ -17,14 +19,28 @@ const DragIcon = () => (
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 export default function StopsContainer() {
-    const { createNewRoute } = useRoutes(`/api/routes`);
-    
+    const searchParams = useSearchParams();
+    const routeId = searchParams.get('id');
     const [stops,setStops]=useState([{
         id: Date.now(),
         location_name: '',
         latitude: '',
         longitude: ''
     }]);
+    const fetchExistingroute=async()=>{
+        if(routeId){
+            const res = await fetch(`${BASE_URL}/api/routes/${routeId}`, { credentials:'include'});
+            const result = await res.json();
+            console.log(result)
+            setStops(result?.locations)
+        }
+    }
+    useEffect(()=>{
+        fetchExistingroute()
+    },[routeId]);
+
+    const { createNewRoute, updateExistingRoute } = useRoutes(`/api/routes`);
+    
     const [draggedItem, setDraggedItem] = useState(null);
     const [dragOverIndex, setDragOverIndex] = useState(null);
 
@@ -104,14 +120,22 @@ export default function StopsContainer() {
     };
 
     const handleSaveRoutes = async() => {
+        const payload = {
+            start:stops[0]?.location_name,
+            end:stops[stops?.length - 1]?.location_name,
+            stops
+        }
+        if(routeId){
+            await updateExistingRoute(routeId,payload).then(()=>{
+                toast.success('Route updated successfully');
+            }).catch((err)=>{
+                toast.error('Could not update Route',err)
+            })
+            return;
+        }
         if(stops?.length >= 2){
-            const payload = {
-                start:stops[0]?.location_name,
-                end:stops[stops?.length - 1]?.location_name,
-                stops
-            }
             await createNewRoute(payload).then(()=>{
-                alert('Route created successfully');
+                toast.success('Route created successfully');
                 setStops([{
                     id: Date.now(),
                     location_name: '',
@@ -119,10 +143,10 @@ export default function StopsContainer() {
                     longitude: ''
                 }]);
             }).catch((err)=>{
-                alert('Could not create route')
+                toast.error('Could not create route')
             })
         }else{
-            alert('You need to select at least two stops')
+            toast.error('You need to select at least two stops')
         }
     };
 
@@ -131,7 +155,7 @@ export default function StopsContainer() {
             {/* Left Side */}
             <div className="overflow-y-auto no-scrollbar h-[calc(100vh-150px)] w-full p-4 ">
                 <Container className='flex flex-row justify-between my-2'>
-                    <Text className='text-4xl fw-bold' as='h1'>Create Route</Text>
+                    <Text className='text-4xl fw-bold' as='h1'>{routeId ? 'Manage':'Create'} Route</Text>
                     <button className="p-2 bg-dark rounded-md text-white" onClick={()=>{addStop()}}>add stop</button>
                 </Container>
                 {stops?.map((stop,idx)=>{
