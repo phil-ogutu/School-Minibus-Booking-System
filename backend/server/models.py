@@ -136,3 +136,15 @@ class Location(db.Model,SerializerMixin):
     longitude = db.Column(db.Float, nullable=False)
 
     routes = db.relationship("Route", back_populates="locations")
+
+class Contact(db.Model,SerializerMixin):
+    __tablename__ = 'contacts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
+    mobile = db.Column(db.String, nullable=False)
+    role = db.Column(Enum(UserRole), nullable=False)
+    subject = db.Column(db.String, nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime(), server_default= func.now())
