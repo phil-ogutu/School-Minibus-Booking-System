@@ -2,12 +2,14 @@
 // Root layout
 
 "use client";
+import Head from "next/head";
 
 import "../styles/globals.css";
 // import { Providers } from "./providers"; // NextAuth wrapper
 // import { MapProvider } from "@/context/MapContext";
 import { AppWrapper } from "./AppWrapper";
 import { ToastContainer } from "react-toastify";
+import NotificationInitializer from "@/components/NotificationInitializer";
 
 export const metadata = {
   title: "SkoolaBus",
@@ -25,11 +27,19 @@ export default function RootLayout({ children }) {
           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
         ></script>
       </head>
+      <Head>
+        {/* Load Google Maps script properly */}
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
+          async
+        ></script>
+      </Head>
       <body suppressHydrationWarning>
         {/* <MapProvider>
           <Providers>{children}</Providers>
         </MapProvider> */}
         <AppWrapper>
+          <NotificationInitializer />
           {children}
           <ToastContainer
             position="top-right"
@@ -37,8 +47,11 @@ export default function RootLayout({ children }) {
             hideProgressBar={true}
           />
         </AppWrapper>
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
+          async
+        ></script>
       </body>
-      {/* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"></script> */}
     </html>
   );
 }

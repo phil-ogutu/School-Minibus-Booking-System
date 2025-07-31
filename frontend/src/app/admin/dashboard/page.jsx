@@ -1,7 +1,7 @@
 "use client";
 
 import { FiUsers, FiTrendingDown } from 'react-icons/fi';
-import { busIcon, groupIcon, routeIcon } from '@/components/ui/icons';
+import { bookingIcon, busIcon, groupIcon, mapPinIcon, routeIcon } from '@/components/ui/icons';
 import { useFetch } from '@/hooks/useFetch';
 
 export default function AdminDashboard() {
@@ -44,7 +44,10 @@ const WelcomeCard = () => {
 const AnalyticsCard=({stat})=>{
   const statLabel={
     parent:{ icon: groupIcon('text-dark','text-4xl'), label: 'Total Parents'},
-    route:{ icon: routeIcon('text-dark','text-4xl'), label: 'Total Routes'}
+    route:{ icon: routeIcon('text-dark','text-4xl'), label: 'Total Routes'},
+    buses:{ icon: busIcon('text-dark','text-4xl'), label: 'Total Buses'},
+    bookings:{ icon: bookingIcon('text-dark','text-4xl'), label: 'Total Bookings'},
+    locations:{ icon: mapPinIcon('text-dark','text-4xl'), label: 'Total Locations'}
   }
   return(
     <div className="w-full my-2 h-36 bg-gradient-to-br from-tertiary to-base rounded-xl p-4 relative overflow-hidden text-dark shadow-sm">

@@ -8,7 +8,8 @@ class Users(Resource):
     method_decorators = [token_required]
     def get(self,role):
         query = request.args.get('query')
-        users = UserService.findAll(role,query)
+        page = request.args.get('page')
+        users = UserService.findAll(role,query,page)
         return make_response(
             jsonify(users),
             200        

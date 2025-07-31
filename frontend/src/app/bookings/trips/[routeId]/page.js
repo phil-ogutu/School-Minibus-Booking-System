@@ -44,7 +44,7 @@ export default function Bus() {
 
   const navigateToTrack = (id) => {
     if (id) {
-      router.push(`/track/${id}`);
+      router.push(`/track?bookingId=${id}`);
     }
   };
 
@@ -52,10 +52,8 @@ export default function Bus() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1 md:grid grid-cols-2">
-
         {/* Left Side */}
         <div className="p-5 overflow-y-auto no-scrollbar h-[calc(100vh-150px)]">
-
           {/* Route Name and stops */}
           <div className="mb-5 w-full shadow-sm bg-white border rounded-xl p-4 border-neutral-300 mx-auto">
             <div className="flex justify-start items-center gap-x-3 text-xl mb-2">
@@ -97,56 +95,66 @@ export default function Bus() {
 
           {/* Bus Cards */}
           <div className="md:grid grid-cols-2 gap-2">
-            {buses?.filter((bus) => bus?.route_id === route?.id)
-              .map((bus) => {
-                const departureTime = new Date(
-                  bus?.departure
-                ).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+            {buses?.filter((bus) => bus?.route_id === route?.id).length === 0 ? 
+            (
+              <div className="col-span-2 text-center text-gray-500 text-lg mt-4">
+                No buses available for this route
+              </div>
+            ) : (
+              buses
+                ?.filter((bus) => bus?.route_id === route?.id)
+                .map((bus) => {
+                  const departureTime = new Date(
+                    bus?.departure
+                  ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
 
-                return (
-                  <div
-                    key={bus?.id}
-                    className="w-full mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4  border-neutral-300 space-y-4"
-                  >
-                    <div className="flex justify-start gap-x-4">
-                      <FaBus className="h-12 w-10" />
-                      <div className="flex flex-col">
-                        <h1 className="text-xl font-medium">{bus?.plate}</h1>
-                        <span className="text-xs font-light">
-                          {route?.start} - {route?.end}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-2">
-                      <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
-                        <FaClock />
+                  return (
+                    <div
+                      key={bus?.id}
+                      className="w-full mb-5 shadow-sm bg-white border hover:scale-[1.005] rounded-xl p-4 border-neutral-300 space-y-4"
+                    >
+                      <div className="flex justify-start gap-x-4">
+                        <FaBus className="h-12 w-10" />
                         <div className="flex flex-col">
-                          <span className="text-xs">Departure</span>
-                          <span>{departureTime}</span>
+                          <h1 className="text-xl font-medium">{bus?.plate}</h1>
+                          <span className="text-xs font-light">
+                            {route?.start} - {route?.end}
+                          </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
-                        <FaUser />
-                        <div className="flex flex-col">
-                          <span className="text-xs">Available seats</span>
-                          <span>{(bus?.capacity - bus?.bookings?.length) ?? 0}</span>
+                      <div className="grid grid-cols-2 gap-x-2">
+                        <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
+                          <FaClock />
+                          <div className="flex flex-col">
+                            <span className="text-xs">Departure</span>
+                            <span>{departureTime}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-x-2 border border-neutral-400 bg-gray-200/60 shadow-sm p-2 rounded-lg">
+                          <FaUser />
+                          <div className="flex flex-col">
+                            <span className="text-xs">Available seats</span>
+                            <span>
+                              {bus?.capacity - bus?.bookings?.length ?? 0}
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => openModal(bus)}
+                          className="w-full px-2 py-1.5 h-full text-base font-medium rounded-lg bg-yellow-400 hover:bg-yellow-500"
+                        >
+                          Book Now
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex justify-center">
-                      <button
-                        onClick={() => openModal(bus)}
-                        className="w-full px-2 py-1.5 h-full text-base font-medium rounded-lg bg-yellow-400 hover:bg-yellow-500"
-                      >
-                        Book Now
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+            )}
           </div>
         </div>
 

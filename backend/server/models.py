@@ -38,6 +38,7 @@ class User(db.Model,SerializerMixin):
     password_hash = db.Column(db.String, nullable=False)
     photo_url = db.Column(db.String)
     role = db.Column(Enum(UserRole), nullable=False)
+    fcm_token = db.Column(db.String)
     created_at = db.Column(db.DateTime(), server_default= func.now())
 
     bookings = db.relationship("Booking", back_populates="parent")
@@ -89,7 +90,11 @@ class Driver(db.Model,SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     driver_name = db.Column(db.String, nullable=False)
+    mobile = db.Column(db.String)
+    id_number = db.Column(db.String)
+    email = db.Column(db.String)
     bio = db.Column(db.String)
+    rating = db.Column(db.Float)
 
     bus = db.relationship("Bus", back_populates="driver")
 
@@ -132,6 +137,18 @@ class Location(db.Model,SerializerMixin):
     longitude = db.Column(db.Float, nullable=False)
 
     routes = db.relationship("Route", back_populates="locations")
+
+class Contact(db.Model,SerializerMixin):
+    __tablename__ = 'contacts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
+    mobile = db.Column(db.String, nullable=False)
+    role = db.Column(Enum(UserRole), nullable=False)
+    subject = db.Column(db.String, nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime(), server_default= func.now())
 
 # Payment Status Enum
 class PaymentStatus(enum.Enum):
