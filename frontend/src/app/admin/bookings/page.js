@@ -374,7 +374,7 @@ const PickupDropoffFields = ({ buses }) => {
 
   return (
     <>
-      <label className="block mb-2 flex gap-2 items-center">
+      <label className="mb-2 flex gap-2 items-center">
         <FaMapMarkerAlt />
         Pickup Location
       </label>
@@ -396,7 +396,7 @@ const PickupDropoffFields = ({ buses }) => {
         ))}
       </Field>
 
-      <label className="block mb-2 flex gap-2 items-center">
+      <label className="mb-2 flex gap-2 items-center">
         <FaMapMarkerAlt />
         Dropoff Location
       </label>
