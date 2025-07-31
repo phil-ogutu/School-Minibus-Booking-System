@@ -37,7 +37,8 @@ class UserService():
         )
     
     @staticmethod
-    def findAll(role='',query=''):
+    def findAll(role='',query='',page=1):
+        offset = (int(page) - 1) * 10
         if role:
             if query:
                 users = User.query.filter(
@@ -47,12 +48,12 @@ class UserService():
                         User.email.ilike(f'%{query}%'),
                         User.mobile.ilike(f'%{query}%')
                     )
-                ).limit(10).all()
+                ).limit(10).offset(offset).all()
                 return [user.to_dict(rules=('-password_hash','-bookings')) for user in users]
             else:
-                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).all()]
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).offset(offset).all()]
         else:
-            return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+            return [user.to_dict(rules=('-password_hash',)) for user in User.query.offset(offset).all()]
         
     @staticmethod
     def analytics(role=''):

@@ -12,6 +12,7 @@ import Modal from "@/components/ui/Modal";
 import { FormField, FormWrapper } from "@/components/ui/Form";
 import * as Yup from 'yup';
 import { useMutation } from "@/hooks/useMutation";
+import { toast } from "react-toastify";
 
 const parentInitialValues = {
   username: '',
@@ -32,7 +33,8 @@ const parentSchema = Yup.object().shape({
 export default function Parents() {
   /****User Fetch */
   const [query,setQuery]=useState('');
-  const { data: parents, loading: loadingParents, error: errorParents, refetch: refetchParents} = useFetch(`/api/users/parent?query=${query}`);
+  const [page,setPage]=useState(1);
+  const { data: parents, loading: loadingParents, error: errorParents, refetch: refetchParents} = useFetch(`/api/users/parent?query=${query}&page=${page}`);
   const debouncedSearch = debounce(refetchParents, 300);
   function handleSearch(event) {
     console.log('Searching for:', event.target.value);
@@ -52,6 +54,7 @@ export default function Parents() {
       console.log(
         `Parent creation functionality is succcess`
       );
+      toast.success(`${values.username} created successfully`)
       closeModal();
       refetchParents()
     }).catch((err)=>{
@@ -80,6 +83,7 @@ export default function Parents() {
       console.log(
         `Parent update functionality is succcess`
       );
+      toast.success(`${values.username} updated successfully`);
       closeEditModal();
       refetchParents()
     }).catch((err)=>{
@@ -101,10 +105,11 @@ export default function Parents() {
         console.log(
           `Parent deleted functionality is succcess`
         );
+        toast.success(`${userToBeDeleted.username} deleted successfully`)
         deletecloseModal();
         refetchParents()
       }).catch((err)=>{
-        alert(err)
+        toast.error(err)
       });
     }
   };
@@ -155,7 +160,7 @@ export default function Parents() {
           >{addIcon('','',{marginTop:4})}new</button>
         </Container>
       </Container>
-      <DataTable columns={columns} data={parents}/>
+      <DataTable columns={columns} data={parents} setPage={setPage} Page={page}/>
       {/* Create user Modal */}
       <Modal
         isOpen={isOpen}
@@ -176,7 +181,7 @@ export default function Parents() {
           >
             <FormField name="username" label="Name" type="text" placeholder="john doe" />
             <FormField name="email" label="Email" type="email" placeholder="johndoe@gmail.com" />
-            <FormField name="mobile" label="Mobile" type="tel" placeholder="johndoe@gmail.com" />
+            <FormField name="mobile" label="Mobile" type="tel" placeholder="0759233322" />
             <FormField name="role" label="Role" type="text" placeholder="parent" disabled={true}/>
             <FormField name="password" label="Password" type="password" placeholder="••••••••" disabled={true}/>
             <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">

@@ -4,7 +4,17 @@ import Container from "./ui/Container";
 import { arrowLeftIcon, arrowRightIcon } from "./ui/icons";
 import Text from "./ui/Text";
 
-export default function DataTable({ columns, data, onEdit, onDelete, className='' }) {
+export default function DataTable({ columns, data, onEdit, onDelete, className='',setPage, Page }) {
+  const handlePageChange=(delta)=>{
+    switch(delta){
+      case '+':
+        setPage(Page+1)
+      case '-':
+        if(Page > 1){
+          setPage(Page-1)
+        }
+    }
+  }
   return (
     <div className="overflow-x-auto bg-white rounded shadow my-4">
       <table className="min-w-full text-sm">
@@ -65,9 +75,9 @@ export default function DataTable({ columns, data, onEdit, onDelete, className='
         <tfoot>
           <tr className="p-2">
             <Container className="flex flex-row align-middle p-4 gap-2">
-              <button className="hover:bg-dark bg-tertiary p-2 rounded-sm cursor-pointer">{arrowLeftIcon('','',{marginTop:2})}</button>
-              <Text className="my-2">1 of 100</Text>
-              <button className="hover:bg-dark bg-tertiary p-2 rounded-sm cursor-pointer">{arrowRightIcon('','',{marginTop:2})}</button>
+              <button onClick={(()=>{handlePageChange('-')})} className="hover:bg-dark hover:text-white bg-tertiary p-2 rounded-sm cursor-pointer">{arrowLeftIcon('','',{marginTop:2})}</button>
+              <Text className="my-2">{Page ?? 1}</Text>
+              <button onClick={(()=>{handlePageChange('+')})} className="hover:bg-dark hover:text-white bg-tertiary p-2 rounded-sm cursor-pointer">{arrowRightIcon('','',{marginTop:2})}</button>
             </Container>
           </tr>
         </tfoot>
