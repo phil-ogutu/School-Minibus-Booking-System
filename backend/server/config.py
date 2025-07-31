@@ -17,6 +17,9 @@ from flask_bcrypt import Bcrypt
 # JWT #
 from flask_jwt_extended import JWTManager
 
+# Flask-SocketIO #
+from flask_socketio import SocketIO
+
 # Local imports
 
 # Instantiate app, set attributes
@@ -52,3 +55,7 @@ api = Api(app)
 
 # Instantiate CORS
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+
+# Instantiate SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*")  # SocketIO instance Set up to handle WebSocket connections
+# socketio = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*") # or 'gevent'  # Allow all origins for CORS

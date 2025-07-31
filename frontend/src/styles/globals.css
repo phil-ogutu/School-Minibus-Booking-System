@@ -9,6 +9,11 @@
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
     }
+    /* Ensure markers display correctly */
+    .leaflet-div-icon {
+      background: transparent !important;
+      border: none !important;
+    }
   }
 @theme {
   --color-primary: #EAAA00;
