@@ -9,6 +9,7 @@ class Bookings(Resource):
     def get(self):
         query=request.args.get('query')
         parent=request.args.get('parent')
+        page = request.args.get('page')
         bookings = BookingService.findAll(query,parent)
         return make_response(
             jsonify(bookings),

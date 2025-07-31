@@ -5,6 +5,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import ParentDashboardSidebar from "@/components/ParentDashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import Container from "@/components/ui/Container";
+import Text from "@/components/ui/Text";
 
 export default function AdminDashboard() {
   // Access the user data from context
@@ -22,6 +23,10 @@ export default function AdminDashboard() {
 
   return (
     <Container className="flex flex-col p-4 h-screen">
+      <Container className='p-4' >
+        <Text className='text-3xl mb-4'>Welcome Back, {user?.username ??'John'}</Text>
+        <img src={'/banners/kids.jpg'} style={{width:'100%',height:'400px',objectFit:'cover',borderRadius:'10px'}}/>
+      </Container>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {["Total Bookings"].map((item) => (
           <div

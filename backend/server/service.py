@@ -37,7 +37,8 @@ class UserService():
         )
     
     @staticmethod
-    def findAll(role='',query=''):
+    def findAll(role='',query='',page=1):
+        offset = (int(page) - 1) * 10
         if role:
             if query:
                 users = User.query.filter(
@@ -47,12 +48,12 @@ class UserService():
                         User.email.ilike(f'%{query}%'),
                         User.mobile.ilike(f'%{query}%')
                     )
-                ).limit(10).all()
+                ).limit(10).offset(offset).all()
                 return [user.to_dict(rules=('-password_hash','-bookings')) for user in users]
             else:
-                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).all()]
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).offset(offset).all()]
         else:
-            return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
+            return [user.to_dict(rules=('-password_hash',)) for user in User.query.limit(10).offset(offset).all()]
         
     @staticmethod
     def analytics(role=''):
@@ -82,8 +83,11 @@ class DriverService():
         )
     
     @staticmethod
-    def findAll():
-        return [driver.to_dict() for driver in Driver.query.all()]
+    def findAll(query='',page=1):
+        offset = (int(page) - 1) * 10
+        if query:
+            return [driver.to_dict() for driver in Driver.query.filter(Driver.driver_name.ilike(f'%{query}%'),).limit(10).offset(offset).all()]
+        return [driver.to_dict() for driver in Driver.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id=None,driver_name=None,id_number=None):
@@ -137,7 +141,8 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll(query='',parent=''):
+    def findAll(query='',parent='',page=1):
+        offset = (int(page) - 1) * 10
         if parent:
             if query:
                 bookings = Booking.query.filter(
@@ -147,8 +152,8 @@ class BookingService():
                         Booking.pickup.ilike(f'%{query}%'),
                         Booking.dropoff.ilike(f'%{query}%')
                     )
-                ).limit(10).all()
-            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).all()] 
+                ).limit(10).offset(offset).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).limit(10).offset(offset).all()] 
         if query:
             bookings = Booking.query.filter(
                 or_(
@@ -156,9 +161,9 @@ class BookingService():
                     Booking.pickup.ilike(f'%{query}%'),
                     Booking.dropoff.ilike(f'%{query}%')
                 )
-            ).limit(10).all()
+            ).limit(10).offset(offset).all()
             return [booking.to_dict() for booking in bookings]
-        return [booking.to_dict() for booking in Booking.query.limit(10).all()]
+        return [booking.to_dict() for booking in Booking.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id):
@@ -196,7 +201,8 @@ class BookingService():
     
 class BusService():
     @staticmethod
-    def findAll(driver_id=None, query='',date=None):
+    def findAll(driver_id=None, query='',date=None,page=1):
+        offset = (int(page) - 1) * 10
         dbQuery = Bus.query
 
         if driver_id:
@@ -208,7 +214,7 @@ class BusService():
         if date:
             dbQuery = dbQuery.filter(Bus.departure == date)
 
-        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.all()]
+        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id=None, plate=None):
@@ -261,17 +267,18 @@ class BusService():
     
 class RouteService():
     @staticmethod
-    def findAll(query=''):        
+    def findAll(query='',page=1):  
+        offset = (int(page or 1) - 1) * 10 
         if query:
             routes = Route.query.filter(
                 or_(
                     Route.start.ilike(f'%{query}%'),
                     Route.end.ilike(f'%{query}%'),
                 )
-            ).limit(10).all()
+            ).limit(10).offset(offset).all()
             return [route.to_dict() for route in routes]
         else:
-            return [route.to_dict() for route in Route.query.all()]
+            return [route.to_dict() for route in Route.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findById(id):

@@ -6,7 +6,7 @@ import { BASE_URL } from '@/utils/constants';
 
 
 export const useRoutes = (url) => {
-  const { data: routes, loading: routesLoading, error: routesError, refetch } = useFetch(url ?? '/api/routes');
+  const { data: routes, loading: routesLoading, error: routesError, refetch } = useFetch(url ?? '/api/routes?page=1');
   const { mutate: createRoute } = useMutation('/api/routes');
   const { mutate: updateRoute } = useMutation('/api/routes', 'PATCH');
   const { mutate: deleteRoute } = useMutation('', 'DELETE');
