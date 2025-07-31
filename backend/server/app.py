@@ -13,6 +13,7 @@ from controllers.buses import BusById, Buses
 from controllers.bookings import Bookings, BookingById
 from controllers.contacts import Contacts, ContactById
 from controllers.owners import Owners, OwnerById
+from controllers.fcm import SaveFcmToken, SendNotification
 # Local imports
 from config import app, db, api
 
@@ -47,6 +48,9 @@ api.add_resource(Analytics, '/api/analytics')
 # Contact endpoints
 api.add_resource(Contacts, '/api/contacts')
 api.add_resource(ContactById, '/api/contacts/<int:id>') 
+# Fcm endpoints
+api.add_resource(SaveFcmToken, '/api/save-fcm-token')
+api.add_resource(SendNotification, '/api/send-notification')
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    app.run(port=5000, debug=True)

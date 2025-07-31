@@ -4,6 +4,7 @@ import jwt
 from flask import abort
 from sqlalchemy import or_
 from datetime import datetime
+from firebase_admin import messaging
 
 
 class UserService():
@@ -391,6 +392,7 @@ class LocationService():
             route_id=route_id
         )
     
+
     @staticmethod
     def analytics():
         return Location.query.count()
@@ -418,3 +420,35 @@ class ContactService:
     def delete_contact(contact):
         db.session.delete(contact)
         db.session.commit()
+
+class NotificationService():
+    def __init__(self, title, user_ids, body):
+        self.title = title
+        self.user_ids = user_ids
+        self.body = body
+
+    def saveFcmToken(self, fcm_token):
+        user = UserService.findById(self.user_ids[0])
+
+        if not user:
+            abort(400, description="User not found")
+
+        user.fcm_token = fcm_token
+        db.session.commit()
+
+        return 
+
+    def sendFcmNotification(self):
+        user = UserService.findById(self.user_ids[0])
+
+        if not user:
+           abort(400, description="User not found")
+
+        message = messaging.Message(
+            notification=messaging.Notification(title=self.title, body=self.body),
+            token=user.fcm_token
+        )
+
+        response = messaging.send(message)
+
+        return response
