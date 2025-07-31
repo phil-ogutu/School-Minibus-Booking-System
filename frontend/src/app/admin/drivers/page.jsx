@@ -15,6 +15,7 @@ import { useModal } from "@/hooks/useModal";
 import { useMutation } from "@/hooks/useMutation";
 import * as Yup from 'yup';
 import { FormField, FormWrapper } from "@/components/ui/Form";
+import { toast } from "react-toastify";
 
 const driverInitialValues = {
   driver_name: '',
@@ -33,7 +34,8 @@ const driverSchema = Yup.object().shape({
 export default function Drivers() {  
   /****Drivers Fetch */
   const [query,setQuery]=useState('');
-  const { data: drivers, loading: loadingDrivers, error: errorDrivers, refetch: refetchDrivers} = useFetch(`/api/drivers?query=${query}`);
+  const [page,setPage]=useState(1);
+  const { data: drivers, loading: loadingDrivers, error: errorDrivers, refetch: refetchDrivers} = useFetch(`/api/drivers?query=${query}&page=${page}`);
   const debouncedSearch = debounce(refetchDrivers, 300);
   function handleSearch(event) {
     console.log('Searching for:', event.target.value);
@@ -49,10 +51,11 @@ export default function Drivers() {
       console.log(
         `Driver creation functionality is succcess`
       );
+      toast.success(`${values.driver_name} created successfully`)
       closeModal();
       refetchDrivers()
     }).catch((err)=>{
-      alert(err)
+      toast.error('Failed to create driver',err)
     });
   };
   /****Driver Update */
@@ -73,10 +76,11 @@ export default function Drivers() {
       console.log(
         `Driver update functionality is succcess`
       );
+      toast.success(`${values.driver_name} updated successfully`)
       closeEditModal();
       refetchDrivers()
     }).catch((err)=>{
-      alert(err)
+      toast.error('Failed to update driver',err)
     });
   };
   /****Driver Deletion */
@@ -94,10 +98,11 @@ export default function Drivers() {
         console.log(
           `driver deleted functionality is succcess`
         );
+        toast.success(`${driverToBeDeleted.driver_name} deleted successfully`)
         deletecloseModal();
         refetchDrivers()
       }).catch((err)=>{
-        alert(err)
+        toast.error('Failed to delete driver',err)
       });
     }
   };
@@ -149,7 +154,7 @@ export default function Drivers() {
           >{addIcon('','',{marginTop:4})}new</button>
         </Container>
       </Container>
-      <DataTable columns={columns} data={drivers}/>
+      <DataTable columns={columns} data={drivers} setPage={setPage} Page={page}/>
       {/* Create driver Modal */}
       <Modal
         isOpen={isOpen}
