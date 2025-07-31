@@ -14,7 +14,7 @@ export const useBookings = () => {
     const [deleting, setDeleting] = useState(false);
 
   const getBookingById = (id) => {
-    const { data, loading, error } = useFetch(`/api/buses/api/bookings/${id}`);
+    const { data, loading, error } = useFetch(`/api/bookings/${id}`);
     return { booking: data, loading, error };
   };
 

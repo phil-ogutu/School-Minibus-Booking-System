@@ -1,5 +1,5 @@
 import bcrypt
-from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location
+from models import db, User, Booking, Driver, Owner, Bus, TripStatus, Route, Location, Contact
 import jwt
 from flask import abort
 from sqlalchemy import or_
@@ -137,7 +137,18 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll(query=''):
+    def findAll(query='',parent=''):
+        if parent:
+            if query:
+                bookings = Booking.query.filter(
+                    Booking.parent_id == parent,
+                    or_(
+                        Booking.child_name.ilike(f'%{query}%'),
+                        Booking.pickup.ilike(f'%{query}%'),
+                        Booking.dropoff.ilike(f'%{query}%')
+                    )
+                ).limit(10).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).all()] 
         if query:
             bookings = Booking.query.filter(
                 or_(
@@ -178,6 +189,10 @@ class BookingService():
             dropoff=dropoff,
             price=price,
         )
+    @staticmethod
+    def analytics():
+        return Booking.query.count()
+
     
 class BusService():
     @staticmethod
@@ -240,6 +255,9 @@ class BusService():
             departure=datetime.fromisoformat(departure),
             status=TripStatus.pending
         )
+    @staticmethod
+    def analytics():
+        return Bus.query.count()
     
 class RouteService():
     @staticmethod
@@ -365,3 +383,31 @@ class LocationService():
             location_name=location_name,
             route_id=route_id
         )
+    
+    @staticmethod
+    def analytics():
+        return Location.query.count()
+
+      
+class ContactService:
+    @staticmethod
+    def create_contact(name, email, mobile, role, subject, message):
+        contact = Contact(name=name, email=email, mobile=mobile, role=role, subject=subject, message=message)
+        db.session.add(contact)
+        db.session.commit()
+        return contact
+
+    @staticmethod
+    def get_all_contacts(query=None):
+        if query:
+            return Contact.query.filter(Contact.name.ilike(f"%{query}%")).all()
+        return Contact.query.all()
+
+    @staticmethod
+    def find_by_id(contact_id):
+        return Contact.query.get(contact_id)
+
+    @staticmethod
+    def delete_contact(contact):
+        db.session.delete(contact)
+        db.session.commit()
