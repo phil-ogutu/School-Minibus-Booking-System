@@ -8,6 +8,7 @@ import { useTheContext } from "@/context/MapContext";
 import { useRoutes } from "@/hooks/useRoutes";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -23,6 +24,7 @@ export default function Booking() {
     router.push(`/payment?tripId=${routeId}`); // Added payment navigation
 
   const [stops, setStops] = useState([]);
+  const [selectedRoute, setSelectedRoute] = useState(null);
 
   const filteredRoutes = routes?.filter((route) => {
     const matchFrom = from
@@ -37,7 +39,13 @@ export default function Booking() {
 
   const displayRoutes =
     filteredRoutes?.length > 0 ? filteredRoutes : routes || [];
-  console.log("Filtered routes", filteredRoutes);
+
+  useEffect(() => {
+    if (routes && routes.length > 0 && !selectedRoute) {
+      setSelectedRoute(routes[0]);
+      setStops(routes[0].locations || []);
+    }
+  }, [routes, selectedRoute]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -45,14 +53,20 @@ export default function Booking() {
 
       <div className="flex-1 md:grid md:grid-cols-2">
         <div className="p-5 flex flex-col space-y-5">
-          <SearchBus />
+          <SearchBus
+            defaultFrom={selectedRoute?.start}
+            defaultTo={selectedRoute?.end}
+          />
 
           <div className="md:grid grid-cols-2 items-start gap-x-5 overflow-y-auto no-scrollbar">
             {displayRoutes.map((route) => (
               <SearchCard
                 key={route.id}
                 route={route}
-                onPreview={() => setStops(route.locations)}
+                onPreview={() => {
+                  setSelectedRoute(route);
+                  setStops(route.locations || []);
+                }}
                 onSelect={() => navigateToBuses(route.id)}
               />
             ))}

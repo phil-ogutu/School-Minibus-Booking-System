@@ -1,7 +1,7 @@
 import { MdNotifications, MdAccountCircle, MdDirectionsBus, MdOutlineAdd, MdEdit, MdDeleteOutline } from 'react-icons/md';
 import { TiGroup } from "react-icons/ti";
 import { RiMapPin2Fill } from "react-icons/ri";
-import { FaPlay, FaArrowRight, FaArrowLeft, FaFlag, FaLocationArrow, FaRoute, } from "react-icons/fa";
+import { FaPlay, FaArrowRight, FaArrowLeft, FaFlag, FaLocationArrow, FaRoute, FaClipboardList } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 /**
  * Generic icon renderer
@@ -59,3 +59,6 @@ export const warningIcon = (color = '', size = '', style = {}) =>
 
 export const routeIcon = (color = '', size = '', style = {}) =>
   renderIcon(FaRoute, color, size, style);
+
+export const bookingIcon = (color = '', size = '', style = {}) =>
+  renderIcon(FaClipboardList, color, size, style);

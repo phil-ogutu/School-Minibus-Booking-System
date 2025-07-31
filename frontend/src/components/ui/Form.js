@@ -14,7 +14,7 @@ function FormWrapper({ initialValues, validationSchema, onSubmit, children, clas
   );
 }
 
-function FormField({ label, name, type = 'text', className = '',disabled=false }) {
+function FormField({ label, name, type = 'text', placeholder='', className = '',disabled=false }) {
   const [field, meta] = useField(name);
 
   return (
@@ -27,6 +27,7 @@ function FormField({ label, name, type = 'text', className = '',disabled=false }
         id={name}
         type={type}
         disabled={disabled}
+        placeholder={placeholder}
         className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
       />
       {meta.touched && meta.error ? (

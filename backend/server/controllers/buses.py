@@ -3,6 +3,7 @@ from service import BusService
 from flask import make_response, jsonify, request, g
 from flask_restful import Resource
 from config import db
+from datetime import datetime
 
 class Buses(Resource):
     method_decorators = [token_required]
@@ -28,7 +29,8 @@ class Buses(Resource):
 
     def get(self):
         query=request.args.get('query')
-        buses = BusService.findAll(query)
+        page=request.args.get('page')
+        buses = BusService.findAll(query,page)
         return make_response(
             jsonify(buses),
             200        
@@ -58,6 +60,10 @@ class BusById(Resource):
         bus=BusService.findOne(id)
         if bus:
             for attr in data:
+                if(attr == 'departure'):
+                    data[attr] = datetime.fromisoformat(data[attr])
+
+                    setattr(bus,attr,data[attr])
                 setattr(bus,attr,data[attr])
             db.session.commit()
             response=make_response(

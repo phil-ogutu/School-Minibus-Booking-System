@@ -107,7 +107,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
 
           <hr className="h-px my-5 bg-gray-200 border-0 dark:bg-gray-700" />
 
-          <label className="block mb-2 flex gap-2 items-center">
+          <label className="mb-2 flex gap-2 items-center">
             <FaUser /> Passenger Name
           </label>
           <input
@@ -119,7 +119,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
             placeholder="Enter passenger name"
           />
 
-          <label className="block mb-2 flex gap-2 items-center">
+          <label className="mb-2 flex gap-2 items-center">
             <FaMapMarkerAlt /> Pickup Location
           </label>
           <select
@@ -137,7 +137,7 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
             ))}
           </select>
 
-          <label className="block mb-2 flex gap-2 items-center">
+          <label className="mb-2 flex gap-2 items-center">
             <FaMapMarkerAlt />
             Dropoff Location
           </label>
