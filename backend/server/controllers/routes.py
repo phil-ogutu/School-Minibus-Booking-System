@@ -48,6 +48,16 @@ class RouteById(Resource):
             for attr in data:
                 setattr(route,attr,data[attr])
             db.session.commit()
+            for stop in data.get('stops'):
+                if not LocationService.findOne(location_name=stop['location_name']):
+                    location = LocationService.createLocation(
+                        latitude=stop['latitude'],
+                        longitude=stop['longitude'],
+                        location_name=stop['location_name'],
+                        route_id=id,
+                    )
+                    db.session.add(location)
+                    db.session.commit()
             response=make_response(
                 jsonify(route.to_dict()),
                 200

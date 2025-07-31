@@ -263,7 +263,7 @@ class BusService():
 class RouteService():
     @staticmethod
     def findAll(query='',page=1):  
-        offset = (int(page) - 1) * 10     
+        offset = (int(page or 1) - 1) * 10 
         if query:
             routes = Route.query.filter(
                 or_(

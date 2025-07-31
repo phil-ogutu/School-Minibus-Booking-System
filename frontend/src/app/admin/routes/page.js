@@ -16,7 +16,7 @@ export default function ManageRoutes() {
   const router = useRouter();
   /****Routes Fetch */
   const [query,setQuery]=useState('');
-    const [page,setPage]=useState(1);
+  const [page,setPage]=useState(1);
   const { routes, routesLoading, routesError, creating, updating, deleting, createNewRoute, deleteExistingRoute, fetchRoutes, updateExistingRoute } = useRoutes(`/api/routes?query=${query}&page=${page}`);
   const debouncedSearch = debounce(fetchRoutes, 300);
   function handleSearch(event) {
@@ -58,7 +58,7 @@ export default function ManageRoutes() {
       render: (id, row) => (
         <div className="flex space-x-2">
           <button
-            // onClick={() => handleShowUpdateModal(id)}
+            onClick={()=>router.push(`/admin/routes/manage?id=${id.id}`)}
             className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
           >
             {editIcon('my-0','text-xl')}
@@ -89,7 +89,7 @@ export default function ManageRoutes() {
           <button 
             className="bg-primary p-2 rounded-md text-white flex-row flex align-middle text-lg cursor-pointer" 
             type="button"
-            onClick={()=>router.push('/admin/routes/new')}
+            onClick={()=>router.push('/admin/routes/manage')}
           >{addIcon('','',{marginTop:4})}new</button>
         </Container>
       </Container>
