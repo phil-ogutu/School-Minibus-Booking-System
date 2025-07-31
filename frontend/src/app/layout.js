@@ -35,6 +35,10 @@ export default function RootLayout({ children }) {
             hideProgressBar={true}
           />
         </AppWrapper>
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4idHJLSEp-jvUmWkjrRIKj8HndPtfmmo&libraries=places"
+          async
+        ></script>
       </body>
     </html>
   );
