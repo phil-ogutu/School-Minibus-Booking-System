@@ -62,19 +62,6 @@ dummy_routes = [
 
 if __name__ == '__main__':
     fake = Faker()
-
-# # Function to seed payments
-#     # This function creates payment records based on bookings
-#     # It randomly assigns a status to each payment and generates a stub record
-#     # for the payment with a booking ID, amount, and status.
-
-
-    # Initialize the database
-# with app.app_context():
-#     print("Dropping and recreating all tables...")
-#     db.drop_all()
-#     db.create_all()
-
     # Helper function to generate random users
     def create_user():
         return User(
