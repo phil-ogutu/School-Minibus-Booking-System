@@ -11,6 +11,7 @@ from controllers.analytics import Analytics
 from controllers.routes import Routes, RouteById, TopRoutes, LocationById, Locations
 from controllers.buses import BusById, Buses
 from controllers.bookings import Bookings, BookingById
+from controllers.payments import payments_bp # Importing the payments blueprint
 from controllers.contacts import Contacts, ContactById
 from controllers.owners import Owners, OwnerById
 # Local imports

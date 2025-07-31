@@ -20,6 +20,8 @@ export default function Booking() {
   const navigateToBuses = (routeId) => {
     router.push(`/bookings/trips/${routeId}`);
   };
+  const navigateToPayment = (routeId) =>
+    router.push(`/payment?tripId=${routeId}`); // Added payment navigation
 
   const [stops, setStops] = useState([]);
   const [selectedRoute, setSelectedRoute] = useState(null);
@@ -72,7 +74,6 @@ export default function Booking() {
         </div>
 
         <div className="hidden md:block md:w-full md:h-full md:p-2">
-
           <Map locations={stops} />
         </div>
       </div>
