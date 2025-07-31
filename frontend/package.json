@@ -30,6 +30,7 @@
     "react-leaflet": "^5.0.0",
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5",
+    "socket.io-client": "^4.8.1",
     "swr": "^2.3.4",
     "twilio": "^5.8.0",
     "yup": "^1.6.1"
