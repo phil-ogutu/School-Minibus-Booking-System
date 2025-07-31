@@ -19,11 +19,13 @@ import { FaCreditCard, FaMapMarkerAlt } from 'react-icons/fa';
 import { Field, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import { calculatePrice, haversineDistance } from '@/utils/distance';
+import { toast } from "react-toastify";
+import { useMutation } from '@/hooks/useMutation';
 
 const bookingInitialValues = {
   parent_id: '',
   bus_id: '',
-  title: 'new Booking',
+  title: 'new Booking from admin',
   child_name: '',
   pickup: '',
   dropoff: '',
@@ -42,28 +44,10 @@ const bookingSchema = Yup.object().shape({
 
 const ViewBookings = () => {
   const [query,setQuery]=useState('');
+  const [page,setPage]=useState(1);
   const { createNewBooking, deleteExistingBooking } = useBookings();
-  const [allowEditing, setAllowEditng] = useState(false)
-  const [editingBookingId, setEditingBookingId] = useState(null);
-  const [isCreating, setIsCreating] = useState(false);
-
-  const handleCreateBooking = () => {
-    setIsCreating(true);
-  };
-
-  const handleEdit = (bookingId) => {
-    setAllowEditng(true)
-    if (bookingId) {
-      setEditingBookingId(bookingId);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsCreating(false);
-    setEditingBookingId(null);
-  };
   /****Bookings Fetch */
-  const { data: bookings, loading: loadingBookings, error: errorBookings, refetch: refetchBookings} = useFetch(`/api/bookings?query=${query}`);
+  const { data: bookings, loading: loadingBookings, error: errorBookings, refetch: refetchBookings} = useFetch(`/api/bookings?query=${query}&page=${page}`);
   
   const debouncedSearch = debounce(refetchBookings, 300);
   function handleSearch(event) {
@@ -79,10 +63,39 @@ const ViewBookings = () => {
       console.log(
         `Booking creation functionality is succcess`
       );
+      toast.success(`Booking for ${values.child_name} created successfully`)
       closeModal();
       refetchBookings()
     }).catch((err)=>{
-      alert(err)
+      toast.error('Failed to create booking',err)
+    });
+  };
+  /****Booking Update */
+  const [bookingToBeUpdated,setbookingToBeUpdated]=useState({});
+  const { isOpen: isEditModalOpen, openModal: openEditModal, closeModal: closeEditModal } = useModal();
+  const { mutate: editMutate, data: updatedBooking, loading: loadingUpdatingBooking, error: errorUpdatingBooking } = useMutation(``,'PATCH');
+  const handleShowUpdateModal=(booking)=>{
+    bookingInitialValues.parent_id = booking.parent_id;
+    bookingInitialValues.bus_id = booking.bus_id;
+    bookingInitialValues.driver_id = booking.driver_id;
+    bookingInitialValues.child_name = booking.child_name;
+    bookingInitialValues.pickup = booking.pickup;
+    bookingInitialValues.dropoff = booking.dropoff;
+    bookingInitialValues.price = booking.price;
+    setbookingToBeUpdated(booking)
+    openEditModal();
+  };
+  const handleUpdateBookingForm=async(values)=>{
+    console.log(values)
+    await editMutate(values,`/api/bookings/${bookingToBeUpdated?.id}`).then(()=>{
+      console.log(
+        `Booking update functionality is succcess`
+      );
+      toast.success(`booking for ${values.child_name} updated successfully`);
+      closeEditModal();
+      refetchBookings()
+    }).catch((err)=>{
+      toast.error(err)
     });
   };
   /****Booking Deletion */
@@ -99,6 +112,7 @@ const ViewBookings = () => {
         console.log(
           `booking deleted functionality is succcess`
         );
+        toast.success(`Booking for ${bookingToBeDeleted.child_name} deleted successfully`)
         deletecloseModal();
         refetchBookings()
       }).catch((err)=>{
@@ -106,7 +120,7 @@ const ViewBookings = () => {
       });
     }
   };
-  const { data: parents, loading: loadingParents, error: errorParents, refetch: refetchParents} = useFetch(`/api/users/parent`);
+  const { data: parents, loading: loadingParents, error: errorParents, refetch: refetchParents} = useFetch(`/api/users/parent?page=1`);
   const { data: buses, loading: loadingBuses, error: errorBuses, refetch: refetchBuses} = useFetch(`/api/buses`);
 
   const columns = [
@@ -123,7 +137,7 @@ const ViewBookings = () => {
       render: (id, row) => (
         <div className="flex space-x-2">
           <button
-            // onClick={() => handleShowUpdateModal(id)}
+            onClick={() => handleShowUpdateModal(id)}
             className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
           >
             {editIcon('my-0','text-xl')}
@@ -159,7 +173,7 @@ const ViewBookings = () => {
             >{addIcon('','',{marginTop:4})}new</button>
           </Container>
         </Container>
-      <DataTable columns={columns} data={bookings}/>
+      <DataTable columns={columns} data={bookings} setPage={setPage} Page={page}/>
       {/* Create Booking Modal */}
       <Modal
         isOpen={isOpen}
@@ -207,6 +221,67 @@ const ViewBookings = () => {
             <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
               <button
                 onClick={closeModal}
+                type="button"
+                className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                className="bg-primary text-white px-4 py-2 rounded"
+              > Save
+              </button>
+            </div>
+          </FormWrapper>
+        </div>
+      </Modal>
+      {/* Update Booking Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={closeEditModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+          <div>
+            <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl">
+              Update Booking
+            </h5>
+          </div>
+          <FormWrapper
+            initialValues={bookingInitialValues}
+            validationSchema={bookingSchema}
+            onSubmit={handleUpdateBookingForm}
+            className="w-full"
+          >
+            <div className='flex flex-col my-2'>
+              <label htmlFor="bus_id">Choose a Bus:</label>
+              <Field as="select" name="bus_id" 
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {buses && buses?.map((bus)=>{
+                  return(
+                    <option key={bus?.id} value={bus?.id}>{bus?.routes?.start}{bus?.routes?.end}</option>
+                  )
+                })}
+              </Field>
+            </div>
+            <div className='flex flex-col my-2'>
+              <label htmlFor="parent_id">Choose a Parent:</label>
+              <Field as="select" name="parent_id" 
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                {parents && parents?.map((parent)=>{
+                  return(
+                    <option key={parent?.id} value={parent?.id}>{parent?.username}</option>
+                  )
+                })}
+              </Field>
+            </div>
+            <FormField name="child_name" label="Child Name" type="text" placeholder="Enter child name here..." />
+            <PickupDropoffFields buses={buses} />
+            <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+              <button
+                onClick={closeEditModal}
                 type="button"
                 className="flex w-full justify-center rounded-lg border border-gray-300 bg-tertiary px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
               >

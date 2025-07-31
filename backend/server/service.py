@@ -138,7 +138,8 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll(query='',parent=''):
+    def findAll(query='',parent='',page=1):
+        offset = (int(page) - 1) * 10
         if parent:
             if query:
                 bookings = Booking.query.filter(
@@ -148,8 +149,8 @@ class BookingService():
                         Booking.pickup.ilike(f'%{query}%'),
                         Booking.dropoff.ilike(f'%{query}%')
                     )
-                ).limit(10).all()
-            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).all()] 
+                ).limit(10).offset(offset).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).limit(10).offset(offset).all()] 
         if query:
             bookings = Booking.query.filter(
                 or_(
@@ -157,9 +158,9 @@ class BookingService():
                     Booking.pickup.ilike(f'%{query}%'),
                     Booking.dropoff.ilike(f'%{query}%')
                 )
-            ).limit(10).all()
+            ).limit(10).offset(offset).all()
             return [booking.to_dict() for booking in bookings]
-        return [booking.to_dict() for booking in Booking.query.limit(10).all()]
+        return [booking.to_dict() for booking in Booking.query.limit(10).offset(offset).all()]
     
     @staticmethod
     def findOne(id):
