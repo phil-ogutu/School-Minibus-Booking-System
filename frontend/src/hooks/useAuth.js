@@ -1,15 +1,15 @@
 // src/hooks/useAuth.js
+'use client'
 import { useState, useContext } from 'react';
 import { useMutation } from './useMutation';
 import { AuthContext } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
 
-export const useAuth = () => {
-  const BASE_URL = "http://localhost:5000"
-  // const BASE_URL = "http://127.0.0.1:5000";
-  
-  const { mutate } = useMutation(`${BASE_URL}/api/auth`);
+export const useAuth = () => {  
+  const { mutate } = useMutation(`/api/auth`);
   const { user, setUser, checkAuth } = useContext(AuthContext);
   const [authError, setAuthError] = useState(null);
+  const router = useRouter()
 
   const login = async (credentials) => {
     try {
@@ -19,6 +19,7 @@ export const useAuth = () => {
       });
       setUser(data.user); // This may not be needed if checkAuth refetches user data
       await checkAuth(); // Fetch user details from /me endpoint after login
+      router.push('/');
       return data;
     } catch (error) {
       setAuthError(error.message);
@@ -33,6 +34,7 @@ export const useAuth = () => {
         action: 'register',
       });
       setUser(data.user);
+      router.push('/');
       return data;
     } catch (error) {
       setAuthError(error.message);
@@ -40,10 +42,14 @@ export const useAuth = () => {
     }
   };
 
+  const { mutate: logoutUser } = useMutation(`/api/auth`,'DELETE');
   const logout = async () => {
     try {
-      // logout endpoin later implementation
-      setUser(null); // Reset user state
+      const response = await logoutUser();
+      if (response.ok){
+        setUser(null); // Reset user state
+      }
+      return router.push('/');
     } catch (error) {
       setAuthError(error.message);
       throw error;
