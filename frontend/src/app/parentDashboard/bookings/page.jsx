@@ -13,6 +13,7 @@ import Text from "@/components/ui/Text";
 import { addIcon, deleteIcon, editIcon } from "@/components/ui/icons";
 import DataTable from "@/components/DataTable";
 import { useFetch } from "@/hooks/useFetch";
+import { useRouter } from "next/navigation";
 
 export default function ParentDashboard() {
   const { user, checkAuth } = useAuthContext();// checkAuth
@@ -22,7 +23,8 @@ export default function ParentDashboard() {
   const { data: bookings } = useFetch(`/api/bookings?parent=${user && user?.id}`)
   const [isEditing, setIsEditing] = useState(false); // Manage modal state
   const [editBookingData, setEditBookingData] = useState(null); // Track booking data being edited
-  console.log(bookings)
+  console.log(bookings);
+  const router = useRouter()
 
   const handleDeleteBooking = async (bookingId) => {
     console.log('BOOKING ID: ', bookingId)
@@ -74,6 +76,12 @@ export default function ParentDashboard() {
       accessor: "actions",
       render: (id, row) => (
         <div className="flex space-x-2">
+          <button
+            onClick={() => router.push(`/track?id=${id?.id}`)}
+            className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
+          >
+            track
+          </button>
           <button
             // onClick={() => handleShowUpdateModal(id)}
             className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
