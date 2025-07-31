@@ -10,12 +10,14 @@ import DataTable from "@/components/DataTable";
 import { useRouter } from "next/navigation";
 import Modal from "@/components/ui/Modal";
 import { useModal } from "@/hooks/useModal";
+import { toast } from "react-toastify";
 
 export default function ManageRoutes() {
   const router = useRouter();
   /****Routes Fetch */
   const [query,setQuery]=useState('');
-  const { routes, routesLoading, routesError, creating, updating, deleting, createNewRoute, deleteExistingRoute, fetchRoutes, updateExistingRoute } = useRoutes(`/api/routes?query=${query}`);
+    const [page,setPage]=useState(1);
+  const { routes, routesLoading, routesError, creating, updating, deleting, createNewRoute, deleteExistingRoute, fetchRoutes, updateExistingRoute } = useRoutes(`/api/routes?query=${query}&page=${page}`);
   const debouncedSearch = debounce(fetchRoutes, 300);
   function handleSearch(event) {
     console.log('Searching for:', event.target.value);
@@ -37,7 +39,8 @@ export default function ManageRoutes() {
           `Route deleted functionality is succcess`
         );
         deletecloseModal();
-        fetchRoutes()
+        fetchRoutes();
+        toast.success(`${routeToBeDeleted.start} deleted successfully`)
       }).catch((err)=>{
         alert(err)
       });
@@ -90,7 +93,7 @@ export default function ManageRoutes() {
           >{addIcon('','',{marginTop:4})}new</button>
         </Container>
       </Container>
-      <DataTable columns={columns} data={routes}/>
+      <DataTable columns={columns} data={routes} setPage={setPage} Page={page}/>
       {/* Delete route Modal */}
       <Modal
         isOpen={deleteisOpen}

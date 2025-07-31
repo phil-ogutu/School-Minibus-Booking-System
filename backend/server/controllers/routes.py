@@ -8,7 +8,8 @@ class Routes(Resource):
     method_decorators = [token_required]
     def get(self):
         query = request.args.get('query')
-        routes = RouteService.findAll(query)
+        page = request.args.get('page')
+        routes = RouteService.findAll(query,page)
         return make_response(
             jsonify(routes),
             200        
