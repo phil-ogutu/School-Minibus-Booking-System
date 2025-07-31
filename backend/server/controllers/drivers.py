@@ -15,10 +15,23 @@ class Drivers(Resource):
     def post(self):
         data=request.get_json()
         driver_name = data['driver_name']
+        email = data['email']
+        mobile = data['mobile']
+        id_number = data['id_number']
+        rating = 0
+        bio=''
+
         if driver_name == None:
             return make_response("Required Inputs are required", 400)
         
-        new_driver = DriverService.createDriver(driver_name)
+        new_driver = DriverService.createDriver(
+            driver_name=driver_name,
+            email=email,
+            mobile=mobile,
+            id_number=id_number,
+            rating=rating,
+            bio=bio,            
+        )
         db.session.add(new_driver)
         db.session.commit()
         response=make_response(

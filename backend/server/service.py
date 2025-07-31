@@ -68,10 +68,17 @@ class DriverService():
             return Driver.query.filter_by(id=id).first()
         return None
     
-    @staticmethod
-    def createDriver(driver_name ):
+    @classmethod
+    def createDriver(cls,driver_name,email,mobile,id_number,rating,bio ):
+        if cls.findOne(id_number=id_number):
+            abort(400,'This driver already exists')
         return Driver(
-            driver_name=driver_name
+            driver_name=driver_name,
+            email=email,
+            mobile=mobile,
+            id_number=id_number,
+            rating=rating,
+            bio=bio
         )
     
     @staticmethod
@@ -79,9 +86,11 @@ class DriverService():
         return [driver.to_dict() for driver in Driver.query.all()]
     
     @staticmethod
-    def findOne(id,driver_name):
+    def findOne(id=None,driver_name=None,id_number=None):
         if id:
             return Driver.query.filter_by(id=id).first()
+        if id_number:
+            return Driver.query.filter_by(id_number=id_number).first()
         elif driver_name:
             return Driver.query.filter_by(driver_name=driver_name).first()
         else:
@@ -101,7 +110,9 @@ class OwnerService():
         )
     
     @staticmethod
-    def findAll():
+    def findAll(query=''):
+        if query:
+            return [owner.to_dict() for owner in Owner.query.filter(Owner.owner_name.ilike(f'%{query}%')).all()]    
         return [owner.to_dict() for owner in Owner.query.all()]
     
     @staticmethod
@@ -126,7 +137,18 @@ class AuthService():
     
 class BookingService():
     @staticmethod
-    def findAll(query=''):
+    def findAll(query='',parent=''):
+        if parent:
+            if query:
+                bookings = Booking.query.filter(
+                    Booking.parent_id == parent,
+                    or_(
+                        Booking.child_name.ilike(f'%{query}%'),
+                        Booking.pickup.ilike(f'%{query}%'),
+                        Booking.dropoff.ilike(f'%{query}%')
+                    )
+                ).limit(10).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).all()] 
         if query:
             bookings = Booking.query.filter(
                 or_(
@@ -167,6 +189,10 @@ class BookingService():
             dropoff=dropoff,
             price=price,
         )
+    @staticmethod
+    def analytics():
+        return Booking.query.count()
+
     
 class BusService():
     @staticmethod
@@ -229,6 +255,9 @@ class BusService():
             departure=datetime.fromisoformat(departure),
             status=TripStatus.pending
         )
+    @staticmethod
+    def analytics():
+        return Bus.query.count()
     
 class RouteService():
     @staticmethod
@@ -354,7 +383,12 @@ class LocationService():
             location_name=location_name,
             route_id=route_id
         )
+    
+    @staticmethod
+    def analytics():
+        return Location.query.count()
 
+      
 class ContactService:
     @staticmethod
     def create_contact(name, email, mobile, role, subject, message):

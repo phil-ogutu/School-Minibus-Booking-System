@@ -89,7 +89,11 @@ class Driver(db.Model,SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     driver_name = db.Column(db.String, nullable=False)
+    mobile = db.Column(db.String)
+    id_number = db.Column(db.String)
+    email = db.Column(db.String)
     bio = db.Column(db.String)
+    rating = db.Column(db.Float)
 
     bus = db.relationship("Bus", back_populates="driver")
 

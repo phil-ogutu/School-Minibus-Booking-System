@@ -8,7 +8,8 @@ class Bookings(Resource):
     method_decorators = [token_required]
     def get(self):
         query=request.args.get('query')
-        bookings = BookingService.findAll(query)
+        parent=request.args.get('parent')
+        bookings = BookingService.findAll(query,parent)
         return make_response(
             jsonify(bookings),
             200        
