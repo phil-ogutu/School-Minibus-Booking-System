@@ -8,12 +8,13 @@ import TripCard from '../components/trip'
 import { useFetch } from '@/hooks/useFetch'
 
 function page() {
-  const { data: trips, loading: tripsLoading, error: tripsError } = useFetch('/api/drivers/1/trips');
+  const driverData = JSON.parse(localStorage.getItem('driverData'))
+  const { data: trips, loading: tripsLoading, error: tripsError } = useFetch(`/api/drivers/${driverData?.id}/trips`);
   return (
     <Container className={'flex-col'}>
         <DriverHeader/>
         <Container className='p-4' >
-          <Text className='text-3xl mb-4'>Welcome Back, John</Text>
+          <Text className='text-3xl mb-4'>Welcome Back, {driverData?.driver_name ??'John'}</Text>
           <img src={'/banners/kids.jpg'} style={{width:'100%',height:'400px',objectFit:'cover',borderRadius:'10px'}}/>
         </Container>
         <Container className='flex flex-row px-4 gap-4 text-center'>
