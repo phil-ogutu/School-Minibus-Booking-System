@@ -17,6 +17,7 @@ const SchoolBusRoute = () => {
   const mapInstance = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [tripStatus,setTripStatus]=useState(false);
+  const driverData = JSON.parse(localStorage.getItem('driverData'))
   const {id : trip_id} = useParams();
   
   const { data , loading: tripsLoading, error: tripsError } = useFetch(`/api/drivers/1/trip/${trip_id}`,tripStatus);
@@ -225,8 +226,8 @@ const SchoolBusRoute = () => {
         <div className="md:hidden absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl border-t border-gray-200 z-1000">
           <Link href={'/driver/home'}>Go back to home</Link>
           {routeData?.status === 'pending' ? 
-            <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/> :
-            <InTripComponent routeData={routeData} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/>
+            <StartTripComponent driverData={driverData} routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/> :
+            <InTripComponent driverData={driverData} routeData={routeData} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/>
           }
         </div>
       </div>
@@ -235,8 +236,8 @@ const SchoolBusRoute = () => {
       <div className="hidden md:block w-80 bg-white shadow-xl">
         <Link href={'/driver/home'}>Go back to home</Link>
         {routeData?.status === 'pending' ? 
-          <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/> :
-          <InTripComponent routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/>
+          <StartTripComponent driverData={driverData} routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/> :
+          <InTripComponent driverData={driverData} routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/>
         }
       </div>
     </div>
@@ -246,9 +247,9 @@ const SchoolBusRoute = () => {
 export default SchoolBusRoute;
 
 
-const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id, setTracking})=>{
+const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id, setTracking, driverData})=>{
   const router = useRouter()
-  const { mutate } = useMutation(`/api/drivers/1/trip/${trip_id}`,'PATCH');
+  const { mutate } = useMutation(`/api/drivers/${driverData?.id}/trip/${trip_id}`,'PATCH');
   const handleStartRide=async()=>{
     try {
       const data = await mutate({status: 'started'});
@@ -300,8 +301,8 @@ const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id
   )
 });
 
-const InTripComponent=(({routeData, desktopClassName='', busStops, setTripStatus, trip_id, setTracking})=>{
-  const { mutate } = useMutation(`/api/drivers/1/trip/${trip_id}`,'PATCH');
+const InTripComponent=(({routeData, desktopClassName='', busStops, setTripStatus, trip_id, setTracking, driverData})=>{
+  const { mutate } = useMutation(`/api/drivers/${driverData?.id}/trip/${trip_id}`,'PATCH');
   const handleUpdateTripStatus=async(body)=>{
     try {
       const data = await mutate(body);
