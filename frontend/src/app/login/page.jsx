@@ -161,8 +161,6 @@ const Login = () => {
                 >
                   <option value="">Select your role</option>
                   <option value="parent">Parent/Guardian</option>
-                  <option value="admin">Administrator</option>
-                  <option value="driver">Bus Driver</option>
                 </select>
               </div>
               <div className="form-group">
