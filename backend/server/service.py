@@ -49,12 +49,12 @@ class UserService():
                         User.email.ilike(f'%{query}%'),
                         User.mobile.ilike(f'%{query}%')
                     )
-                ).limit(10).offset(offset).all()
+                ).all()
                 return [user.to_dict(rules=('-password_hash','-bookings')) for user in users]
             else:
-                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).limit(10).offset(offset).all()]
+                return [user.to_dict(rules=('-password_hash','-bookings')) for user in User.query.filter_by(role=role).all()]
         else:
-            return [user.to_dict(rules=('-password_hash',)) for user in User.query.limit(10).offset(offset).all()]
+            return [user.to_dict(rules=('-password_hash',)) for user in User.query.all()]
         
     @staticmethod
     def analytics(role=''):
@@ -88,8 +88,8 @@ class DriverService():
         page = int(page) if str(page).isdigit() else 1
         offset = (page - 1) * 10
         if query:
-            return [driver.to_dict() for driver in Driver.query.filter(Driver.driver_name.ilike(f'%{query}%'),).limit(10).offset(offset).all()]
-        return [driver.to_dict() for driver in Driver.query.limit(10).offset(offset).all()]
+            return [driver.to_dict() for driver in Driver.query.filter(Driver.driver_name.ilike(f'%{query}%'),).all()]
+        return [driver.to_dict() for driver in Driver.query.all()]
     
     @staticmethod
     def findOne(id=None,driver_name=None,id_number=None):
@@ -154,8 +154,8 @@ class BookingService():
                         Booking.pickup.ilike(f'%{query}%'),
                         Booking.dropoff.ilike(f'%{query}%')
                     )
-                ).limit(10).offset(offset).all()
-            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).limit(10).offset(offset).all()] 
+                ).all()
+            return [booking.to_dict() for booking in Booking.query.filter_by(parent_id=int(parent)).all()] 
         if query:
             bookings = Booking.query.filter(
                 or_(
@@ -163,9 +163,9 @@ class BookingService():
                     Booking.pickup.ilike(f'%{query}%'),
                     Booking.dropoff.ilike(f'%{query}%')
                 )
-            ).limit(10).offset(offset).all()
+            ).all()
             return [booking.to_dict() for booking in bookings]
-        return [booking.to_dict() for booking in Booking.query.limit(10).offset(offset).all()]
+        return [booking.to_dict() for booking in Booking.query.all()]
     
     @staticmethod
     def findOne(id):
@@ -216,7 +216,7 @@ class BusService():
         if date:
             dbQuery = dbQuery.filter(Bus.departure == date)
 
-        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.limit(10).offset(offset).all()]
+        return [bus.to_dict(rules=('-routes.buses', )) for bus in dbQuery.all()]
     
     @staticmethod
     def findOne(id=None, plate=None):
@@ -277,10 +277,10 @@ class RouteService():
                     Route.start.ilike(f'%{query}%'),
                     Route.end.ilike(f'%{query}%'),
                 )
-            ).limit(10).offset(offset).all()
+            ).all()
             return [route.to_dict() for route in routes]
         else:
-            return [route.to_dict() for route in Route.query.limit(10).offset(offset).all()]
+            return [route.to_dict() for route in Route.query.all()]
     
     @staticmethod
     def findById(id):
