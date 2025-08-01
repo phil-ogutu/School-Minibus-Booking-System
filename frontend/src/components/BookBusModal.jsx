@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import { haversineDistance, calculatePrice } from "@/utils/distance";
 import { FaBus, FaCreditCard, FaMapMarkerAlt, FaUser } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { sendBookingConfirmation, prepareBookingDataForEmail } from "@/app/api/mailer/utils";
+
 
 const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
   if (!isOpen || !route || !bus) return null;
@@ -52,11 +54,12 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
     }
   }, [formData.pickup, formData.dropoff, route.locations]);
 
+// Enhanced handleSubmit function for BookBusModal
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const bookingTitle = `${formData.passengerName} - ${route.start} -> ${route.end}`;
-
+  
     const bookingData = {
       title: bookingTitle,
       bus_id: bus.id,
@@ -66,17 +69,52 @@ const BookBusModal = ({ isOpen, onClose, route, bus, onNavigate }) => {
       dropoff: formData.dropoff,
       price: price,
     };
-
+  
     mutate(bookingData)
-      .then((response) => {
+      .then(async (response) => {
         console.log("Booking successful:", response);
         toast.success("Booking successful");
-
+  
+        // Send confirmation email
+        try {
+          console.log("Preparing email data...");
+          const emailData = prepareBookingDataForEmail(
+            {
+              id: response?.booking?.id || response?.id,
+              child_name: formData.passengerName,
+              pickup: formData.pickup,
+              dropoff: formData.dropoff,
+              price: price,
+              created_at: new Date().toISOString()
+            },
+            user, // Contains parent's email from login
+            bus,
+            route
+          );
+          
+          console.log("Email data prepared:", emailData);
+          console.log("Sending email to:", user?.email);
+          
+          const emailResult = await sendBookingConfirmation(emailData);
+          
+          if (emailResult) {
+            console.log("Email sent successfully");
+            toast.success("Confirmation email sent!");
+          } else {
+            console.log("Email sending failed");
+            toast.warn("Booking confirmed, but email notification failed");
+          }
+          
+        } catch (emailError) {
+          console.error("Email sending failed:", emailError);
+          toast.warn("Booking confirmed, but email notification failed");
+        }
+  
         const bookingId = response?.id || response?.data?.id;
         if (bookingId) {
           onNavigate(bookingId);
         }
-
+  
         onClose();
       })
       .catch((error) => {

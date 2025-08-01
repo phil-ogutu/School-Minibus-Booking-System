@@ -31,7 +31,7 @@ class Bookings(Resource):
         db.session.add(new_booking)
         db.session.commit()
         response=make_response(
-            {"driver":new_booking.to_dict(),"message":"Booking created successfully"},
+            {"booking":new_booking.to_dict(),"message":"Booking created successfully"},
             201
         )
         return response
