@@ -9,13 +9,13 @@ import { getMessaging, getToken, onMessage } from "firebase/messaging";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA6_6bKAlT0RCYrFY5Y88fhj1DB1YYsE9A",
-  authDomain: "skoola-bus.firebaseapp.com",
-  projectId: "skoola-bus",
-  storageBucket: "skoola-bus.firebasestorage.app",
-  messagingSenderId: "239308664910",
-  appId: "1:239308664910:web:7f3a1a8135dd95e9f2131f",
-  measurementId: "G-F4V0WM3L3N",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
