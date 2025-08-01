@@ -14,6 +14,7 @@ from controllers.bookings import Bookings, BookingById
 from controllers.contacts import Contacts, ContactById
 from controllers.owners import Owners, OwnerById
 from controllers.fcm import SaveFcmToken, SendNotification
+from controllers.payments import payments_bp # Importing the payments blueprint
 # Local imports
 from config import app, db, api
 

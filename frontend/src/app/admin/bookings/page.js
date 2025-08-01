@@ -1,80 +1,142 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useBookings } from '@/hooks/useBookings';
+import { useEffect, useState } from "react";
+import { useBookings } from "@/hooks/useBookings";
+import { useState } from "react";
+import { useBookings } from "@/hooks/useBookings";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import CreateBooking from "@/components/CreateBooking";
-import UpdateBookingForm from '@/components/UpdateBooking';
+import UpdateBookingForm from "@/components/UpdateBooking";
 import DataTable from "@/components/DataTable"; // Import DataTable
-import { addIcon, deleteIcon, editIcon, warningIcon } from '@/components/ui/icons';
-import Container from '@/components/ui/Container';
-import Text from '@/components/ui/Text';
-import { useModal } from '@/hooks/useModal';
-import debounce from '@/utils/debounce';
-import { useFetch } from '@/hooks/useFetch';
-import Modal from '@/components/ui/Modal';
-import { FormField, FormWrapper } from '@/components/ui/Form';
-import { FaCreditCard, FaMapMarkerAlt } from 'react-icons/fa';
-import { Field, useFormikContext } from 'formik';
-import * as Yup from 'yup';
-import { calculatePrice, haversineDistance } from '@/utils/distance';
+import {
+  addIcon,
+  deleteIcon,
+  editIcon,
+  warningIcon,
+} from "@/components/ui/icons";
+import Container from "@/components/ui/Container";
+import Text from "@/components/ui/Text";
+import { useModal } from "@/hooks/useModal";
+import debounce from "@/utils/debounce";
+import { useFetch } from "@/hooks/useFetch";
+import Modal from "@/components/ui/Modal";
+import dynamic from "next/dynamic"; // Dynamically import CreateBooking to avoid SSR issues
+
+//  Dynamic imports
+const CreateBooking = dynamic(() => import("@/components/CreateBooking"), {
+  ssr: false,
+});
+const UpdateBookingForm = dynamic(() => import("@/components/UpdateBooking"), {
+  ssr: false,
+});
+const DataTable = dynamic(() => import("@/components/DataTable"), {
+  ssr: false,
+});
+
+// Main component to view bookingsimport { FormField, FormWrapper } from '@/components/ui/Form';
+import { FaCreditCard, FaMapMarkerAlt } from "react-icons/fa";
+import { Field, useFormikContext } from "formik";
+import * as Yup from "yup";
+import { calculatePrice, haversineDistance } from "@/utils/distance";
 import { toast } from "react-toastify";
-import { useMutation } from '@/hooks/useMutation';
+import { useMutation } from "@/hooks/useMutation";
 
 const bookingInitialValues = {
-  parent_id: '',
-  bus_id: '',
-  title: 'new Booking from admin',
-  child_name: '',
-  pickup: '',
-  dropoff: '',
+  parent_id: "",
+  bus_id: "",
+  title: "new Booking from admin",
+  child_name: "",
+  pickup: "",
+  dropoff: "",
   price: 0,
 };
 
 const bookingSchema = Yup.object().shape({
-  parent_id: Yup.number().required('Parent is required'),
-  bus_id: Yup.number().required('Bus is required'),
-  title: Yup.string().required('Booking title is required'),
-  child_name: Yup.string().required('Child name is required'),
-  pickup: Yup.string().required('Pick up is required'),
-  dropoff: Yup.string().required('Drop Off is required'),
-  price: Yup.number().required('Driver is required'),
+  parent_id: Yup.number().required("Parent is required"),
+  bus_id: Yup.number().required("Bus is required"),
+  title: Yup.string().required("Booking title is required"),
+  child_name: Yup.string().required("Child name is required"),
+  pickup: Yup.string().required("Pick up is required"),
+  dropoff: Yup.string().required("Drop Off is required"),
+  price: Yup.number().required("Driver is required"),
 });
 
 const ViewBookings = () => {
-  const [query,setQuery]=useState('');
-  const [page,setPage]=useState(1);
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
   const { createNewBooking, deleteExistingBooking } = useBookings();
+  const [query, setQuery] = useState("");
+  const { deleteExistingBooking } = useBookings();
+  const [allowEditing, setAllowEditng] = useState(false);
+  const [editingBookingId, setEditingBookingId] = useState(null);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const handleCreateBooking = () => {
+    setIsCreating(true);
+  };
+
+  const handleEdit = (bookingId) => {
+    setAllowEditng(true);
+    if (bookingId) {
+      setEditingBookingId(bookingId);
+    }
+  };
+
+  // const handleDelete = async (bookingId) => {
+  //   const confirmation = window.confirm('Are you sure you want to delete this booking?');
+  //   if (confirmation) {
+  //     await deleteExistingBooking(bookingId);
+  //   }
+  // };
+
+  const handleCloseModal = () => {
+    setIsCreating(false);
+    setEditingBookingId(null);
+  };
   /****Bookings Fetch */
-  const { data: bookings, loading: loadingBookings, error: errorBookings, refetch: refetchBookings} = useFetch(`/api/bookings?query=${query}&page=${page}`);
-  
+  const {
+    data: bookings,
+    loading: loadingBookings,
+    error: errorBookings,
+    refetch: refetchBookings,
+  } = useFetch(`/api/bookings?query=${query}&page=${page}`);
+
   const debouncedSearch = debounce(refetchBookings, 300);
   function handleSearch(event) {
-    console.log('Searching for:', event.target.value);
-    setQuery(event.target.value)
-    debouncedSearch()
-  };
+    console.log("Searching for:", event.target.value);
+    setQuery(event.target.value);
+    debouncedSearch();
+  }
   /****Booking Creation */
   const { isOpen, openModal, closeModal } = useModal();
-  const handleCreateBookingForm=async(values)=>{
-    console.log(values)    
-    await createNewBooking(values).then(()=>{
-      console.log(
-        `Booking creation functionality is succcess`
-      );
-      toast.success(`Booking for ${values.child_name} created successfully`)
-      closeModal();
-      refetchBookings()
-    }).catch((err)=>{
-      toast.error('Failed to create booking',err)
-    });
+  const handleCreateBookingForm = async (values) => {
+    console.log(values);
+    await createNewBooking(values)
+      .then(() => {
+        console.log(`Booking creation functionality is succcess`);
+        toast.success(`Booking for ${values.child_name} created successfully`);
+        closeModal();
+        refetchBookings();
+      })
+      .catch((err) => {
+        toast.error("Failed to create booking", err);
+      });
   };
   /****Booking Update */
-  const [bookingToBeUpdated,setbookingToBeUpdated]=useState({});
-  const { isOpen: isEditModalOpen, openModal: openEditModal, closeModal: closeEditModal } = useModal();
-  const { mutate: editMutate, data: updatedBooking, loading: loadingUpdatingBooking, error: errorUpdatingBooking } = useMutation(``,'PATCH');
-  const handleShowUpdateModal=(booking)=>{
+  const [bookingToBeUpdated, setbookingToBeUpdated] = useState({});
+  const {
+    isOpen: isEditModalOpen,
+    openModal: openEditModal,
+    closeModal: closeEditModal,
+  } = useModal();
+  const {
+    mutate: editMutate,
+    data: updatedBooking,
+    loading: loadingUpdatingBooking,
+    error: errorUpdatingBooking,
+  } = useMutation(``, "PATCH");
+  const handleShowUpdateModal = (booking) => {
     bookingInitialValues.parent_id = booking.parent_id;
     bookingInitialValues.bus_id = booking.bus_id;
     bookingInitialValues.driver_id = booking.driver_id;
@@ -82,55 +144,99 @@ const ViewBookings = () => {
     bookingInitialValues.pickup = booking.pickup;
     bookingInitialValues.dropoff = booking.dropoff;
     bookingInitialValues.price = booking.price;
-    setbookingToBeUpdated(booking)
+    setbookingToBeUpdated(booking);
     openEditModal();
   };
-  const handleUpdateBookingForm=async(values)=>{
-    console.log(values)
-    await editMutate(values,`/api/bookings/${bookingToBeUpdated?.id}`).then(()=>{
-      console.log(
-        `Booking update functionality is succcess`
-      );
-      toast.success(`booking for ${values.child_name} updated successfully`);
-      closeEditModal();
-      refetchBookings()
-    }).catch((err)=>{
-      toast.error(err)
-    });
+  const handleUpdateBookingForm = async (values) => {
+    console.log(values);
+    await editMutate(values, `/api/bookings/${bookingToBeUpdated?.id}`)
+      .then(() => {
+        console.log(`Booking update functionality is succcess`);
+        toast.success(`booking for ${values.child_name} updated successfully`);
+        closeEditModal();
+        refetchBookings();
+      })
+      .catch((err) => {
+        toast.error(err);
+      });
   };
   /****Booking Deletion */
-  const [bookingToBeDeleted,setbookingToBeDeleted]=useState({});
-  const { isOpen: deleteisOpen, openModal: deleteopenModal, closeModal : deletecloseModal} = useModal();
-  const handleShowDeleteModal=(booking)=>{
-    console.log('booking',booking);
-    setbookingToBeDeleted(booking)
+  const [bookingToBeDeleted, setbookingToBeDeleted] = useState({});
+  const {
+    isOpen: deleteisOpen,
+    openModal: deleteopenModal,
+    closeModal: deletecloseModal,
+  } = useModal();
+  const handleShowDeleteModal = (booking) => {
+    console.log("booking", booking);
+    setbookingToBeDeleted(booking);
     deleteopenModal();
   };
-  const handleDelete = async(id) => {
-    if(id){
-      await deleteExistingBooking(bookingToBeDeleted?.id).then(()=>{
-        console.log(
-          `booking deleted functionality is succcess`
-        );
-        toast.success(`Booking for ${bookingToBeDeleted.child_name} deleted successfully`)
-        deletecloseModal();
-        refetchBookings()
-      }).catch((err)=>{
-        alert(err)
-      });
+  // const handleDelete = async(id) => {
+  //   if(id){
+  //     await deleteExistingBooking(bookingToBeDeleted?DataTable.id).then(()=>{
+  //       console.log(
+  //         `booking deleted functionality is succcess`
+  //       );
+  toast.success(
+    `Booking for ${bookingToBeDeleted.child_name} deleted successfully`
+  );
+  //       deletecloseModal();
+  //       refetchBookings()
+  //     }).catch((err)=>{
+  //       alert(err)
+  //     });
+  //   }
+  // };
+  const handleDelete = async () => {
+    if (bookingToBeDeleted && bookingToBeDeleted.id) {
+      try {
+        await deleteExistingBooking(bookingToBeDeleted.id);
+        console.log("Booking deleted successfully");
+        deleteCloseModal();
+        refetchBookings();
+      } catch (err) {
+        console.error("Error deleting booking:", err);
+        alert(err.message || "An error occurred while deleting the booking.");
+      }
+    } else {
+      l;
+      alert("Invalid booking ID");
     }
   };
-  const { data: parents, loading: loadingParents, error: errorParents, refetch: refetchParents} = useFetch(`/api/users/parent?page=1`);
-  const { data: buses, loading: loadingBuses, error: errorBuses, refetch: refetchBuses} = useFetch(`/api/buses`);
+  const {
+    data: parents,
+    loading: loadingParents,
+    error: errorParents,
+    refetch: refetchParents,
+  } = useFetch(`/api/users/parent?page=1`);
+  const {
+    data: buses,
+    loading: loadingBuses,
+    error: errorBuses,
+    refetch: refetchBuses,
+  } = useFetch(`/api/buses`);
 
   const columns = [
     { header: "Student", accessor: "child_name" },
-    { header: "Parent", accessor: "parent?.username", render: ((booking) => (`${booking?.parent?.username}`)) },
-    { header: "Bus", accessor: "bus?.plate ",render: ((booking) => (`${booking?.bus?.plate}`)) },
+    {
+      header: "Parent",
+      accessor: "parent?.username",
+      render: (booking) => `${booking?.parent?.username}`,
+    },
+    {
+      header: "Bus",
+      accessor: "bus?.plate ",
+      render: (booking) => `${booking?.bus?.plate}`,
+    },
     { header: "Pickup", accessor: "pickup" },
     { header: "Drop-off", accessor: "dropoff" },
     { header: "Price", accessor: "price" },
-    { header: "Status", accessor: "status", render: (status) => status ? 'Active' : 'Inactive' },
+    {
+      header: "Status",
+      accessor: "status",
+      render: (status) => (status ? "Active" : "Inactive"),
+    },
     {
       header: "Actions",
       accessor: "actions",
@@ -140,14 +246,14 @@ const ViewBookings = () => {
             onClick={() => handleShowUpdateModal(id)}
             className="bg-tertiary text-dark p-1 rounded hover:bg-secondary flex flex-row gap-2 align-middle"
           >
-            {editIcon('my-0','text-xl')}
+            {editIcon("my-0", "text-xl")}
             edit
           </button>
           <button
             onClick={() => handleShowDeleteModal(id)}
             className="bg-red-400 text-white p-1 rounded hover:bg-red-600 flex flex-row gap-2 align-middle text-md"
           >
-            {deleteIcon('my-0','text-xl')}
+            {deleteIcon("my-0", "text-xl")}
             delete
           </button>
         </div>
@@ -157,23 +263,34 @@ const ViewBookings = () => {
 
   return (
     <Container className="flex flex-col p-4 h-screen">
-        <Container className="flex flex-row justify-between align-middle">
-          <Text className='text-4xl fw-bold' as='h1'>Bookings</Text>
-          <Container className="flex flex-row gap-2">
-            <input 
-              type="search" 
-              placeholder="search bookings" 
-              className="block min-w-0 grow py-1.5 pr-3 pl-1 bg-tertiary border-dark rounded-md text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-              onChange={((e)=>{handleSearch(e)})}
-            />
-            <button 
-              className="bg-primary p-2 rounded-md text-white flex-row flex align-middle text-lg cursor-pointer" 
-              type="button"
-              onClick={()=>openModal()}
-            >{addIcon('','',{marginTop:4})}new</button>
-          </Container>
+      <Container className="flex flex-row justify-between align-middle">
+        <Text className="text-4xl fw-bold" as="h1">
+          Bookings
+        </Text>
+        <Container className="flex flex-row gap-2">
+          <input
+            type="search"
+            placeholder="search bookings"
+            className="block min-w-0 grow py-1.5 pr-3 pl-1 bg-tertiary border-dark rounded-md text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+            onChange={(e) => {
+              handleSearch(e);
+            }}
+          />
+          <button
+            className="bg-primary p-2 rounded-md text-white flex-row flex align-middle text-lg cursor-pointer"
+            type="button"
+            // onClick={()=>openModal()}
+          >
+            {addIcon("", "", { marginTop: 4 })}new
+          </button>
         </Container>
-      <DataTable columns={columns} data={bookings} setPage={setPage} Page={page}/>
+      </Container>
+      <DataTable
+        columns={columns}
+        data={bookings}
+        setPage={setPage}
+        Page={page}
+      />
       {/* Create Booking Modal */}
       <Modal
         isOpen={isOpen}
@@ -192,31 +309,47 @@ const ViewBookings = () => {
             onSubmit={handleCreateBookingForm}
             className="w-full"
           >
-            <div className='flex flex-col my-2'>
+            <div className="flex flex-col my-2">
               <label htmlFor="bus_id">Choose a Bus:</label>
-              <Field as="select" name="bus_id" 
+              <Field
+                as="select"
+                name="bus_id"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {buses && buses?.map((bus)=>{
-                  return(
-                    <option key={bus?.id} value={bus?.id}>{bus?.routes?.start}{bus?.routes?.end}</option>
-                  )
-                })}
+                {buses &&
+                  buses?.map((bus) => {
+                    return (
+                      <option key={bus?.id} value={bus?.id}>
+                        {bus?.routes?.start}
+                        {bus?.routes?.end}
+                      </option>
+                    );
+                  })}
               </Field>
             </div>
-            <div className='flex flex-col my-2'>
+            <div className="flex flex-col my-2">
               <label htmlFor="parent_id">Choose a Parent:</label>
-              <Field as="select" name="parent_id" 
+              <Field
+                as="select"
+                name="parent_id"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {parents && parents?.map((parent)=>{
-                  return(
-                    <option key={parent?.id} value={parent?.id}>{parent?.username}</option>
-                  )
-                })}
+                {parents &&
+                  parents?.map((parent) => {
+                    return (
+                      <option key={parent?.id} value={parent?.id}>
+                        {parent?.username}
+                      </option>
+                    );
+                  })}
               </Field>
             </div>
-            <FormField name="child_name" label="Child Name" type="text" placeholder="Enter child name here..." />
+            <FormField
+              name="child_name"
+              label="Child Name"
+              type="text"
+              placeholder="Enter child name here..."
+            />
             <PickupDropoffFields buses={buses} />
             <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
               <button
@@ -229,7 +362,9 @@ const ViewBookings = () => {
               <button
                 type="submit"
                 className="bg-primary text-white px-4 py-2 rounded"
-              > Save
+              >
+                {" "}
+                Save
               </button>
             </div>
           </FormWrapper>
@@ -253,31 +388,47 @@ const ViewBookings = () => {
             onSubmit={handleUpdateBookingForm}
             className="w-full"
           >
-            <div className='flex flex-col my-2'>
+            <div className="flex flex-col my-2">
               <label htmlFor="bus_id">Choose a Bus:</label>
-              <Field as="select" name="bus_id" 
+              <Field
+                as="select"
+                name="bus_id"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {buses && buses?.map((bus)=>{
-                  return(
-                    <option key={bus?.id} value={bus?.id}>{bus?.routes?.start}{bus?.routes?.end}</option>
-                  )
-                })}
+                {buses &&
+                  buses?.map((bus) => {
+                    return (
+                      <option key={bus?.id} value={bus?.id}>
+                        {bus?.routes?.start}
+                        {bus?.routes?.end}
+                      </option>
+                    );
+                  })}
               </Field>
             </div>
-            <div className='flex flex-col my-2'>
+            <div className="flex flex-col my-2">
               <label htmlFor="parent_id">Choose a Parent:</label>
-              <Field as="select" name="parent_id" 
+              <Field
+                as="select"
+                name="parent_id"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {parents && parents?.map((parent)=>{
-                  return(
-                    <option key={parent?.id} value={parent?.id}>{parent?.username}</option>
-                  )
-                })}
+                {parents &&
+                  parents?.map((parent) => {
+                    return (
+                      <option key={parent?.id} value={parent?.id}>
+                        {parent?.username}
+                      </option>
+                    );
+                  })}
               </Field>
             </div>
-            <FormField name="child_name" label="Child Name" type="text" placeholder="Enter child name here..." />
+            <FormField
+              name="child_name"
+              label="Child Name"
+              type="text"
+              placeholder="Enter child name here..."
+            />
             <PickupDropoffFields buses={buses} />
             <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
               <button
@@ -290,7 +441,9 @@ const ViewBookings = () => {
               <button
                 type="submit"
                 className="bg-primary text-white px-4 py-2 rounded"
-              > Save
+              >
+                {" "}
+                Save
               </button>
             </div>
           </FormWrapper>
@@ -305,7 +458,7 @@ const ViewBookings = () => {
         <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
           <div className="flex flex-row gap-2 align-middle">
             <div className="rounded-full p-4 bg-red-300">
-              {warningIcon('text-white','text-2xl')}
+              {warningIcon("text-white", "text-2xl")}
             </div>
             <h5 className="mb-2 font-semibold text-dark modal-title lg:text-2xl text-center my-auto">
               Delete booking for {bookingToBeDeleted?.child_name}
@@ -326,8 +479,12 @@ const ViewBookings = () => {
             <button
               type="submit"
               className="bg-red-500 text-white px-4 py-2 rounded"
-              onClick={()=>{handleDelete(bookingToBeDeleted?.id)}}
-            > Delete
+              onClick={() => {
+                handleDelete(bookingToBeDeleted?.id);
+              }}
+            >
+              {" "}
+              Delete
             </button>
           </div>
         </div>
@@ -338,11 +495,10 @@ const ViewBookings = () => {
 
 export default ViewBookings;
 
-
 const PickupDropoffFields = ({ buses }) => {
   const { values, setFieldValue } = useFormikContext();
 
-  const selectedBus = buses.find(bus => bus.id == values?.bus_id);
+  const selectedBus = buses.find((bus) => bus.id == values?.bus_id);
   const locations = selectedBus?.routes?.locations || [];
 
   const pickupIndex = locations.findIndex(
@@ -367,7 +523,7 @@ const PickupDropoffFields = ({ buses }) => {
         );
         const computedPrice = calculatePrice(distance);
         setPrice(computedPrice.toFixed(2));
-        setFieldValue('price', parseFloat(computedPrice.toFixed(2)));
+        setFieldValue("price", parseFloat(computedPrice.toFixed(2)));
       }
     }
   }, [values.pickup, values.dropoff, locations, setFieldValue]);
@@ -383,8 +539,8 @@ const PickupDropoffFields = ({ buses }) => {
         name="pickup"
         className="w-full p-2 mb-4 border rounded-lg border-neutral-400 focus:outline-none text-neutral-600"
         onChange={(e) => {
-          setFieldValue('pickup', e.target.value);
-          setFieldValue('dropoff', ''); // reset dropoff when pickup changes
+          setFieldValue("pickup", e.target.value);
+          setFieldValue("dropoff", ""); // reset dropoff when pickup changes
         }}
         disabled={!selectedBus}
       >

@@ -2,7 +2,13 @@
 import React from "react";
 import Link from "next/link";
 
-const Button = ({ href, children, variant = "primary", size = "base" }) => {
+export default function Button({
+  href,
+  children,
+  variant = "primary",
+  size = "base",
+  ...props
+}) {
   const base =
     "inline-block rounded font-semibold focus:outline-none transition duration-200";
   const sizes = {
@@ -14,13 +20,19 @@ const Button = ({ href, children, variant = "primary", size = "base" }) => {
     secondary: "bg-gray-700 hover:bg-gray-800 text-white",
   };
 
-  return (
-    <Link href={href}>
-      <span className={`${base} ${variants[variant]} ${sizes[size]}`}>
-        {children}
-      </span>
-    </Link>
-  );
-};
+  const cls = `${base} ${variants[variant]} ${sizes[size]}`;
 
-export default Button;
+  if (href) {
+    return (
+      <Link href={href} {...props}>
+        <span className={cls}>{children}</span>
+      </Link>
+    );
+  }
+
+  return (
+    <button className={cls} {...props}>
+      {children}
+    </button>
+  );
+}
