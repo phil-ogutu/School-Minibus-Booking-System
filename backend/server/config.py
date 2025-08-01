@@ -57,5 +57,4 @@ api = Api(app)
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
 # Instantiate SocketIO
-# socketio = SocketIO(app, cors_allowed_origins="*")  # SocketIO instance Set up to handle WebSocket connections
 socketio = SocketIO(app, cors_allowed_origins="*")
