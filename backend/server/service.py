@@ -423,7 +423,7 @@ class ContactService:
         db.session.commit()
 
 class NotificationService():
-    def __init__(self, title, user_ids, body):
+    def __init__(self, title=None, user_ids=[], body=None):
         self.title = title
         self.user_ids = user_ids
         self.body = body
