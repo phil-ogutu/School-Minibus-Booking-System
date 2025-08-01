@@ -15,7 +15,7 @@ from controllers.contacts import Contacts, ContactById
 from controllers.owners import Owners, OwnerById
 from controllers.fcm import SaveFcmToken, SendNotification
 # Local imports
-from config import app, db, api
+from config import app, db, api, socketio
 
 @app.route('/')
 def index():
@@ -53,4 +53,4 @@ api.add_resource(SaveFcmToken, '/api/save-fcm-token')
 api.add_resource(SendNotification, '/api/send-notification')
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    socketio.run(app, port=5555, debug=True)
