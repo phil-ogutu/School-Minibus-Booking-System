@@ -16,18 +16,31 @@ import {
   FaPersonBooth,
   FaUser,
 } from "react-icons/fa";
+import { useSocketTracking } from '@/hooks/useSocketTracking'
+import { useAuthContext } from "@/context/AuthContext";
+// import MapRenderer from "@/Shared/MapRenderer";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
+const MapRenderer = dynamic(() => import("@/Shared/MapRenderer"), { ssr: false });
 
 export default function TrackPage() {
   const searchParams = useSearchParams(); // Get query parameters
   const queryId = searchParams.get('id'); // Get 'id' from query params
   const { isAuthenticated } = useAuth();
+  const { user } = useAuthContext()
   const [trackingNumber, setTrackingNumber] = useState(queryId || ""); // Pre-fill with query ID
   const [trackingError, setTrackingError] = useState("");
   const [isTracking, setIsTracking] = useState(false);
   const [trackingData, setTrackingData] = useState(null);
+  const [activeBooking, setactiveBooking] = useState(null);
 
+
+  const {
+    busLocation,
+    remainingStops
+  } = useSocketTracking(user, activeBooking);
+
+  const isMoving = busLocation?.isMoving ?? false;
   
   const handleTrack = useCallback(async (trackingId = trackingNumber) => {
     if (!isAuthenticated) {
@@ -44,24 +57,25 @@ export default function TrackPage() {
      setTrackingError("");
      
      try {
-       // Save tracking number to localStorage
-       localStorage.setItem('trackingNumber', trackingId);
+        // Save tracking number to localStorage
+        localStorage.setItem('trackingNumber', trackingId);
+        
+        const { booking, bus, route } = await fetchTrackingData(trackingId);
        
-       const { booking, bus, route } = await fetchTrackingData(trackingId);
-       
-       // Transform data for display
-       const transformedData = {
-         from: booking.pickup || "N/A",
-         to: booking.dropoff || "N/A", 
-         tripStartTime: bus?.departure ? new Date(bus.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "4:00 am",
-         studentName: booking.child_name || "N/A",
-         studentNumber: booking.id.toString(),
-         currentLocation: booking.pickup || "Starting Point",
-         destination: booking.dropoff || "Destination",
-         routeLocations: route?.locations || []
+        // Transform data for display
+        const transformedData = {
+          from: booking.pickup || "N/A",
+          to: booking.dropoff || "N/A", 
+          tripStartTime: bus?.departure ? new Date(bus.departure).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "4:00 am",
+          studentName: booking.child_name || "N/A",
+          studentNumber: booking.id.toString(),
+          currentLocation: booking.pickup || "Starting Point",
+          destination: booking.dropoff || "Destination",
+          routeLocations: route?.locations || []
         };
         
         setTrackingData(transformedData);
+        setactiveBooking(booking)
         
       } catch (error) {
         setTrackingError("Tracking number not found. Please check and try again.");
@@ -91,7 +105,9 @@ export default function TrackPage() {
         handleTrack(savedTrackingNumber);
       }
     }
-  }, [queryId, isAuthenticated, handleTrack]);
+  }, [queryId, isAuthenticated, trackingNumber, handleTrack]);
+
+
 
   const fetchTrackingData = async (bookingId) => {
     try {
@@ -187,6 +203,15 @@ export default function TrackPage() {
                   className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
                   onKeyPress={(e) => e.key === 'Enter' && handleTrack()}
                 />
+                {trackingNumber && (
+                  <button
+                    onClick={() => {localStorage.removeItem('trackingNumber');setTrackingNumber('');handleTrack()}}
+                    disabled={isTracking}
+                    className="px-6 py-2 bg-dark disabled:bg-gray-300 font-medium rounded-lg transition-colors text-white"
+                  >
+                    Clear Input
+                  </button>
+                )}
                 <button
                   onClick={() => handleTrack()}
                   disabled={isTracking}
@@ -277,7 +302,13 @@ export default function TrackPage() {
 
         {/* Right Side - Map */}
         <div className="hidden md:block md:w-full md:h-full md:p-2">
-          <Map locations={trackingData?.routeLocations || []} />
+          <MapRenderer 
+            locations={trackingData?.routeLocations || []} 
+            isMoving={isMoving}
+            currentLocation={busLocation}
+            checkpoints={remainingStops}
+            trackingStatus={true}
+          />
         </div>
       </div>
     </div>

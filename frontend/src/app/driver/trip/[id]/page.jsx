@@ -9,8 +9,13 @@ import { useFetch } from '@/hooks/useFetch';
 import { loadLeaflet, L_Instance } from '@/utils/leaflet';
 import { useMutation } from '@/hooks/useMutation';
 import Link from 'next/link';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { BASE_URL } from '@/utils/constants';
+
+const socket = io(`${BASE_URL ?? 'http://localhost:5000'}`, {
+  withCredentials: true,  // Ensure cookies are sent
+  transports: ["websocket"]  // To use WebSockets as transport
+});
 
 const SchoolBusRoute = () => {
   const mapRef = useRef(null);
@@ -156,19 +161,11 @@ const SchoolBusRoute = () => {
   const [tracking, setTracking] = useState(true); // start tracking by default
   const watchIdRef = useRef(null); // store the watchId persistently
 
-  let socket
 
   // Connect to socket.io server
-  useEffect(() => {
-    socket = io(`${BASE_URL}`, {
-      withCredentials: true,  // Ensure cookies are sent
-      transports: ["websocket"]  // To use WebSockets as transport
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  socket.on('connect', () => {
+    console.log('Connected to server');
+  });
 
   // Manage geolocation tracking
   useEffect(() => {
