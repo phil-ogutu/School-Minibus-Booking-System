@@ -1,7 +1,7 @@
 // Here is the Next.js App Router pages
 // Root layout
 
-"use client";
+// "use client";
 import Head from "next/head";
 
 import "../styles/globals.css";
