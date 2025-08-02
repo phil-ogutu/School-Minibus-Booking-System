@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 import { useSocketTracking } from '@/hooks/useSocketTracking'
 import { useAuthContext } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 // import MapRenderer from "@/Shared/MapRenderer";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
@@ -34,10 +35,12 @@ export default function TrackPage() {
   const [trackingData, setTrackingData] = useState(null);
   const [activeBooking, setactiveBooking] = useState(null);
 
-
   const {
+    socket,
     busLocation,
-    remainingStops
+    remainingStops,
+    roomEmitter,
+    roomListener
   } = useSocketTracking(user, activeBooking);
 
   const isMoving = busLocation?.isMoving ?? false;
@@ -75,8 +78,8 @@ export default function TrackPage() {
         };
         
         setTrackingData(transformedData);
-        setactiveBooking(booking)
-        
+        setactiveBooking(booking);
+        roomEmitter("join tracking group",{bus_id: bus.id});        
       } catch (error) {
         setTrackingError("Tracking number not found. Please check and try again.");
         setTrackingData(null);
@@ -106,8 +109,13 @@ export default function TrackPage() {
       }
     }
   }, [queryId, isAuthenticated, trackingNumber, handleTrack]);
+  useEffect(() => {
+    const cleanup = roomListener("tracking-joined", (data) =>
+      toast.info(`${data?.user} has joined the tracking room.`)
+    );
 
-
+    return cleanup;
+  }, []);
 
   const fetchTrackingData = async (bookingId) => {
     try {

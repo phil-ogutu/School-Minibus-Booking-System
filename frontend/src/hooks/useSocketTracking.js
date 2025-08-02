@@ -8,13 +8,14 @@ export const useSocketTracking = (user, activeBooking) => {
   const [checkpointData, setCheckpointData] = useState(null)
   const [connectionStatus, setConnectionStatus] = useState('disconnected')
   const [remainingStops, setRemainingStops] = useState([])
-  const [estimatedArrival, setEstimatedArrival] = useState(null)
+  const [estimatedArrival, setEstimatedArrival] = useState(null);
+  const socket = getSocket() ?? null;
 
   useEffect(() => {
-    console.log('user',user,activeBooking);
     if (!user || !activeBooking) return
+    console.log(activeBooking)
 
-    const socket = getSocket()
+
     console.log('socket',socket)
 
     const handleConnect = () => setConnectionStatus('connected')
@@ -23,10 +24,14 @@ export const useSocketTracking = (user, activeBooking) => {
     socket.on('connect', handleConnect)
     socket.on('disconnect', handleDisconnect)
 
+    socket.emit('join tracking group', {
+      bus_id: activeBooking.bus_id,
+    });
+
     socket.on('bus_location_update_to_parent', (data) => {
-      console.log('bus_location_update_to_parent',data,activeBooking)
+      console.log('bus_location_update_to_parent',data)
       setBusLocation(data)
-    })
+    });
 
     socket.on('bus_checkpoint_reached', (data) => {
       console.log('checkpoint reached: ', data)
@@ -34,7 +39,7 @@ export const useSocketTracking = (user, activeBooking) => {
         setCheckpointData(data)
         updateRemainingStops(data)
       }
-    })
+    });
 
     return () => {
       socket.off('connect', handleConnect)
@@ -66,11 +71,33 @@ export const useSocketTracking = (user, activeBooking) => {
     setRemainingStops(remaining)
   }
 
+  const roomEmitter=(event,data)=>{
+    socket.emit(event, data);
+  };
+
+  function roomListener(event, func) {
+    if (typeof func !== "function") {
+      console.error(`roomListener: second argument must be a function`);
+      return;
+    }
+
+    const handler = (data) => {
+      console.log(`[SOCKET] [${event}]:`, data);
+      func(data);
+    };
+
+    socket.on(event, handler);
+    return () => socket.off(event, handler);
+  }
+
   return {
+    socket,
     busLocation,
     checkpointData,
     connectionStatus,
     estimatedArrival,
-    remainingStops
+    remainingStops,
+    roomEmitter,
+    roomListener
   }
 }
