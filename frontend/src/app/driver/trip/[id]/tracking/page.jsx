@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import io from 'socket.io-client';
 import SimulatedTrackerMap from '@/app/driver/components/SimulatedTrackerMap';
 import { BASE_URL } from '@/utils/constants';
+import { useSocketTracking } from '@/hooks/useSocketTracking';
+import { useBuses } from '@/hooks/useBuses';
 
 let socket;
 
@@ -16,6 +18,13 @@ export default function DriverTrackingPage() {
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [tracking, setTracking] = useState(true); // start tracking by default
   const watchIdRef = useRef(null); // store the watchId persistently
+  const { roomEmitter } = useSocketTracking();
+  const { getBusById } = useBuses();
+  const {bus} = getBusById(trip_id);
+  console.log(bus)
+  // const {roomEmitter} = useSocketTracking()
+
+  // console.log('roomEmitter',roomEmitter(bus?.tracking_room))
 
   // Connect to socket.io server
   useEffect(() => {
@@ -50,6 +59,14 @@ export default function DriverTrackingPage() {
             speed: 15,  // Temporary 
             timestamp: new Date().toISOString()
           });
+          roomEmitter("send bus location update", {
+            bus_id: trip_id,
+            latitude,
+            latitude,
+          });
+          roomEmitter('join tracking group', {
+            bus_id: trip_id,
+          })          
         },
         (err) => {
           console.error("Location error:", err);
@@ -64,6 +81,9 @@ export default function DriverTrackingPage() {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
+    socket.on("join tracking group",(data)=>{
+      console.log(data)
+    });
 
     // Cleanup on unmount
     return () => {
@@ -73,7 +93,7 @@ export default function DriverTrackingPage() {
       }
     };
   }, [tracking, trip_id]);
-
+  
   return (
     <> 
     <div className='p-8'>

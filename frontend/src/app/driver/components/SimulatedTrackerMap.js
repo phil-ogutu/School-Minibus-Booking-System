@@ -9,6 +9,7 @@ import { useFetch } from "@/hooks/useFetch";
 import { useParams } from "next/navigation";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { IoBus } from "react-icons/io5";
+import { useSocketTracking } from "@/hooks/useSocketTracking";
 
 // Custom SVG for a school bus icon
 const schoolBusIconSVG = `
@@ -31,6 +32,7 @@ export default function SimulatedTrackerMap() {
   const [locations, setLocations] = useState([]);
   const [polylineCoords, setPolylineCoords] = useState([]);
   const [expandedStops, setExpandedStops] = useState(false);
+  const { roomEmitter } = useSocketTracking();
 
   const { data, loading, error } = useFetch(`/api/drivers/1/trip/${trip_id}`, "trip");
 
@@ -79,6 +81,11 @@ export default function SimulatedTrackerMap() {
       location_name: "Moving",  // Temporary name for the moving bus
       speed: 15,  // Temporary 
       timestamp: new Date().toISOString(),
+    });
+    roomEmitter("send bus location update", {
+      bus_id: trip_id,
+      latitude: markerPosition[0],
+      longitude: markerPosition[1],
     });
 
     console.log("Emitted location for bus: LAT:", markerPosition[0], "LONG:", markerPosition[1]);
