@@ -1,9 +1,7 @@
 'use client'
 import Container from '@/components/ui/Container'
 import Text from '@/components/ui/Text'
-import React from 'react'
-import {Header as DriverHeader} from '../components/Header'
-import Image from 'next/image'
+import React from 'react';
 import TripCard from '../components/trip'
 import { useFetch } from '@/hooks/useFetch'
 
@@ -12,7 +10,6 @@ function page() {
   const { data: trips, loading: tripsLoading, error: tripsError } = useFetch(`/api/drivers/${driverData?.id}/trips`);
   return (
     <Container className={'flex-col'}>
-        <DriverHeader/>
         <Container className='p-4' >
           <Text className='text-3xl mb-4'>Welcome Back, {driverData?.driver_name ??'John'}</Text>
           <img src={'/banners/kids.jpg'} style={{width:'100%',height:'400px',objectFit:'cover',borderRadius:'10px'}}/>
