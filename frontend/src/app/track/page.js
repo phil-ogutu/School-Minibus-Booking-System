@@ -22,7 +22,6 @@ import { toast } from "react-toastify";
 // import MapRenderer from "@/Shared/MapRenderer";
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
-const MapRenderer = dynamic(() => import("@/Shared/MapRenderer"), { ssr: false });
 
 export default function TrackPage() {
   const searchParams = useSearchParams(); // Get query parameters
@@ -32,18 +31,15 @@ export default function TrackPage() {
   const [trackingNumber, setTrackingNumber] = useState(queryId || ""); // Pre-fill with query ID
   const [trackingError, setTrackingError] = useState("");
   const [isTracking, setIsTracking] = useState(false);
+  const [isTrackingLocation, setIsTrackingLocation] = useState({});
   const [trackingData, setTrackingData] = useState(null);
   const [activeBooking, setactiveBooking] = useState(null);
 
   const {
-    socket,
-    busLocation,
-    remainingStops,
     roomEmitter,
     roomListener
   } = useSocketTracking(user, activeBooking);
 
-  const isMoving = busLocation?.isMoving ?? false;
   
   const handleTrack = useCallback(async (trackingId = trackingNumber) => {
     if (!isAuthenticated) {
@@ -87,15 +83,7 @@ export default function TrackPage() {
         setIsTracking(false);
      }
    }, [isAuthenticated, trackingNumber]);
-   // // Load tracking number from localStorage on component mount
-   // useEffect(() => {
-   //   const savedTrackingNumber = localStorage.getItem('trackingNumber');
-   //   if (savedTrackingNumber) {
-   //     setTrackingNumber(savedTrackingNumber);
-   //     handleTrack(savedTrackingNumber);
-   //   }
-   // }, [isAuthenticated]);
-  // Auto-track when component mounts if there's an ID in query params
+   
   useEffect(() => {
     if (isAuthenticated && queryId) {
       setTrackingNumber(queryId);
@@ -109,13 +97,17 @@ export default function TrackPage() {
       }
     }
   }, [queryId, isAuthenticated, trackingNumber, handleTrack]);
+  
   useEffect(() => {
     const cleanup = roomListener("tracking-joined", (data) =>
       toast.info(`${data?.user} has joined the tracking room.`)
     );
-
+    roomListener('receiver bus location update',(data)=>{
+      setIsTrackingLocation(data);
+      setIsTracking(true);
+    })
     return cleanup;
-  }, []);
+  }, [isTrackingLocation?.latitude,isTrackingLocation?.longitude,]);
 
   const fetchTrackingData = async (bookingId) => {
     try {
@@ -310,13 +302,7 @@ export default function TrackPage() {
 
         {/* Right Side - Map */}
         <div className="hidden md:block md:w-full md:h-full md:p-2">
-          <MapRenderer 
-            locations={trackingData?.routeLocations || []} 
-            isMoving={isMoving}
-            currentLocation={busLocation}
-            checkpoints={remainingStops}
-            trackingStatus={true}
-          />
+          <Map locations={trackingData?.routeLocations || []} isTracking={isTracking} currentLocation={isTrackingLocation}/>
         </div>
       </div>
     </div>

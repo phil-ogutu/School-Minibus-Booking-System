@@ -13,10 +13,6 @@ export const useSocketTracking = (user, activeBooking) => {
 
   useEffect(() => {
     if (!user || !activeBooking) return
-    console.log(activeBooking)
-
-
-    console.log('socket',socket)
 
     const handleConnect = () => setConnectionStatus('connected')
     const handleDisconnect = () => setConnectionStatus('disconnected')
@@ -29,12 +25,12 @@ export const useSocketTracking = (user, activeBooking) => {
     });
 
     socket.on('bus_location_update_to_parent', (data) => {
-      console.log('bus_location_update_to_parent',data)
+      // console.log('bus_location_update_to_parent',data)
       setBusLocation(data)
     });
 
     socket.on('bus_checkpoint_reached', (data) => {
-      console.log('checkpoint reached: ', data)
+      // console.log('checkpoint reached: ', data)
       if (data.bus_id === activeBooking.bus_id) {
         setCheckpointData(data)
         updateRemainingStops(data)
@@ -71,8 +67,8 @@ export const useSocketTracking = (user, activeBooking) => {
     setRemainingStops(remaining)
   }
 
-  const roomEmitter=(event,data)=>{
-    socket.emit(event, data);
+  function roomEmitter(event,data){
+    return socket.emit(event, data);
   };
 
   function roomListener(event, func) {
@@ -82,7 +78,6 @@ export const useSocketTracking = (user, activeBooking) => {
     }
 
     const handler = (data) => {
-      console.log(`[SOCKET] [${event}]:`, data);
       func(data);
     };
 

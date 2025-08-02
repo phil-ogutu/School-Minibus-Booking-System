@@ -256,24 +256,15 @@ def handle_location_update(data):
 
 # ## Emitting location update in general (No bus id)
 
-@socketio.on('bus_location_update')
+@socketio.on('send bus location update')
 def sendBusLocationUpdate(data):
-    bus_id = int(data.get("trip_id"))
-    lat = float(data.get("latitude"))
-    lng = float(data.get("longitude"))
-
-    if not bus_id or not lat or not lng:
-        emit('error', {'message': 'Missing data for location update'})
-        return
+    bus_id = int(data.get("bus_id"))
+    lat = data.get("latitude")
+    lng = data.get("longitude")
     
     bus = BusService.findOne(id=bus_id)
-    if not bus:
-        print(f"Bus not found with ID: {bus_id}")
-        emit('error', {'message': 'Bus not found'})
-        return
-
-    room = f"trip_{bus.id}_driver_{bus.driver.id}_plate_{bus.plate}"
-    emit(event='',args={},to=room)
+    print('receiver bus location update',{"latitude": lat,"longitude": lng})
+    emit('receiver bus location update',{"latitude": lat,"longitude": lng},to=bus.tracking_room)
 
 @socketio.on('join tracking group')
 def joinTrackingGroup(data):

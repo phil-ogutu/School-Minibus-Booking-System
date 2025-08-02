@@ -12,7 +12,6 @@ const Navbar = () => {
   const { user, setUser, loading, checkAuth } = useAuthContext();
   const { logout } = useAuth()
 
-  console.log(user);
   const linkClasses = (path) =>
     `block py-2 px-3 rounded-sm md:p-0 ${
       pathname === path
