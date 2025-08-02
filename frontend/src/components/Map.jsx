@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { loadLeaflet, L_Instance } from '@/utils/leaflet';
 import { getRouteFromStops } from '@/utils/route';
 
-const Map = ({ locations }) => {
+const Map = ({ locations, isTracking=false, currentLocation={}, isMoving }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markersLayer = useRef(null);
@@ -95,7 +95,55 @@ const Map = ({ locations }) => {
     }
   }, [routeCoordinates]);
 
+  // Update bus location
+  const markersRef = useRef({
+    bus: null,
+    pickup: null,
+    dropoff: null,
+  })
+  useEffect(() => {
+    if(!isTracking|| !mapInstance.current || !currentLocation) return;
+    
+    const { latitude, longitude } = currentLocation;
+    console.log(currentLocation, 'latitude', typeof latitude, latitude)
+    console.log('longitude', typeof longitude, longitude)
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') return;
+    const newLatLng = L.latLng(latitude, longitude)
+
+    if (!markersRef.current.bus) {
+        markersRef.current.bus = L.marker(newLatLng, {
+            icon: createBusIcon(isTracking),
+            zIndexOffset: 1000
+        }).addTo(mapInstance.current)
+            .bindPopup('Current Bus Location')
+    } else {
+        markersRef.current.bus.setLatLng(newLatLng)
+        markersRef.current.bus.setIcon(createBusIcon(isTracking))
+    }
+
+    mapInstance.current.setView(newLatLng, 15, { animate: true, duration: 1 })
+  }, [currentLocation?.latitude, currentLocation?.latitude, isTracking])
+
   return <div ref={mapRef} className="w-full h-full rounded-lg shadow-md" />;
 };
 
 export default Map;
+
+// Custom SVG-based bus icon
+const createBusIcon = (isTracking = true) => L.divIcon({
+  html: `
+    <div class="relative">
+      <svg width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path fill="${isTracking ? '#EF4444' : '#6B7280'}" d="M5 11C5 9.89543 5.89543 9 7 9H17C18.1046 9 19 9.89543 19 11V18C19 19.1046 18.1046 20 17 20H16C16 21.1046 15.1046 22 14 22H10C8.89543 22 8 21.1046 8 20H7C5.89543 20 5 19.1046 5 18V11Z"/>
+        <path fill="#1F2937" d="M17 9H7V6C7 4.89543 7.89543 4 9 4H15C16.1046 4 17 4.89543 17 6V9Z"/>
+        <circle fill="#FFFFFF" cx="8.5" cy="18.5" r="1.5"/>
+        <circle fill="#FFFFFF" cx="15.5" cy="18.5" r="1.5"/>
+        ${isTracking ? '<animateTransform attributeName="transform" type="translate" values="0 0; 0 -2; 0 0" dur="1s" repeatCount="indefinite"/>' : ''}
+      </svg>
+      ${isTracking ? '<div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>' : ''}
+    </div>
+  `,
+  className: '',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32]
+});

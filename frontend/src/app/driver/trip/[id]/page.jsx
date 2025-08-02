@@ -9,12 +9,20 @@ import { useFetch } from '@/hooks/useFetch';
 import { loadLeaflet, L_Instance } from '@/utils/leaflet';
 import { useMutation } from '@/hooks/useMutation';
 import Link from 'next/link';
+import { io } from 'socket.io-client';
+import { BASE_URL } from '@/utils/constants';
+
+const socket = io(`${BASE_URL ?? 'http://localhost:5000'}`, {
+  withCredentials: true,  // Ensure cookies are sent
+  transports: ["websocket"]  // To use WebSockets as transport
+});
 
 const SchoolBusRoute = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [tripStatus,setTripStatus]=useState(false);
+  const driverData = JSON.parse(localStorage.getItem('driverData'))
   const {id : trip_id} = useParams();
   
   const { data , loading: tripsLoading, error: tripsError } = useFetch(`/api/drivers/1/trip/${trip_id}`,tripStatus);
@@ -149,6 +157,62 @@ const SchoolBusRoute = () => {
     }
   }, [routeCoordinates]);
 
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const [tracking, setTracking] = useState(true); // start tracking by default
+  const watchIdRef = useRef(null); // store the watchId persistently
+
+
+  // Connect to socket.io server
+  socket.on('connect', () => {
+    console.log('Connected to server');
+  });
+
+  // Manage geolocation tracking
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    if (tracking) {
+      watchIdRef.current = navigator.geolocation.watchPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          setLocation({ latitude, longitude });
+          console.log({ latitude, longitude })
+
+          socket.emit('bus_location_update', {
+            driver_id: 1, // replace with real driver ID (logged in as driver)
+            trip_id,
+            latitude,
+            longitude,
+            speed: 15,  // Temporary 
+            timestamp: new Date().toISOString()
+          });
+        },
+        (err) => {
+          console.error("Location error:", err);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 10000,
+        }
+      );
+    } else if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+        watchIdRef.current = null;
+      }
+    };
+  }, [tracking, trip_id]);
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Map Container */}
@@ -159,8 +223,8 @@ const SchoolBusRoute = () => {
         <div className="md:hidden absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl border-t border-gray-200 z-1000">
           <Link href={'/driver/home'}>Go back to home</Link>
           {routeData?.status === 'pending' ? 
-            <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id}/> :
-            <InTripComponent routeData={routeData} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id}/>
+            <StartTripComponent driverData={driverData} routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/> :
+            <InTripComponent driverData={driverData} routeData={routeData} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/>
           }
         </div>
       </div>
@@ -169,8 +233,8 @@ const SchoolBusRoute = () => {
       <div className="hidden md:block w-80 bg-white shadow-xl">
         <Link href={'/driver/home'}>Go back to home</Link>
         {routeData?.status === 'pending' ? 
-          <StartTripComponent routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id}/> :
-          <InTripComponent routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id}/>
+          <StartTripComponent driverData={driverData} routeData={routeData} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/> :
+          <InTripComponent driverData={driverData} routeData={routeData} desktopClassName={'h-full flex flex-col'} busStops={busStops} setTripStatus={setTripStatus} trip_id={trip_id} setTracking={setTracking}/>
         }
       </div>
     </div>
@@ -180,13 +244,14 @@ const SchoolBusRoute = () => {
 export default SchoolBusRoute;
 
 
-const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id})=>{
+const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id, setTracking, driverData})=>{
   const router = useRouter()
-  const { mutate } = useMutation(`/api/drivers/1/trip/${trip_id}`,'PATCH');
+  const { mutate } = useMutation(`/api/drivers/${driverData?.id}/trip/${trip_id}`,'PATCH');
   const handleStartRide=async()=>{
     try {
       const data = await mutate({status: 'started'});
       setTripStatus('started')
+      setTracking(true)
       return data;
     } catch (error) {
       throw error;
@@ -233,12 +298,13 @@ const StartTripComponent=(({routeData, desktopClassName='',setTripStatus,trip_id
   )
 });
 
-const InTripComponent=(({routeData, desktopClassName='', busStops, setTripStatus, trip_id})=>{
-  const { mutate } = useMutation(`/api/drivers/1/trip/${trip_id}`,'PATCH');
+const InTripComponent=(({routeData, desktopClassName='', busStops, setTripStatus, trip_id, setTracking, driverData})=>{
+  const { mutate } = useMutation(`/api/drivers/${driverData?.id}/trip/${trip_id}`,'PATCH');
   const handleUpdateTripStatus=async(body)=>{
     try {
       const data = await mutate(body);
       setTripStatus(body?.status)
+      setTracking(false)
       return data;
     } catch (error) {
       throw error;

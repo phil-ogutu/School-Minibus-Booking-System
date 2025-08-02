@@ -12,7 +12,6 @@ const Navbar = () => {
   const { user, setUser, loading, checkAuth } = useAuthContext();
   const { logout } = useAuth()
 
-  console.log(user);
   const linkClasses = (path) =>
     `block py-2 px-3 rounded-sm md:p-0 ${
       pathname === path
@@ -141,7 +140,7 @@ const ProfileCard = ({ name = 'User', email = 'user@example.com',role='' }) => {
     }else if(role=='parent'){
       router.push('/parentDashboard/home')
     }else if(role=='driver'){
-      router.push('/driver')
+      router.push('/driver/home')
     }
   }
   return (
@@ -151,8 +150,10 @@ const ProfileCard = ({ name = 'User', email = 'user@example.com',role='' }) => {
       </div>
       <div>
         <div className="font-semibold text-gray-800">{name}</div>
-        <div className="text-sm text-gray-500">{email}</div>
+        <div className="text-sm text-gray-500 w-30 truncate">{email}</div>
       </div>
     </div>
   );
 };
+
+export { ProfileCard }
