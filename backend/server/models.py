@@ -79,6 +79,7 @@ class Bus(db.Model,SerializerMixin):
     created_at = db.Column(db.DateTime(), server_default= func.now())
     arrived = db.Column(db.DateTime(),nullable=True)
     departure = db.Column(db.DateTime(),nullable=True)
+    tracking_room = db.Column(db.String())
 
     bookings = db.relationship("Booking", back_populates="bus")
     routes = db.relationship("Route", back_populates="buses")
@@ -160,7 +161,7 @@ class PaymentStatus(enum.Enum):
 # Payment Table
 class Payment(db.Model, SerializerMixin):
     __tablename__ = 'payments'
-    serialize_rules = ('-booking.payment_transactions',)
+    # serialize_rules = ('-booking.payment_transactions',)
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -175,4 +176,4 @@ class Payment(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=func.now())
 
     # Relationship
-    booking = db.relationship ("Booking", back_populates="payments")
+    # booking = db.relationship ("Booking", back_populates="payments")
