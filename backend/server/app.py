@@ -3,7 +3,6 @@
 # Standard library imports
 
 # Remote library imports
-from flask import request, make_response, jsonify, g
 from controllers.drivers import Drivers, DriverById, DriverTrips, DriverTripById, DriverAuth
 from controllers.auth import Auth
 from controllers.users import Users, UserById, CurrentUser
@@ -14,8 +13,10 @@ from controllers.bookings import Bookings, BookingById
 from controllers.contacts import Contacts, ContactById
 from controllers.owners import Owners, OwnerById
 from controllers.fcm import SaveFcmToken, SendNotification
+from controllers.payments import payments_bp # Importing the payments blueprint
 # Local imports
-from config import app, db, api
+from config import app, db, api, socketio
+import utilities.socket
 
 @app.route('/')
 def index():
@@ -53,4 +54,6 @@ api.add_resource(SaveFcmToken, '/api/save-fcm-token')
 api.add_resource(SendNotification, '/api/send-notification')
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    import eventlet
+    import eventlet.wsgi
+    socketio.run(app, port=5000, debug=True)

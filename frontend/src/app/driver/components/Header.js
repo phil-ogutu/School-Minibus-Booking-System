@@ -5,19 +5,15 @@ import Text from '@/components/ui/Text';
 import { accountIcon, notificationIcon } from '@/components/ui/icons';
 import { theme } from '@/components/ui/theme';
 import Link from 'next/link';
+import { ProfileCard } from '@/components/Navbar'
 
-export function Header() {
+export function Header({user}) {
   return (
-    <Container className='flex flex-row align-middle justify-between w-full p-4'>
-      <Link href={'/'}>
-        <Logo />
-      </Link>
-      <Container className='flex flex-row align-middle gap-4'>
-        <Text className='m-auto text-xl'>Bus</Text>
-        <Text className='m-auto text-xl'>Routes</Text>
-        {/* {notificationIcon('text-dark','text-3xl',{marginTop:'5px'})} */}
-        <Text className='m-auto text-xl'>Profile</Text>
-      </Container>
+    <Container className='flex flex-row align-middle justify-between w-full px-4 border-b border-b-slate-200'>
+      <Text className='text-3xl my-auto'>Home</Text>
+      {user && (
+        <ProfileCard name={user?.username} email={user?.email} role={user?.role}/>
+      )}
     </Container>
   )
 };

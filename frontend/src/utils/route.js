@@ -36,12 +36,12 @@ export const getRouteFromStops = async (stops,setRouteCoordinates) => {
       
       for (const service of routingServices) {
           try {
-              console.log(`Trying ${service?.name} routing service...`);
+              //console.log(`Trying ${service?.name} routing service...`);
               const response = await fetch(service.url(waypoints));
               
               if (response.ok) {
                   const data = await response.json();
-                  console.log(`${service?.name} response:`, data);
+                  //console.log(`${service?.name} response:`, data);
                   
                   if (data?.routes && data?.routes[0] && data?.routes[0].geometry) {
                   const geometry = data?.routes[0]?.geometry;
@@ -54,7 +54,7 @@ export const getRouteFromStops = async (stops,setRouteCoordinates) => {
                       .map(coord => [coord[1], coord[0]]);
                       
                       if (coordinates.length > 2) { // Need more than 2 points for a good route
-                          console.log(`Successfully got ${coordinates?.length} route points from ${service?.name}`);
+                          //console.log(`Successfully got ${coordinates?.length} route points from ${service?.name}`);
                           setRouteCoordinates(coordinates);
                           
                           return; // Success, exit function
@@ -68,7 +68,7 @@ export const getRouteFromStops = async (stops,setRouteCoordinates) => {
           }
       };
 
-      console.log('All routing services failed, creating enhanced fallback route');
+      //console.log('All routing services failed, creating enhanced fallback route');
       const enhancedRoute = [];
       
       for (let i = 0; i < validStops?.length - 1; i++) {
@@ -94,7 +94,7 @@ export const getRouteFromStops = async (stops,setRouteCoordinates) => {
       // Add final point
       const lastStop = validStops[validStops?.length - 1];
       enhancedRoute.push([lastStop?.latitude, lastStop?.longitude]);
-      console.log('enhancedRoute',enhancedRoute)
+      //console.log('enhancedRoute',enhancedRoute)
       
       setRouteCoordinates(enhancedRoute);
     } catch (error) {

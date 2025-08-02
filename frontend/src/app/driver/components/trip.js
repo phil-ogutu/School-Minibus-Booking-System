@@ -6,16 +6,16 @@ import { useRouter } from 'next/navigation';
 export default function TripCard({trip,index}) {
   const router = useRouter();
   return (
-    <div onClick={()=>{router.push(`/driver/trip/${trip?.id}`)}} className={`bg-gradient-to-r from-[#2e2e2e] to-[#4d4d4d] text-white rounded-xl shadow-md p-4 w-full max-w-md m-1 cursor-pointer`}>
+    <div onClick={()=>{router.push(`/driver/trip/${trip?.id}`)}} className={`bg-white text-dark rounded-xl shadow-md p-4 w-full max-w-md m-1 cursor-pointer`}>
       {/* Header: Icon + Route Name + Date */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 flex items-center justify-center bg-white bg-opacity-10 rounded-full">
+        <div className="w-10 h-10 flex items-center justify-center bg-secondary bg-opacity-10 rounded-full">
           {busIcon('text-dark','text-2xl')}
         </div>
         <div>
-          <div className="text-lg font-medium">{`${trip?.routes?.start}-${trip?.routes?.end}` ?? 'Route Name'}</div>
-          <div className="text-sm text-gray-300">{trip?.departure ?? 'date'}</div>
-          <span className={`inline-block px-3 py-1 ${trip?.status !== 'ended' ? 'bg-primary': 'bg-green-400'} text-dark rounded-full text-sm font-medium`}>
+          <div className="text-lg font-medium">{`${trip?.plate}` ?? 'Buss Plate number'}</div>
+          <div className="text-sm text-gray-600">{trip?.departure ?? 'date'}</div>
+          <span className={`inline-block px-3 py-1 ${trip?.status !== 'ended' ? 'bg-primary': 'bg-green-300'} text-dark rounded-full text-sm font-medium`}>
             {trip?.status}
           </span>
         </div>
@@ -28,7 +28,7 @@ export default function TripCard({trip,index}) {
         <div className="flex justify-between items-center mt-4">
           {/* Origin */}
           <div>
-            <div className="text-xl font-semibold">{trip?.routes?.locations[0]?.location_name}</div>
+            <div className="text-lg font-normal">{trip?.routes?.locations[0]?.location_name}</div>
           </div>
 
           {/* Arrow */}
@@ -36,7 +36,7 @@ export default function TripCard({trip,index}) {
 
           {/* Destination */}
           <div className="text-right">
-            <div className="text-xl font-semibold">{trip?.routes?.locations.at(-1)?.location_name}</div>
+            <div className="text-lg font-normal">{trip?.routes?.locations.at(-1)?.location_name}</div>
           </div>
         </div>
       ): <Text className='my-1'>No stops added</Text>}

@@ -79,6 +79,7 @@ class Bus(db.Model,SerializerMixin):
     created_at = db.Column(db.DateTime(), server_default= func.now())
     arrived = db.Column(db.DateTime(),nullable=True)
     departure = db.Column(db.DateTime(),nullable=True)
+    tracking_room = db.Column(db.String())
 
     bookings = db.relationship("Booking", back_populates="bus")
     routes = db.relationship("Route", back_populates="buses")
@@ -149,3 +150,30 @@ class Contact(db.Model,SerializerMixin):
     subject = db.Column(db.String, nullable=False)
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime(), server_default= func.now())
+
+# Payment Status Enum
+class PaymentStatus(enum.Enum):
+    PENDING = "PENDING"
+    PAID = "PAID"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+
+# Payment Table
+class Payment(db.Model, SerializerMixin):
+    __tablename__ = 'payments'
+    # serialize_rules = ('-booking.payment_transactions',)
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    booking_id = db.Column(db.Integer, db.ForeignKey('bookings.id'), nullable=False)
+    mpesa_code = db.Column(db.String(50), unique=True, index=True, nullable=True)  # e.g. STK-123456
+
+    amount = db.Column(db.Float, nullable=False)
+
+    status = db.Column(Enum(PaymentStatus), default=PaymentStatus.PENDING, index=True)  # PENDING | PAID | FAILED
+
+    paid_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, server_default=func.now())
+
+    # Relationship
+    # booking = db.relationship ("Booking", back_populates="payments")

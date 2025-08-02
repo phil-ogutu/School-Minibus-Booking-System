@@ -60,6 +60,10 @@ flask-bcrypt = "1.0.1"
 flask-jwt-extended = "*"
 marshmallow = "*"
 flask-marshmallow = "*"
+firebase-admin = "*"
+flask-socketio = "*"
+eventlet = "*"
+gevent = "*"
 
 [dev-packages]
 
